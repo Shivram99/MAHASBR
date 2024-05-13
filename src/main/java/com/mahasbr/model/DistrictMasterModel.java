@@ -8,11 +8,43 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class DistrictMasterModel {
+	
+	
 	@NotBlank
 	@Size(max = 100)
 	private String districtName;
+	
+	
 	@NotBlank
 	@Size(max = 10)
-	private Integer censusDistrictCode;
+	private int censusDistrictCode;
+
+
+	public String getDistrictName() {
+		return districtName;
+	}
+
+
+	public void setDistrictName(String districtName) {
+		this.districtName = districtName;
+	}
+
+
+	public int getCensusDistrictCode() {
+		return censusDistrictCode;
+	}
+
+
+	public void setCensusDistrictCode(int censusDistrictCode) {
+		this.censusDistrictCode = censusDistrictCode;
+	}
+	
+	
+	
+	
+	
+	
+	
+	
 }
 

@@ -23,6 +23,58 @@ public class StatesMaster {
 	private String stateName;
 	@NotBlank
 	private Integer censusStateCode;
+	
+	
+	
+	
+
+	public Long getStateId() {
+		return stateId;
+	}
+
+
+
+
+
+	public void setStateId(Long stateId) {
+		this.stateId = stateId;
+	}
+
+
+
+
+
+	public String getStateName() {
+		return stateName;
+	}
+
+
+
+
+
+	public void setStateName(String stateName) {
+		this.stateName = stateName;
+	}
+
+
+
+
+
+	public Integer getCensusStateCode() {
+		return censusStateCode;
+	}
+
+
+
+
+
+	public void setCensusStateCode(Integer censusStateCode) {
+		this.censusStateCode = censusStateCode;
+	}
+
+
+
+
 
 	public StatesMaster(StatesMasterModel stateMasterModel) {
 		this.stateName = stateMasterModel.getStateName();
