@@ -14,4 +14,19 @@ public class StatesMasterModel {
 	@NotBlank
 	@Size(max = 10)
 	private Integer censusStateCode;
+	public String getStateName() {
+		return stateName;
+	}
+	public void setStateName(String stateName) {
+		this.stateName = stateName;
+	}
+	public Integer getCensusStateCode() {
+		return censusStateCode;
+	}
+	public void setCensusStateCode(Integer censusStateCode) {
+		this.censusStateCode = censusStateCode;
+	}
+	
+	
+	
 }

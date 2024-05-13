@@ -27,6 +27,5 @@ public class TalukaMaster {
 	public TalukaMaster(TalukaMasterModel talukaMasterModel) {
 		this.talukaName = talukaMasterModel.getTalukaName();
 		this.censusTalukaCode = talukaMasterModel.getCensusTalukaCode();
-
 	}
 }
