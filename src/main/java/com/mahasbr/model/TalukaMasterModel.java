@@ -4,7 +4,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 @Data
 @NoArgsConstructor
 public class TalukaMasterModel {
@@ -13,6 +12,6 @@ public class TalukaMasterModel {
 	private String TalukaName;
 	@NotBlank
 	@Size(max = 10)
-	private Integer censusTalukaCode;
+	private int censusTalukaCode;
 }
 

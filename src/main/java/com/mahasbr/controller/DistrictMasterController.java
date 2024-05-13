@@ -24,34 +24,34 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.demo.controller.DistrictController;
-import com.example.demo.model.DistrictModel;
 import com.mahasbr.entity.DistrictMaster;
 import com.mahasbr.model.DistrictMasterModel;
+import com.mahasbr.repository.DistrictMasterRepository;
 import com.mahasbr.response.MessageResponse;
 import com.mahasbr.service.DistrictMasterService;
-
 
 @RestController
 @RequestMapping("/api/auth")
 public class DistrictMasterController {
 	@Autowired
 	DistrictMasterService districtMasterService;
-
+	@Autowired
+	DistrictMasterRepository districtMasterRepository;
+	
+	private static final Logger logger = LoggerFactory.getLogger(DistrictMasterController.class);
+	private static final String CSV_FILE_LOCATION = "\\MAHASBR\\target\\Book3.xlsx";
 	@PostMapping("/district")
 	public ResponseEntity<?> postDistrictDetails(@RequestBody DistrictMasterModel districtMasterModel) {
 		DistrictMaster district = districtMasterService.insertDistrictDetail(districtMasterModel);
 		return ResponseEntity.ok(new MessageResponse("Added successfully!", district));
 
 	}
-	private static final Logger logger = LoggerFactory.getLogger(DistrictMasterController.class);
-	private static final String CSV_FILE_LOCATION = "D:\\SBR WorkSpace\\data\\target\\Book3.xlsx";
-	
+
 	@GetMapping
-	public @ResponseBody List<DistrictModel> readCSV(){
-		List<DistrictModel> districts = new ArrayList<>();
-		Workbook workbook =null;
-		 Set<String> districtCodes = new HashSet<>(); // Set to store unique district codes
+	public @ResponseBody List<DistrictMasterModel> readCSV() {
+		List<DistrictMasterModel> districts = new ArrayList<>();
+		Workbook workbook = null;
+		Set<Integer> districtCodes = new HashSet<>(); // Set to store unique district codes
 		try {
 			// Creating a Workbook from an Excel file (.xls or .xlsx)
 			workbook = WorkbookFactory.create(new File(CSV_FILE_LOCATION));
@@ -64,30 +64,33 @@ public class DistrictMasterController {
 
 				// Create a DataFormatter to format and get each cell's value as String
 				DataFormatter dataFormatter = new DataFormatter();
-				//loop through all rows and columns and create Course object
+				// loop through all rows and columns and create Course object
 				int index = 0;
-				for(Row row : sheet) {
-					if(index++ == 0) continue;
-					DistrictModel district = new DistrictModel();
-					district.setId(dataFormatter.formatCellValue(row.getCell(0)));
-					district.setDistrictCode(dataFormatter.formatCellValue(row.getCell(1)));
+				for (Row row : sheet) {
+					if (index++ == 0)
+						continue;
+					DistrictMasterModel district = new DistrictMasterModel();
+
+					district.setCensusDistrictCode(Integer.parseInt(dataFormatter.formatCellValue(row.getCell(1))));
 					district.setDistrictName(dataFormatter.formatCellValue(row.getCell(2)));
-					
-	 // Check if district code is already in set, if not add to list and set
-	                if (!districtCodes.contains(district.getDistrictCode())) {
-	                    districts.add(district);
-	                    districtCodes.add(district.getDistrictCode());
-	                }
-						}
-				
-				
+
+					// Check if district code is already in set, if not add to list and set
+					if (!districtCodes.contains(district.getCensusDistrictCode())) {
+						districts.add(district);
+						districtCodes.add(district.getCensusDistrictCode());
+				}
+					DistrictMaster data = new DistrictMaster(district);
+					districtMasterRepository.save(data);
+				}
+
 			});
-			
+
 		} catch (EncryptedDocumentException | InvalidFormatException | IOException e) {
 			logger.error(e.getMessage(), e);
-		}finally {
+		} finally {
 			try {
-				if(workbook != null) workbook.close();
+				if (workbook != null)
+					workbook.close();
 			} catch (IOException e) {
 				logger.error(e.getMessage(), e);
 			}
@@ -96,4 +99,3 @@ public class DistrictMasterController {
 		return districts;
 	}
 }
-
