@@ -3,6 +3,8 @@ package com.mahasbr.repository;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.mahasbr.entity.User;
@@ -12,7 +14,9 @@ import com.mahasbr.entity.User;
 public interface UserRepository extends JpaRepository<User, Long> {
   Optional<User> findByUsername(String username);
 
-  Boolean existsByUsername(String username);
+ // Boolean existsByUsername(String username);
 
-  //Boolean existsByEmail(String email);
+  @Query("SELECT CASE WHEN COUNT(u) > 0 THEN true ELSE false END FROM User u WHERE u.username = :username")
+  Boolean existsByUsername(@Param("username") String username);  //Boolean existsByEmail(String email);
+  
 }
