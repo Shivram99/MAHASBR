@@ -13,6 +13,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 
 import com.mahasbr.filter.AuthEntryPointJwt;
 import com.mahasbr.filter.AuthTokenFilter;
@@ -28,6 +30,9 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
   @Autowired
   private AuthEntryPointJwt unauthorizedHandler;
 
+  @Autowired
+  private CustomLogoutSuccessHandler logoutSuccessHandler;   
+  
   @Bean
   public AuthTokenFilter authenticationJwtTokenFilter() {
     return new AuthTokenFilter();
@@ -53,6 +58,18 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
     return new BCryptPasswordEncoder();
   }
   
+  
+  @Bean
+  public LogoutSuccessHandler logoutSuccessHandler() {
+      return new HttpStatusReturningLogoutSuccessHandler();
+  }
+
+	/*
+	 * @Bean public SimpleUrlAuthenticationSuccessHandler loginSuccessHandler() {
+	 * return new SimpleUrlAuthenticationSuccessHandler(); }
+	 */
+  
+  
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     http.csrf(csrf -> csrf.disable())
@@ -64,15 +81,22 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
               .requestMatchers("/api/auth/signin").permitAll()
               .requestMatchers("/api/test/**").permitAll()
               .requestMatchers("/common/api**").permitAll()
-              
-              
+              .requestMatchers(" /common/department**").permitAll()
+              .requestMatchers("/admin/**").hasRole("ADMIN")
+              .requestMatchers("/moderator/**").hasRole("MODERATOR")
+              .requestMatchers("/developer/**").hasRole("DEVELOPER")
+              .requestMatchers("/user/**").hasRole("USER")
               .anyRequest().authenticated()
-        );
+        ). logout().logoutUrl("/logout").permitAll();
+        
+	/*
+	 * logout(logout -> logout .logoutUrl("/logout")
+	 * .logoutSuccessHandler(logoutSuccessHandler) //
+	 * .logoutFailureHandler(logoutFailureHandler()) );
+	 */
     
     http.authenticationProvider(authenticationProvider());
-
     http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
-    
     return http.build();
   }
   
