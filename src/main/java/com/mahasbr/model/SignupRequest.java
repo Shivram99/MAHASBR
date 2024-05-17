@@ -1,6 +1,9 @@
 package com.mahasbr.model;
 
+import java.util.List;
 import java.util.Set;
+
+import com.mahasbr.entity.DepartmentMst;
 
 import jakarta.validation.constraints.*;
 
@@ -11,6 +14,12 @@ public class SignupRequest {
 	private String username;
 
 	private Set<String> role;
+	
+	
+	 private String roles;
+	 
+	 
+	 private Long departmentId;
 
 	@NotBlank
 	@Size(max = 50)
@@ -65,5 +74,28 @@ public class SignupRequest {
 	public void setPhoneNo(String phoneNo) {
 		this.phoneNo = phoneNo;
 	}
+
+	
+
+	public String getRoles() {
+		return roles;
+	}
+
+	public void setRoles(String roles) {
+		this.roles = roles;
+	}
+
+	public Long getDepartmentId() {
+		return departmentId;
+	}
+
+	public void setDepartmentId(Long departmentId) {
+		this.departmentId = departmentId;
+	}
+
+	
+	
+	
+	
 
 }

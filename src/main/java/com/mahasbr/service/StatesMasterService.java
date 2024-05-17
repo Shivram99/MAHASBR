@@ -11,10 +11,9 @@ import com.mahasbr.repository.StatesMasterRepository;
 public class StatesMasterService {
 	@Autowired
 	StatesMasterRepository statesMasterRepository;
-	
-   public StatesMaster postState(StatesMasterModel stateMasterModel) {
-		StatesMaster data = new StatesMaster(stateMasterModel);
-		statesMasterRepository.save(data);
-		return data;
-	}
+
+	/*
+	 * public StatesMaster postState(StatesMasterModel stateMasterModel) {
+	 * statesMasterRepository.save(data); return data; }
+	 */
 }

@@ -106,6 +106,24 @@
 			<artifactId>jakarta.validation-api</artifactId>
 		</dependency>
 		
+		
+		<!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
+		<dependency>
+		    <groupId>org.projectlombok</groupId>
+		    <artifactId>lombok</artifactId>
+		    <scope>provided</scope>
+		</dependency>
+
+
+
+
+		<!-- <dependency>
+			<groupId>com.example</groupId>
+			<artifactId>data</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency> -->
+
+		
 			<!-- https://mvnrepository.com/artifact/org.apache.poi/poi -->
 		<dependency>
 			<groupId>org.apache.poi</groupId>
@@ -124,6 +142,8 @@
 
 
 	
+
+
 	</dependencies>
 
 	<build>
@@ -132,12 +152,12 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
-					<excludes>
+				<!--	<excludes>
 						<exclude>
 							<groupId>org.projectlombok</groupId>
 							<artifactId>lombok</artifactId>
 						</exclude>
-					</excludes>
+					</excludes>-->
 				</configuration>
 			</plugin>
 		</plugins>

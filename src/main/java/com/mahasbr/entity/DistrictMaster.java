@@ -1,7 +1,5 @@
 package com.mahasbr.entity;
 
-import com.mahasbr.model.DistrictMasterModel;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -10,26 +8,29 @@ import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Data
-@Table(name = "district_master", uniqueConstraints = { @UniqueConstraint(columnNames = "districtId")})
-public class DistrictMaster {
+@Table(name = "district_master")
+public class DistrictMaster  extends Auditable{
+	
 	@Id
-	 @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "districtmaster_seq_generator")
-    @SequenceGenerator(name="districtmaster_seq_generator", sequenceName = "districtmasters_seq", allocationSize=1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "district_master_seq_generator")
+    @SequenceGenerator(name="district_master_seq_generator", sequenceName = "district_seq", allocationSize=1)
 	@NotBlank
-	private Long districtId;
+	private Long censusDistrictCode;
+	
 
 	@NotBlank
 	private String districtName;
+	
+	
 	@NotBlank
-	private Integer censusDistrictCode;
-
-	public DistrictMaster(DistrictMasterModel districtMasterModel) {
-		this.districtName = districtMasterModel.getDistrictName();
-		this.censusDistrictCode = districtMasterModel.getCensusDistrictCode();
-
-	}
+	private Long censusStateCode;
+	
+	
+	
 }
