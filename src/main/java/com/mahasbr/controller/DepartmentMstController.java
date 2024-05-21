@@ -17,36 +17,37 @@ import com.mahasbr.entity.DepartmentMst;
 import com.mahasbr.service.DepartmentMstService;
 
 @RestController
-@RequestMapping("/departments")
+@RequestMapping("/admin")
 public class DepartmentMstController {
 
 	@Autowired
     private final DepartmentMstService departmentMstService;
 
+	
     @Autowired
     public DepartmentMstController(DepartmentMstService departmentMstService) {
         this.departmentMstService = departmentMstService;
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/getDepartmentById/{id}")
     public ResponseEntity<DepartmentMst> getDepartmentById(@PathVariable("id") Long id) {
         return departmentMstService.findDepartmentById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @GetMapping
+    @GetMapping("/getAllDepartments")
     public List<DepartmentMst> getAllDepartments() {
         return departmentMstService.findAllDepartments();
     }
 
-    @PostMapping
+    @PostMapping("/createDepartment")
     public ResponseEntity<DepartmentMst> createDepartment(@RequestBody DepartmentMst department) {
         DepartmentMst savedDepartment = departmentMstService.saveOrUpdateDepartment(department);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedDepartment);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/updateDepartment/{id}")
     public ResponseEntity<DepartmentMst> updateDepartment(@PathVariable("id") Long id, @RequestBody DepartmentMst department) {
         if (!departmentMstService.findDepartmentById(id).isPresent()) {
             return ResponseEntity.notFound().build();
@@ -56,7 +57,7 @@ public class DepartmentMstController {
         return ResponseEntity.ok(updatedDepartment);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/deleteDepartment/{id}")
     public ResponseEntity<Void> deleteDepartment(@PathVariable("id") Long id) {
         if (!departmentMstService.findDepartmentById(id).isPresent()) {
             return ResponseEntity.notFound().build();

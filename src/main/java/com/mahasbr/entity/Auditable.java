@@ -14,16 +14,19 @@ import lombok.Data;
 @MappedSuperclass
 public abstract class Auditable {
 	
+	
+	
+	
     @Column(name = "created_user_id")
     private Long createdUserId;
 
     @Column(name = "updated_user_id")
     private Long updatedUserId;
 
-    @Column(name = "created_date_time")
+    @Column(name = "created_date_time", updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private Date createdDateTime;
 
-    @Column(name = "updated_date_time")
+    @Column(name = "updated_date_time", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private Date updatedDateTime;
     
     
