@@ -43,7 +43,7 @@ public class RoleController {
     @PostMapping("/createRole")
     public ResponseEntity<Role> createRole(@RequestBody Role role) {
         Role savedRole = roleService.saveOrUpdateRole(role);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedRole);
+        return ResponseEntity.status(HttpStatus.OK).body(savedRole);
     }
 
     @PutMapping("/updateRole/{id}")
