@@ -8,13 +8,5 @@ import com.mahasbr.repository.DistrictMasterRepository;
 
 public interface DistrictMasterService {
 
-
-	@Autowired
-	DistrictMasterRepository districtMasterRepository;
-
-	public DistrictMaster insertDistrictDetail(DistrictMaster districtMaster) {
-		DistrictMaster save = districtMasterRepository.save(districtMaster);
-		return save;
-	}
-
+	public DistrictMaster insertDistrictDetail(DistrictMaster districtMaster);
 }
