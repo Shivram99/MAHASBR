@@ -17,19 +17,14 @@ import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mahasbr.entity.TalukaMaster;
-import com.mahasbr.model.TalukaMasterModel;
 import com.mahasbr.repository.TalukaMasterRepository;
-import com.mahasbr.response.MessageResponse;
 import com.mahasbr.service.TalukaMasterService;
 
 @RestController
@@ -84,9 +79,9 @@ public class TalukaMasterController {
 						taluka.setCensusTalukaCode(Long.parseLong(dataFormatter.formatCellValue(row.getCell(2))));
 						taluka.setTalukaName(dataFormatter.formatCellValue(row.getCell(3)));
 						taluka.setCensusTalukaCode(Long.parseLong(dataFormatter.formatCellValue(row.getCell(1))));
-						
+
 						talukas.add(taluka);
-						
+
 						talukaMasterRepository.saveAll(talukas);
 					}
 				}

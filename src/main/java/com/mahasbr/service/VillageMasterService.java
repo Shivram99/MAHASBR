@@ -3,8 +3,7 @@ package com.mahasbr.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.mahasbr.entity.VillageMaster;
-import com.mahasbr.model.VillageMasterModel;
+
 import com.mahasbr.repository.VillageMasterRepository;
 
 @Service

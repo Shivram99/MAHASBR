@@ -16,41 +16,37 @@ import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mahasbr.entity.DistrictMaster;
 import com.mahasbr.repository.DistrictMasterRepository;
-import com.mahasbr.response.MessageResponse;
 import com.mahasbr.service.DistrictMasterService;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/developer")
 public class DistrictMasterController {
 	@Autowired
 	DistrictMasterService districtMasterService;
-	
-	
+
 	@Autowired
 	DistrictMasterRepository districtMasterRepository;
-	
+
 	private static final Logger logger = LoggerFactory.getLogger(DistrictMasterController.class);
 	private static final String CSV_FILE_LOCATION = "\\MAHASBR\\target\\Book3.xlsx";
-	
-	@PostMapping("/district")
-	public ResponseEntity<?> postDistrictDetails(@RequestBody DistrictMaster districtMaster) {
-		DistrictMaster district = districtMasterService.insertDistrictDetail(districtMaster);
-		return ResponseEntity.ok(new MessageResponse("Added successfully!", district));
-	}
 
+//	@PostMapping("/district")
+//	public ResponseEntity<?> postDistrictDetails(@RequestBody DistrictMasterModel districtMasterModel) {
+//		DistrictMaster district = districtMasterService.insertDistrictDetail(districtMasterModel);
+//		return ResponseEntity.ok(new MessageResponse("Added successfully!", district));
+//	}
+
+	@SuppressWarnings("unlikely-arg-type")
 	@GetMapping
 	public @ResponseBody void readCSV() {
-		
+
 		List<DistrictMaster> districts = new ArrayList<>();
 		Workbook workbook = null;
 		Set<Integer> districtCodes = new HashSet<>(); // Set to store unique district codes
@@ -66,7 +62,6 @@ public class DistrictMasterController {
 				// Create a DataFormatter to format and get each cell's value as String
 				DataFormatter dataFormatter = new DataFormatter();
 				// loop through all rows and columns and create Course object
-				int index = 0;
 				for (Row row : sheet) {
 					DistrictMaster district = new DistrictMaster();
 					district.setCensusDistrictCode(Long.parseLong(dataFormatter.formatCellValue(row.getCell(1))));
@@ -75,10 +70,10 @@ public class DistrictMasterController {
 					// Check if district code is already in set, if not add to list and set
 					if (!districtCodes.contains(district.getCensusDistrictCode())) {
 						districts.add(district);
-					//	districtCodes.add(district.getCensusDistrictCode());
-				}
-				//	DistrictMaster data = new DistrictMaster(district);
-				districtMasterRepository.saveAll(districts);
+						// districtCodes.add(district.getCensusDistrictCode());
+					}
+					// DistrictMaster data = new DistrictMaster(district);
+					districtMasterRepository.saveAll(districts);
 				}
 
 			});
@@ -94,6 +89,6 @@ public class DistrictMasterController {
 			}
 		}
 
-		//return districts;
+		// return districts;
 	}
 }

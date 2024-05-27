@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import com.mahasbr.entity.FeedbackForm;
 import com.mahasbr.model.FeedbackFormModel;
 import com.mahasbr.repository.FeedbackFormRepository;
-import com.mahasbr.util.EmailSenderService;
+//import com.mahasbr.util.EmailSenderService;
 
 import jakarta.validation.Valid;
 
@@ -14,15 +14,15 @@ import jakarta.validation.Valid;
 public class FeedbackFormServiceImpl implements FeedbackFormService {
 	@Autowired
 	FeedbackFormRepository feedbackFormRepository;
-	@Autowired
-	EmailSenderService emailSender;
+	//@Autowired
+	//EmailSenderService emailSender;
 
 	@Override
 	public FeedbackForm getFeedbackFormDetails(@Valid FeedbackFormModel feedbackFormModel) {
 		FeedbackForm details = new FeedbackForm(feedbackFormModel);
 		feedbackFormRepository.save(details);
-		emailSender.sendEmail(details.getEmailId(), "About Registration",
-				"Registration Successful!☑️ \n here is your feedback: " + details);
+	//	emailSender.sendEmail(details.getEmailId(), "About Registration",
+	//			"Registration Successful!☑️ \n here is your feedback: " + details);
 		return details;
 	}
 
