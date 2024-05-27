@@ -43,13 +43,13 @@ public class DistrictMasterController {
 //		return ResponseEntity.ok(new MessageResponse("Added successfully!", district));
 //	}
 
-	@SuppressWarnings("unlikely-arg-type")
+	
 	@GetMapping
 	public @ResponseBody void readCSV() {
 
 		List<DistrictMaster> districts = new ArrayList<>();
 		Workbook workbook = null;
-		Set<Integer> districtCodes = new HashSet<>(); // Set to store unique district codes
+		Set<Long> districtCodes = new HashSet<>(); // Set to store unique district codes
 		try {
 			workbook = WorkbookFactory.create(new File(CSV_FILE_LOCATION));
 
@@ -62,6 +62,7 @@ public class DistrictMasterController {
 				// Create a DataFormatter to format and get each cell's value as String
 				DataFormatter dataFormatter = new DataFormatter();
 				// loop through all rows and columns and create Course object
+				int index = 0;
 				for (Row row : sheet) {
 					DistrictMaster district = new DistrictMaster();
 					district.setCensusDistrictCode(Long.parseLong(dataFormatter.formatCellValue(row.getCell(1))));
@@ -70,10 +71,10 @@ public class DistrictMasterController {
 					// Check if district code is already in set, if not add to list and set
 					if (!districtCodes.contains(district.getCensusDistrictCode())) {
 						districts.add(district);
-						// districtCodes.add(district.getCensusDistrictCode());
-					}
-					// DistrictMaster data = new DistrictMaster(district);
-					districtMasterRepository.saveAll(districts);
+					//	districtCodes.add(district.getCensusDistrictCode());
+				}
+				//	DistrictMaster data = new DistrictMaster(district);
+				districtMasterRepository.saveAll(districts);
 				}
 
 			});
