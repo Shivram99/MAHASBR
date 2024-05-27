@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor  
-@Table(name = "states_master")
+@Table(name = "state_master")
 public class StatesMaster extends Auditable {
 
 	@Id
