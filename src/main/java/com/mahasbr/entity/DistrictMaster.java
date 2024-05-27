@@ -31,6 +31,36 @@ public class DistrictMaster  extends Auditable{
 	
 	@NotBlank
 	private Long censusStateCode;
+
+
+	public Long getCensusDistrictCode() {
+		return censusDistrictCode;
+	}
+
+
+	public void setCensusDistrictCode(Long censusDistrictCode) {
+		this.censusDistrictCode = censusDistrictCode;
+	}
+
+
+	public String getDistrictName() {
+		return districtName;
+	}
+
+
+	public void setDistrictName(String districtName) {
+		this.districtName = districtName;
+	}
+
+
+	public Long getCensusStateCode() {
+		return censusStateCode;
+	}
+
+
+	public void setCensusStateCode(Long censusStateCode) {
+		this.censusStateCode = censusStateCode;
+	}
 	
 	
 	
