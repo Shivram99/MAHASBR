@@ -18,35 +18,35 @@ import com.mahasbr.entity.Role;
 import com.mahasbr.service.RoleService;
 
 @RestController
-@RequestMapping("/common/api")
+@RequestMapping("/admin")
 public class RoleController {
 
-	private final RoleService roleService;
+	
+	@Autowired
+	private  RoleService roleService;
 
-    @Autowired
-    public RoleController(RoleService roleService) {
-        this.roleService = roleService;
-    }
 
-    @GetMapping("/{id}")
+    @GetMapping("/getRoleById/{id}")
     public ResponseEntity<Role> getRoleById(@PathVariable("id") Long id) {
         Optional<Role> role = roleService.findRoleById(id);
         return role.map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @GetMapping
+    @GetMapping("/getAllRoles")
     public List<Role> getAllRoles() {
+    	
+    	
         return roleService.getAllRoles();
     }
 
-    @PostMapping
+    @PostMapping("/createRole")
     public ResponseEntity<Role> createRole(@RequestBody Role role) {
         Role savedRole = roleService.saveOrUpdateRole(role);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedRole);
+        return ResponseEntity.status(HttpStatus.OK).body(savedRole);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/updateRole/{id}")
     public ResponseEntity<Role> updateRole(@PathVariable("id") Long id, @RequestBody Role role) {
         if (!roleService.findRoleById(id).isPresent()) {
             return ResponseEntity.notFound().build();
@@ -56,7 +56,7 @@ public class RoleController {
         return ResponseEntity.ok(updatedRole);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/deleteRole/{id}")
     public ResponseEntity<Void> deleteRole(@PathVariable("id") Long id) {
         if (!roleService.findRoleById(id).isPresent()) {
             return ResponseEntity.notFound().build();

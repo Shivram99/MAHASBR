@@ -16,44 +16,40 @@ import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mahasbr.entity.DistrictMaster;
 import com.mahasbr.repository.DistrictMasterRepository;
-import com.mahasbr.response.MessageResponse;
 import com.mahasbr.service.DistrictMasterService;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/developer")
 public class DistrictMasterController {
 	@Autowired
 	DistrictMasterService districtMasterService;
-	
-	
+
 	@Autowired
 	DistrictMasterRepository districtMasterRepository;
-	
+
 	private static final Logger logger = LoggerFactory.getLogger(DistrictMasterController.class);
 	private static final String CSV_FILE_LOCATION = "\\MAHASBR\\target\\Book3.xlsx";
-	
-	@PostMapping("/district")
-	public ResponseEntity<?> postDistrictDetails(@RequestBody DistrictMaster districtMaster) {
-		DistrictMaster district = districtMasterService.insertDistrictDetail(districtMaster);
-		return ResponseEntity.ok(new MessageResponse("Added successfully!", district));
-	}
 
+//	@PostMapping("/district")
+//	public ResponseEntity<?> postDistrictDetails(@RequestBody DistrictMasterModel districtMasterModel) {
+//		DistrictMaster district = districtMasterService.insertDistrictDetail(districtMasterModel);
+//		return ResponseEntity.ok(new MessageResponse("Added successfully!", district));
+//	}
+
+	
 	@GetMapping
 	public @ResponseBody void readCSV() {
-		
+
 		List<DistrictMaster> districts = new ArrayList<>();
 		Workbook workbook = null;
-		Set<Integer> districtCodes = new HashSet<>(); // Set to store unique district codes
+		Set<Long> districtCodes = new HashSet<>(); // Set to store unique district codes
 		try {
 			workbook = WorkbookFactory.create(new File(CSV_FILE_LOCATION));
 
@@ -94,6 +90,6 @@ public class DistrictMasterController {
 			}
 		}
 
-		//return districts;
+		// return districts;
 	}
 }
