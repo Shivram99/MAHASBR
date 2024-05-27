@@ -10,4 +10,7 @@ public class FeedbackFormModel {
 	private String districtName;
 	private String emailId;
 	private String textMsg;
+	
+	
+	
 }

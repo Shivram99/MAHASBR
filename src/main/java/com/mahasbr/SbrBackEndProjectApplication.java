@@ -3,8 +3,12 @@ package com.mahasbr;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Profile;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
+@EnableScheduling
+@ComponentScan("com.mahasbr.cronjob")
 @SpringBootApplication
 public class SbrBackEndProjectApplication {
 
@@ -31,4 +35,7 @@ public class SbrBackEndProjectApplication {
     public String prodBean() {
         return "prod";
     }
+    
+   
+
 }

@@ -6,23 +6,21 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Data
+@NoArgsConstructor
 @Table(name = "district_master")
-public class DistrictMaster  extends Auditable{
-	
+public class DistrictMaster extends Auditable {
+
 	@Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "district_master_seq_generator")
-    @SequenceGenerator(name="district_master_seq_generator", sequenceName = "district_seq", allocationSize=1)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "district_master_seq_generator")
+	@SequenceGenerator(name = "district_master_seq_generator", sequenceName = "district_seq", allocationSize = 1)
 	@NotBlank
 	private Long censusDistrictCode;
-	
 
 	@NotBlank
 	private String districtName;
@@ -30,7 +28,7 @@ public class DistrictMaster  extends Auditable{
 	
 	@NotBlank
 	private Long censusStateCode;
+
 	
-	
-	
+
 }

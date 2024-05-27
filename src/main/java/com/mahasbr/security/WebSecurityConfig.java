@@ -81,11 +81,12 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
               .requestMatchers("/api/auth/signin").permitAll()
               .requestMatchers("/api/test/**").permitAll()
               .requestMatchers("/common/api**").permitAll()
+              .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
               .requestMatchers(" /common/department**").permitAll()
               .requestMatchers("/admin/**").hasRole("ADMIN")
               .requestMatchers("/moderator/**").hasRole("MODERATOR")
               .requestMatchers("/developer/**").hasRole("DEVELOPER")
-              .requestMatchers("/user/**").hasRole("USER")
+            .requestMatchers("/user/**").permitAll()
               .anyRequest().authenticated()
         ). logout().logoutUrl("/logout").permitAll();
         
