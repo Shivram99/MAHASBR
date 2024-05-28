@@ -1,10 +1,16 @@
 package com.mahasbr.cronjob;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+
+import com.mahasbr.entity.DetailsPage;
 
 @Component
 public class MyCronJobs {
@@ -27,14 +33,45 @@ public class MyCronJobs {
     private void executeJob(int jobNumber) {
         try {
             WebClient webClient = webClientBuilder.baseUrl(baseUrl).build();
+            
+            
+            List<DetailsPage> lstDetailsPage=new ArrayList<>();
 
-            String result = webClient.get()
-                    .uri("/services.php")
+            lstDetailsPage= webClient.get()
+                    .uri("/sbr.php")
                     .retrieve()
-                    .bodyToMono(String.class)
+                    .bodyToFlux(DetailsPage.class) // Corrected deserialization
+                    .collectList()
                     .block(); // Blocking operation, consider using reactive chaining
             // Your logic for the job
-            System.out.println("Job " + jobNumber + " completed."+result);
+            System.out.println("Job " + jobNumber + " completed."+lstDetailsPage.toString());
+
+            if(lstDetailsPage.size()>0) {
+            	//brn logic
+            	Iterator itr=lstDetailsPage.iterator();
+            	String brnNumber=null;
+            	String villageCode=null;
+            	String wardNumber=null;
+            	String runningSeq=null;
+                while(itr.hasNext()) {
+                	DetailsPage dt=(DetailsPage) itr.next();
+                	villageCode=dt.getTownVillage();
+                	wardNumber=dt.getHoLocality();
+                	
+                	 Random random = new Random();
+                     int randomNumber = random.nextInt(9000) + 1000;
+                	
+                	brnNumber=villageCode+wardNumber+randomNumber;
+                	
+                	System.out.println(brnNumber);
+                }
+            	
+            	
+            	
+            }
+            
+            
+            
         } catch (Exception e) {
             e.printStackTrace();
         }
