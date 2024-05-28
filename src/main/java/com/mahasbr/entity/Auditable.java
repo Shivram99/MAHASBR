@@ -29,21 +29,6 @@ public abstract class Auditable {
     @Column(name = "updated_date_time", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private Date updatedDateTime;
     
-    
-    @PrePersist
-    protected void onCreate() {
-        Date now = new Date();
-        if (this.createdDateTime == null) {
-            this.createdDateTime = now;
-        }
-        if (this.updatedDateTime == null) {
-            this.updatedDateTime = now;
-        }
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        this.updatedDateTime = new Date();
-    }
+ 
 
 }

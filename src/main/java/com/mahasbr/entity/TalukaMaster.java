@@ -30,4 +30,34 @@ public class TalukaMaster extends Auditable {
 	@NotBlank
 	private Long censusDistrictCode;
 
+<<<<<<< HEAD
+=======
+	public Long getCensusTalukaCode() {
+		return censusTalukaCode;
+	}
+
+	public void setCensusTalukaCode(Long censusTalukaCode) {
+		this.censusTalukaCode = censusTalukaCode;
+	}
+
+	public String getTalukaName() {
+		return talukaName;
+	}
+
+	public void setTalukaName(String talukaName) {
+		this.talukaName = talukaName;
+	}
+
+	public Long getCensusDistrictCode() {
+		return censusDistrictCode;
+	}
+
+	public void setCensusDistrictCode(Long censusDistrictCode) {
+		this.censusDistrictCode = censusDistrictCode;
+	}
+	
+	
+	
+	
+>>>>>>> 59dabe76fb422650d341e362819d296c5542fa3d
 }

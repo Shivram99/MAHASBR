@@ -24,5 +24,11 @@ public class DistrictMaster extends Auditable {
 
 	@NotBlank
 	private String districtName;
+	
+	
+	@NotBlank
+	private Long censusStateCode;
+
+	
 
 }

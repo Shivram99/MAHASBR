@@ -1,7 +1,6 @@
 package com.mahasbr.entity;
 
-import java.time.Year;
-
+import java.time.LocalDate;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -86,7 +85,7 @@ public class DetailsPage {
 	int nicActCode;
 	
 	@Column(length = 4)
-	Year opCurStartDate;
+	LocalDate  opCurStartDate;
 	
 	@Column(length = 1)
 	int ownCode;

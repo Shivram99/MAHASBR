@@ -24,6 +24,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "department_mst")
 public class DepartmentMst extends Auditable {
 
+<<<<<<< HEAD
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "department_seq_generator")
 	@SequenceGenerator(name = "department_seq_generator", sequenceName = "department_seq", allocationSize = 1)
@@ -35,5 +36,46 @@ public class DepartmentMst extends Auditable {
 	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id") // name of the foreign key column in department_mst table
 	private User user;
+=======
+	    @Column(length = 20)
+	    private String departmentName;
+	    
+	    
+	    @OneToOne(fetch = FetchType.LAZY)
+	    @JoinColumn(name = "user_id") // name of the foreign key column in department_mst table
+	    private User user;
+
+
+		public Long getDepartmentId() {
+			return departmentId;
+		}
+
+
+		public void setDepartmentId(Long departmentId) {
+			this.departmentId = departmentId;
+		}
+
+
+		public String getDepartmentName() {
+			return departmentName;
+		}
+
+
+		public void setDepartmentName(String departmentName) {
+			this.departmentName = departmentName;
+		}
+
+
+		public User getUser() {
+			return user;
+		}
+
+
+		public void setUser(User user) {
+			this.user = user;
+		}
+	    
+	    
+>>>>>>> 59dabe76fb422650d341e362819d296c5542fa3d
 
 }
