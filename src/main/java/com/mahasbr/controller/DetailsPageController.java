@@ -2,12 +2,12 @@ package com.mahasbr.controller;
 
 import java.io.File;
 import java.io.IOException;
-import java.time.Year;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mahasbr.entity.DetailsPage;
-import com.mahasbr.entity.DistrictMaster;
 import com.mahasbr.repository.DetailsPageRepository;
 
 @RestController
@@ -69,7 +68,13 @@ public class DetailsPageController {
 						details.setHoTanNo(dataFormatter.formatCellValue(row.getCell(17)));
 						details.setMajarActOfEst(dataFormatter.formatCellValue(row.getCell(18)));
 						details.setNicActCode(Integer.parseInt(dataFormatter.formatCellValue(row.getCell(19))));
-						details.setOpCurStartDate(Year.parse(dataFormatter.formatCellValue(row.getCell(20))));
+
+						DataFormatter dataFormatter1 = new DataFormatter();
+						Cell cell = row.getCell(20);
+						String cellValue = dataFormatter1.formatCellValue(cell);
+						LocalDate localDate = LocalDate.parse(cellValue);
+
+						details.setOpCurStartDate(localDate);
 						details.setOwnCode(Integer.parseInt(dataFormatter.formatCellValue(row.getCell(21))));
 						details.setNoOfWorkers(Integer.parseInt(dataFormatter.formatCellValue(row.getCell(22))));
 						details.setActRegNo(dataFormatter.formatCellValue(row.getCell(23)));

@@ -61,9 +61,9 @@ public class MyCronJobs {
                 	 Random random = new Random();
                      int randomNumber = random.nextInt(9000) + 1000;
                 	
-                	brnNumber=villageCode+wardNumber+randomNumber;
+                	brnNumber=villageCode.trim()+wardNumber.trim()+randomNumber;
                 	
-                	System.out.println(brnNumber);
+                	System.out.println("brnumbe ="+brnNumber);
                 }
             	
             	
