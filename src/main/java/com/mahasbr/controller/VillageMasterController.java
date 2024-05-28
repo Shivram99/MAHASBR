@@ -25,7 +25,6 @@ import com.mahasbr.entity.VillageMaster;
 import com.mahasbr.repository.VillageMasterRepository;
 import com.mahasbr.service.VillageMasterService;
 
-
 @RestController
 @RequestMapping("/api/auth")
 public class VillageMasterController {
@@ -33,7 +32,7 @@ public class VillageMasterController {
 	VillageMasterService villageMasterService;
 	@Autowired
 	VillageMasterRepository villageMasterRepository;
-	
+
 	private static final Logger logger = LoggerFactory.getLogger(VillageMasterController.class);
 	private static final String CSV_FILE_LOCATION = "\\MAHASBR\\target\\Book3.xlsx";
 
@@ -44,11 +43,9 @@ public class VillageMasterController {
 	 * villageMasterService.insertVillageDetails(villageMasterModel); return
 	 * ResponseEntity.ok(new MessageResponse("Added successfully!", village)); }
 	 */
-	
-	
 
 	@GetMapping("/{talukaCode}")
-	public @ResponseBody void  getVillageDetails(@PathVariable String talukaCode) {
+	public @ResponseBody void getVillageDetails(@PathVariable String talukaCode) {
 		List<VillageMaster> villages = new ArrayList<>();
 		Workbook workbook = null;
 		try {
@@ -67,14 +64,13 @@ public class VillageMasterController {
 					Cell cell = row.getCell(3);
 					String cellValue = dataFormatter.formatCellValue(cell);
 
+					VillageMaster village = new VillageMaster();
+					village.setCensusVillageCode(Integer.parseInt(dataFormatter.formatCellValue(row.getCell(2))));
+					village.setVillageName(dataFormatter.formatCellValue(row.getCell(3)));
+					// village
+					villages.add(village);
 
-						VillageMaster village = new VillageMaster();
-						village.setCensusVillageCode(Integer.parseInt(dataFormatter.formatCellValue(row.getCell(2))));
-						village.setVillageName(dataFormatter.formatCellValue(row.getCell(3)));
-						//village
-						villages.add(village);
-					
-					}
+				}
 				villageMasterRepository.saveAll(villages);
 			});
 		} catch (EncryptedDocumentException | InvalidFormatException | IOException e) {
@@ -88,6 +84,6 @@ public class VillageMasterController {
 			}
 		}
 
-		//return villages;
-	}}
-
+		// return villages;
+	}
+}

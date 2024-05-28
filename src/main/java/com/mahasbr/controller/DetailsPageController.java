@@ -3,8 +3,6 @@ package com.mahasbr.controller;
 import java.io.File;
 import java.io.IOException;
 import java.time.Year;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
@@ -22,7 +20,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mahasbr.entity.DetailsPage;
-import com.mahasbr.entity.DistrictMaster;
 import com.mahasbr.repository.DetailsPageRepository;
 
 @RestController

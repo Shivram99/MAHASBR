@@ -3,9 +3,7 @@ package com.mahasbr.controller;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
@@ -51,10 +49,8 @@ public class TalukaMasterController {
 	public @ResponseBody void getDistrictDetails(@PathVariable String districtCode) {
 		List<TalukaMaster> talukas = new ArrayList<>();
 		Workbook workbook = null;
-		Set<Integer> talukaCodes = new HashSet<>(); // Set to store unique taluka
-		// codes
-		// Set<String> districtCodes = new HashSet<>(); // Set to store unique district
-		// codes
+		//Set<Integer> talukaCodes = new HashSet<>(); // Set to store unique taluka codes
+		// Set<String> districtCodes = new HashSet<>(); // Set to store unique district codes
 		try {
 			// Creating a Workbook from an Excel file (.xls or .xlsx)
 			workbook = WorkbookFactory.create(new File(CSV_FILE_LOCATION));

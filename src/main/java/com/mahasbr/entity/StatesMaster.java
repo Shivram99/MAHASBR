@@ -14,21 +14,17 @@ import lombok.NoArgsConstructor;
 @Entity
 @Data
 @NoArgsConstructor
-@AllArgsConstructor  
+@AllArgsConstructor
 @Table(name = "states_master")
 public class StatesMaster extends Auditable {
 
 	@Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "state_master_seq_generator")
-    @SequenceGenerator(name="state_master_seq_generator", sequenceName = "state_seq", allocationSize=1)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "state_master_seq_generator")
+	@SequenceGenerator(name = "state_master_seq_generator", sequenceName = "state_seq", allocationSize = 1)
 	@NotBlank
 	private Integer censusStateCode;
-		
-	
 
 	@NotBlank
 	private String stateName;
-	
-	
 
 }

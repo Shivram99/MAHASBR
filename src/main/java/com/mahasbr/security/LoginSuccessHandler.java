@@ -17,20 +17,19 @@ public class LoginSuccessHandler extends SavedRequestAwareAuthenticationSuccessH
 	/*
 	 * @Autowired private CustomerServices customerService;
 	 */
-    @Override
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-            Authentication authentication) throws IOException, ServletException {
- 
-        UserDetails customerDetails = (UserDetails) authentication.getPrincipal();
-        
-        
+	@Override
+	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
+			Authentication authentication) throws IOException, ServletException {
+
+		UserDetails customerDetails = (UserDetails) authentication.getPrincipal();
+
 		/*
 		 * Customer customer = customerDetails.getCustomer();
 		 * 
 		 * if (customer.isOTPRequired()) { customerService.clearOTP(customer); }
 		 */
-         
-        super.onAuthenticationSuccess(request, response, authentication);
-    }
- 
+
+		super.onAuthenticationSuccess(request, response, authentication);
+	}
+
 }

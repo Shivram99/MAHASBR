@@ -26,52 +26,47 @@ import lombok.Data;
 @Entity
 @AllArgsConstructor
 @Table(name = "users", uniqueConstraints = { @UniqueConstraint(columnNames = "username"),
-    @UniqueConstraint(columnNames = "email") })
-public class User extends Auditable{
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_seq_generator")
-    @SequenceGenerator(name="user_seq_generator", sequenceName = "users_seq", allocationSize=1)
-    private Long id;
+		@UniqueConstraint(columnNames = "email") })
+public class User extends Auditable {
+	@Id
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_seq_generator")
+	@SequenceGenerator(name = "user_seq_generator", sequenceName = "users_seq", allocationSize = 1)
+	private Long id;
 
-    @NotBlank
-    @Size(max = 20)
-    private String username;
+	@NotBlank
+	@Size(max = 20)
+	private String username;
 
-    @NotBlank
-    @Size(max = 12)
-    @Email
-    private String phoneNo;
-    
-    
-    @NotBlank
-    @Size(max = 50)
-    @Email
-    private String email;
-    
-    
-    @NotBlank
-    @Size(max = 120)
-    private String password;
+	@NotBlank
+	@Size(max = 12)
+	@Email
+	private String phoneNo;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
-    private Set<Role> roles = new HashSet<>();
+	@NotBlank
+	@Size(max = 50)
+	@Email
+	private String email;
 
-    
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    private DepartmentMst department;
-    
-    
-    public User() {
-    	
-    }
-    
-    public User(String username, String password, String email, String phoneNo) {
-    	   this.username = username;
-           this.password = password;
-           this.email = email;
-           this.phoneNo = phoneNo;
-       }
-   
+	@NotBlank
+	@Size(max = 120)
+	private String password;
+
+	@ManyToMany(fetch = FetchType.LAZY)
+	@JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
+	private Set<Role> roles = new HashSet<>();
+
+	@OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+	private DepartmentMst department;
+
+	public User() {
+
+	}
+
+	public User(String username, String password, String email, String phoneNo) {
+		this.username = username;
+		this.password = password;
+		this.email = email;
+		this.phoneNo = phoneNo;
+	}
+
 }
-
