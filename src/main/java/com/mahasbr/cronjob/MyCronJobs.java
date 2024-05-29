@@ -6,7 +6,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
-@Component
+//@Component
 public class MyCronJobs {
 
     @Autowired
@@ -19,7 +19,7 @@ public class MyCronJobs {
 
 
     // Job 1: Runs every 30 minutes starting from 12:00 AM
-    @Scheduled(cron = "0 0 0/1 * * ?") // Runs every hour
+    @Scheduled(cron = "0 0 12 * * ?") // Runs every hour
     public void job1() {
         executeJob(1);
     }
@@ -34,7 +34,7 @@ public class MyCronJobs {
                     .bodyToMono(String.class)
                     .block(); // Blocking operation, consider using reactive chaining
             // Your logic for the job
-            System.out.println("Job " + jobNumber + " completed."+result);
+            System.out.println("Job " + jobNumber + " completed.");
         } catch (Exception e) {
             e.printStackTrace();
         }
