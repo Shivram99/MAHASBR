@@ -25,7 +25,7 @@ public class MyCronJobs {
 
 
     // Job 1: Runs every 30 minutes starting from 12:00 AM
-    @Scheduled(cron = "0 0 0/1 * * ?") // Runs every hour
+    @Scheduled(cron = "0 0 12 * * ?") // Runs every hour
     public void job1() {
         executeJob(1);
     }
@@ -44,6 +44,7 @@ public class MyCronJobs {
                     .collectList()
                     .block(); // Blocking operation, consider using reactive chaining
             // Your logic for the job
+            System.out.println("Job " + jobNumber + " completed.");
             System.out.println("Job " + jobNumber + " completed."+lstDetailsPage.toString());
 
             if(lstDetailsPage.size()>0) {
@@ -65,13 +66,7 @@ public class MyCronJobs {
                 	
                 	System.out.println("brnumbe ="+brnNumber);
                 }
-            	
-            	
-            	
             }
-            
-            
-            
         } catch (Exception e) {
             e.printStackTrace();
         }

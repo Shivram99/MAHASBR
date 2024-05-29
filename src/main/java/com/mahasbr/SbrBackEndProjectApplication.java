@@ -17,7 +17,7 @@ public class SbrBackEndProjectApplication {
 //		System.out.println("new BCryptPasswordEncoder()"+new BCryptPasswordEncoder().encode("Password@123"));	
 	}
 	
-	
+
 	 @Bean
 	 public WebMvcConfigurer corsConfigurer() {
 	 	        return new WebMvcConfigurer() {
@@ -33,8 +33,6 @@ public class SbrBackEndProjectApplication {
 	 	            }
 	 	        };
 	 	    }
-	
-
 	
 	@Profile("local")
     @Bean
