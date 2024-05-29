@@ -14,7 +14,9 @@ public class SbrBackEndProjectApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(SbrBackEndProjectApplication.class, args);
+//		System.out.println("new BCryptPasswordEncoder()"+new BCryptPasswordEncoder().encode("Password@123"));	
 	}
+	
 
 	 @Bean
 	 public WebMvcConfigurer corsConfigurer() {
