@@ -18,6 +18,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mahasbr.filter.AuthEntryPointJwt;
 import com.mahasbr.filter.AuthTokenFilter;
 import com.mahasbr.service.UserDetailsServiceImpl;
@@ -36,9 +37,14 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
   private CustomLogoutSuccessHandler logoutSuccessHandler;   
   
   
-  @Autowired
-  private CustomAuthenticationFailureHandler authenticationFailureHandler;
+ // @Autowired
+  //private CustomAuthenticationFailureHandler authenticationFailureHandler;
 
+
+  @Bean
+  public ObjectMapper objectMapper() {
+      return new ObjectMapper();
+  }
   
   @Bean
   public AuthTokenFilter authenticationJwtTokenFilter() {
@@ -102,10 +108,11 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
     http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
     return http.build();
   }
-	/*
-	 * @Bean public AuthenticationFailureHandler authenticationFailureHandler() {
-	 * return new CustomAuthenticationFailureHandler(); }
-	 */
+	
+  
+	  @Bean public AuthenticationFailureHandler authenticationFailureHandler() {
+	  return new CustomAuthenticationFailureHandler(objectMapper()); }
+	 
 	
 	@Bean
 	public AuthenticationSuccessHandler myAuthenticationSuccessHandler(){

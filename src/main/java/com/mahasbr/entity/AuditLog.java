@@ -41,5 +41,6 @@ public class AuditLog {
         this.action = action;
         this.timestamp = timestamp;
         this.ipAddress = ipAddress;
+        this.status="failure";
     }
 }
