@@ -12,7 +12,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import com.mahasbr.entity.DetailsPage;
 
-//@Component
+@Component
 public class MyCronJobs {
 
     @Autowired
