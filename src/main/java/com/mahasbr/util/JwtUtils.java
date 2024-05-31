@@ -26,7 +26,8 @@ public class JwtUtils {
 	@Value("${com.mahait.gov.in.jwtSecret}")
 	private String jwtSecret;
 
-	@Value("${com.mahait.gov.injwtExpirationMs}")
+
+	@Value("${com.mahait.gov.in.jwtExpirationMs}")
 	private int jwtExpirationMs;
 	
 

@@ -17,7 +17,8 @@ public class SbrBackEndProjectApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(SbrBackEndProjectApplication.class, args);
 	}
-	@Bean
+
+	 @Bean
 	 public WebMvcConfigurer corsConfigurer() {
 	 	        return new WebMvcConfigurer() {
 	 	            @Override
