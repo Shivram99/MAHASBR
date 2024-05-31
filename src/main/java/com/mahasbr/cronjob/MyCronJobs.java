@@ -12,7 +12,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import com.mahasbr.entity.DetailsPage;
 
-@Component
+//@Component
 public class MyCronJobs {
 
     @Autowired
@@ -25,7 +25,8 @@ public class MyCronJobs {
 
 
     // Job 1: Runs every 30 minutes starting from 12:00 AM
-    @Scheduled(cron = "0 0 12 * * ?") // Runs every hour
+   // @Scheduled(cron = "0 0 12 * * ?") // Runs every hour
+    @Scheduled(fixedDelay = DELAY)
     public void job1() {
         executeJob(1);
     }

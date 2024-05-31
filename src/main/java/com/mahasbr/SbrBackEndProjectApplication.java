@@ -5,12 +5,15 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Profile;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-@EnableScheduling
-@ComponentScan("com.mahasbr.cronjob")
+
+@EnableJpaAuditing
+//@EnableScheduling
+//@ComponentScan("com.mahasbr.cronjob")
 @SpringBootApplication
 public class SbrBackEndProjectApplication {
 

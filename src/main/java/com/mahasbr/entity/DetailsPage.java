@@ -24,7 +24,7 @@ public class DetailsPage {
 	@Column(length = 7)
 	private Long slNo;
 	@NotBlank
-	@Column(length = 100)
+	@Column(length = 500)
 	String nameOfEstateOwner;
 	
 	@NotBlank
@@ -119,7 +119,7 @@ public class DetailsPage {
 	@Column(length = 100)
 	String district;
 	
-	@Column(length = 5)
+	@Column(length = 100)
 	String sector;
 	
 	@Column(length = 200)
