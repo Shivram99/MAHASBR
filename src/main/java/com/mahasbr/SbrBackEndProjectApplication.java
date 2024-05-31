@@ -9,8 +9,9 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-@EnableScheduling
-@ComponentScan("com.mahasbr.cronjob")
+//@EnableScheduling
+//@ComponentScan("com.mahasbr.cronjob")
+//@EnableOpenApi
 @SpringBootApplication
 public class SbrBackEndProjectApplication {
 

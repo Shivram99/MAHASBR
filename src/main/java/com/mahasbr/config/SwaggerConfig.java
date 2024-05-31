@@ -25,27 +25,28 @@ import io.swagger.v3.oas.models.info.License;
 @EnableSwagger2
 public class SwaggerConfig {
 
-    @Bean
-    public Docket api() {
-        return new Docket(DocumentationType.SWAGGER_2)
-                .select()
-                .apis(RequestHandlerSelectors.any())
-                .build();
-    }
-
-    @Bean
-    public SecurityConfiguration security() {
-        return SecurityConfigurationBuilder.builder()
-                .clientId("test-app-client-id")
-                .clientSecret("test-app-client-secret")
-                .scopeSeparator(" ")
-                .useBasicAuthenticationWithAccessCodeGrant(true)
-                .build();
-    }
-
-    private ApiKey apiKey() {
-        return new ApiKey("JWT", "Authorization", "header");
-    }
+//    @Bean
+//    public Docket api() {
+//        return new Docket(DocumentationType.SWAGGER_2)
+//                .select()
+//                .apis(RequestHandlerSelectors.any())
+//                .build();
+//    }
+//
+//    @Bean
+//    public SecurityConfiguration security() {
+//        return SecurityConfigurationBuilder.builder()
+//                .clientId("test-app-client-id")
+//                .clientSecret("test-app-client-secret")
+//                .scopeSeparator(" ")
+//                .useBasicAuthenticationWithAccessCodeGrant(true)
+//                .build();
+//    }
+//
+//    private ApiKey apiKey() {
+//        return new ApiKey("JWT", "Authorization", "header");
+//    }
+    
     private SecurityScheme createAPIKeyScheme() {
         return new SecurityScheme().type(SecurityScheme.Type.HTTP)
             .bearerFormat("JWT")
