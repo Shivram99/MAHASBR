@@ -1,37 +1,54 @@
+
+
 package com.mahasbr.entity;
 
+import java.util.HashSet;
+import java.util.Set;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.Data;
-@Data
+import lombok.NoArgsConstructor;
+
 @Entity
-@Table(name="menu_role_mapping",schema="public")
-public class MstMenuRoleMapping {
-	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "mstMenuRoleMapping_seq_generator")
-	@SequenceGenerator(name = "mstMenuRoleMapping_seq_generator", sequenceName = "mstMenuROleMapping_seq", allocationSize = 1)
-		@Column(name="MENU_MAP_ID")
-		private Long menuMapID;
-		
-		@Column(name="MENU_ID")
-		private Long menuID;
+@Data
+@Table(name = "menu_role_mapping")
+@NoArgsConstructor
+public class MstMenuRoleMapping extends Auditable {
 
-		@Column(name="ROLE_ID")
-		private Long roleId;
-		
-		@Column(name="is_active")
-		private Character is_active;
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "mstmenurolemapping_seq_generator")
+    @SequenceGenerator(name = "mstmenurolemapping_seq_generator", sequenceName = "mstMenuRoleMapping_seq", allocationSize = 1)
+    @Column(name = "MENU_MAP_ID")
+    private Long menuMapID;
 
-		@Column(name = "CREATED_USER_ID")
-		private Integer createdUserId;
-		
+	/*
+	 * @ManyToMany
+	 * 
+	 * @JoinTable(name = "mst_menu_role_mapping", joinColumns = @JoinColumn(name =
+	 * "MENU_MAP_ID"), inverseJoinColumns = @JoinColumn(name = "MENU_ID"))
+	 * Set<MstMenu> mstMenu = new HashSet<>();
+	 * 
+	 * @ManyToMany
+	 * 
+	 * @JoinTable(name = "mst_menu_role_mapping", joinColumns = @JoinColumn(name =
+	 * "MENU_MAP_ID"), inverseJoinColumns = @JoinColumn(name = "ROLE_ID")) Set<Role>
+	 * role = new HashSet<>();
+	 */
+    @Column(name = "is_active")
+    private Character isActive;
 
-
-
+    public MstMenuRoleMapping(Set<MstMenu> mstMenu, Set<Role> role, Character isActive) {
+       //this.mstMenu = mstMenu;
+     //   this.role = role;
+        this.isActive = isActive;
+    }
 }

@@ -14,30 +14,27 @@ import lombok.NoArgsConstructor;
 @Data
 @Table(name = "MstMenu")
 @NoArgsConstructor
-public class MstMenu {
+public class MstMenu extends Auditable {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "mstMenu_seq_generator")
-	@SequenceGenerator(name = "mstMenu_seq_generator", sequenceName = "mstMenu_seq", allocationSize = 1)
-	@Column(name = "MENU_ID")
-	private Long menuId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "mstmenu_seq_generator")
+    @SequenceGenerator(name = "mstmenu_seq_generator", sequenceName = "mstmenu_seq", allocationSize = 1)
+    @Column(name = "menu_id")
+    private Long menuId;
 
-	@Column(name = "MENU_CODE")
-	private Long menuCode;
+    @Column(name = "menu_name_english")
+    private String menuNameEnglish;
 
-	@Column(name = "menu_name_english")
-	private String menu_name_english;
+    @Column(name = "menu_name_marathi")
+    private String menuNameMarathi;
 
-	@Column(name = "menu_name_marathi")
-	private String menu_name_marathi;
-
-	@Column(name = "is_active")
-	private String is_active;
-
-	@Column(name = "CREATED_USER_ID")
-	private Integer createdUserId;
-
-	@Column(name = "UPDATED_USER_ID")
-	private Integer updatedUserId;
-
+    @Column(name = "is_active")
+    private String isActive;
+	/*
+	 * @ManyToMany(mappedBy = "mstMenu", cascade = CascadeType.ALL)
+	 * Set<MstMenuRoleMapping> mstMenuRoleMapping;
+	 * 
+	 * @ManyToMany(mappedBy = "mstMenu", cascade = CascadeType.ALL) Set<MstSubMenu>
+	 * mstSubMenu;
+	 */
 }

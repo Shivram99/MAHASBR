@@ -13,6 +13,7 @@ import jakarta.transaction.Transactional;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
+ 
   @Autowired
   UserRepository userRepository;
 
