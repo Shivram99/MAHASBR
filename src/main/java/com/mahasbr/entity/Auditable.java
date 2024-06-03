@@ -23,10 +23,10 @@ public abstract class Auditable {
     @Column(name = "updated_user_id")
     private Long updatedUserId;
 
-    @Column(name = "created_date_time", updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    @Column(name = "created_date_time", updatable = false)
     private Date createdDateTime;
 
-    @Column(name = "updated_date_time", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
+    @Column(name = "updated_date_time")
     private Date updatedDateTime;
     
  
