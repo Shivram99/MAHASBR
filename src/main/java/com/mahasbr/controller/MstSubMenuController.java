@@ -27,7 +27,7 @@ public class MstSubMenuController {
 	MstSubMenuService mstSubMenuService;
 
 	@PostMapping("/savemstSubMenu")
-	public String saveMenuRoleMapping(@ModelAttribute("mstSubMenuModel") @RequestBody MstSubMenuModel mstSubMenuModel,
+	public String saveMenuRoleMapping(@RequestBody MstSubMenuModel mstSubMenuModel,
 			BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model, Locale locale,
 			HttpSession session) {
 		if (bindingResult.hasErrors()) {

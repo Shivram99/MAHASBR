@@ -46,7 +46,7 @@ public class MstMenuRoleMapping extends Auditable {
     @Column(name = "is_active")
     private Character isActive;
 
-    public MstMenuRoleMapping(Set<MstMenu> mstMenu, Set<Role> role, Character isActive) {
+    public MstMenuRoleMapping(Character isActive) {
        //this.mstMenu = mstMenu;
      //   this.role = role;
         this.isActive = isActive;
