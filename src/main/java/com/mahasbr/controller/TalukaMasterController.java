@@ -34,7 +34,8 @@ public class TalukaMasterController {
 	TalukaMasterRepository talukaMasterRepository;
 
 	private static final Logger logger = LoggerFactory.getLogger(TalukaMasterController.class);
-	private static final String CSV_FILE_LOCATION = "\\MAHASBR\\target\\Book3.xlsx";
+	private static final String CSV_FILE_LOCATION ="C:\\Users\\Dipali.sonawane\\Desktop\\Book3.xlsx" /*"\\MAHASBR\\target\\Book3.xlsx"*/;
+	
 
 	/*
 	 * @PostMapping("/taluka") public ResponseEntity<MessageResponse>
@@ -45,7 +46,7 @@ public class TalukaMasterController {
 	 * 
 	 * }
 	 */
-	@GetMapping("/{districtCode}")
+	@GetMapping("/talukamaster/{districtCode}")
 	public @ResponseBody void getDistrictDetails(@PathVariable String districtCode) {
 		List<TalukaMaster> talukas = new ArrayList<>();
 		Workbook workbook = null;
@@ -65,7 +66,8 @@ public class TalukaMasterController {
 				DataFormatter dataFormatter = new DataFormatter();
 				// loop through all rows and columns and create Course object
 				for (Row row : sheet) {
-					// if(index++ == 0) continue;
+					int index = 0;
+					if(index++ == 0) continue;
 					Cell cell = row.getCell(1);
 					String cellValue = dataFormatter.formatCellValue(cell);
 					if (cellValue.equals(districtCode)) {
