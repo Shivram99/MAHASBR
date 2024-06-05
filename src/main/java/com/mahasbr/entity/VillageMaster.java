@@ -33,35 +33,4 @@ public class VillageMaster extends Auditable{
 	@NotBlank
 	private Long censusTalukaCode;
 
-
-	public Integer getCensusVillageCode() {
-		return censusVillageCode;
-	}
-
-
-	public void setCensusVillageCode(Integer censusVillageCode) {
-		this.censusVillageCode = censusVillageCode;
-	}
-
-
-	public String getVillageName() {
-		return villageName;
-	}
-
-
-	public void setVillageName(String villageName) {
-		this.villageName = villageName;
-	}
-
-
-	public Long getCensusTalukaCode() {
-		return censusTalukaCode;
-	}
-
-
-	public void setCensusTalukaCode(Long censusTalukaCode) {
-		this.censusTalukaCode = censusTalukaCode;
-	}
-	
-	
 }
