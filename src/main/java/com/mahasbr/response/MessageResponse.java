@@ -1,5 +1,7 @@
 package com.mahasbr.response;
 
+import java.util.List;
+
 import com.mahasbr.entity.DistrictMaster;
 import com.mahasbr.entity.FeedbackForm;
 import com.mahasbr.entity.StatesMaster;
@@ -44,6 +46,22 @@ public class MessageResponse {
 		this.object = feedbackdetails;
 	}
 
+	public MessageResponse(String message, List<DistrictMaster> district) {
+		this.message=message;
+		this.object=district;
+	}
+
+	
+	public MessageResponse(String message, List<TalukaMaster> talukaList ,boolean b) {
+        this.message = message;
+        this.object = talukaList;
+    }
+
+	
+	public MessageResponse(String string, List<VillageMaster> village,int a) {
+		// TODO Auto-generated constructor stub
+	}
+
 	public String getMessage() {
 		return message;
 	}
@@ -51,4 +69,6 @@ public class MessageResponse {
 	public void setMessage(String message) {
 		this.message = message;
 	}
+	
+	
 }
