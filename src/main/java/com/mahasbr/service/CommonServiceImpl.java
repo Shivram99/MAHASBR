@@ -53,7 +53,7 @@ public class CommonServiceImpl implements CommonService {
 	            return districtCode.get();
 	        else {
 
-	            throw new Exception("** Id is not present ***");
+	            throw new Exception("*** Id is not present ***");
 	       }
 	}
 

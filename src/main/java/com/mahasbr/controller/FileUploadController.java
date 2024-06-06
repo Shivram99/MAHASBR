@@ -2,6 +2,9 @@ package com.mahasbr.controller;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 
 import org.apache.poi.EncryptedDocumentException;
@@ -15,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -29,7 +33,8 @@ import com.mahasbr.repository.DetailsPageRepository;
 public class FileUploadController {
 
     private static final Logger logger = LoggerFactory.getLogger(FileUploadController.class);
-
+    
+    private static final String PDF_UPLOAD_DIR = "pdf_files/";
     @Autowired
     private DetailsPageRepository detailsPageRepository;
 
@@ -42,6 +47,8 @@ public class FileUploadController {
             } else if (file.getOriginalFilename().endsWith(".xlsx")) {
                 workbook = WorkbookFactory.create(file.getInputStream());
                 processExcelFile(workbook);
+            } else if (file.getOriginalFilename().endsWith(".pdf")) {
+                processPDFFile(file);
             } else {
                 throw new IllegalArgumentException("Unsupported file type");
             }
@@ -58,7 +65,25 @@ public class FileUploadController {
         }
     }
 
-    private void processCSVFile(MultipartFile file) throws IOException {
+    	private void processPDFFile(MultipartFile file) throws IOException {
+            // Ensure the directory exists or create it if it doesn't
+            Path uploadDir = Paths.get(PDF_UPLOAD_DIR);
+            if (!Files.exists(uploadDir)) {
+                Files.createDirectories(uploadDir);
+            }
+
+            // Generate a unique file name
+            String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+            String uniqueFileName = System.currentTimeMillis() + "_" + fileName;
+
+            // Save the file to the specified location
+            Path filePath = uploadDir.resolve(uniqueFileName);
+            Files.copy(file.getInputStream(), filePath);
+
+            logger.info("PDF file saved successfully at: {}", filePath);
+        }
+
+	private void processCSVFile(MultipartFile file) throws IOException {
         try (BufferedReader br = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
             String line;
             int index = 0;
