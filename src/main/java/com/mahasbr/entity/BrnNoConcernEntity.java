@@ -16,11 +16,11 @@ import lombok.NoArgsConstructor;
 @Entity
 @Data
 @NoArgsConstructor
-@Table(name = "DetailsPage")
-public class DetailsPage {
+@Table(name = "brn_no_concern_dtls")
+public class BrnNoConcernEntity {
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "detailPage_seq_generator")
-	@SequenceGenerator(name = "detailPage_seq_generator", sequenceName = "deatilspage_seq", allocationSize = 1)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "brn_no_concern_dtls_seq_generator")
+	@SequenceGenerator(name = "brn_no_concern_dtls_seq_generator", sequenceName = "brn_no_concern_dtls_seq", allocationSize = 1)
 	@Column(length = 7)
 	private Long slNo;
 	@NotBlank
@@ -114,7 +114,7 @@ public class DetailsPage {
 	String townVillage;
 	
 	@Column(length = 100)
-	String taluka;
+	String Taluka;
 	
 	@Column(length = 100)
 	String district;
@@ -125,16 +125,22 @@ public class DetailsPage {
 	@Column(length = 200)
 	String nameofAuth;
 	
+	
 	@Column(length = 200)
-	String nameofAct;
+	String NameofAct;
 	
 	@Column(length = 30)
 	String dateOfReg;
 	
 	@Column(length = 30)
 	String dateOfExpiry;
+
 	
-	@Column(length = 17)
-	String brnNo;
+
+	@Column(length = 100)
+	String remark;
+	
+	
+	
 
 }

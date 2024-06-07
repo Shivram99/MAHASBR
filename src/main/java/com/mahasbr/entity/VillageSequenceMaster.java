@@ -1,6 +1,5 @@
 package com.mahasbr.entity;
 
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -12,25 +11,33 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+	
+	
+
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor  
-@Table(name = "village_master")
-public class VillageMaster extends Auditable{
+@Table(name = "VILLAGE_SEQUENCE")
+public class VillageSequenceMaster {
 	
+
 	@Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "village_master_seq_generator")
-    @SequenceGenerator(name="village_master_seq_generator", sequenceName = "village_seq", allocationSize=1)
-	@NotBlank
-	private Integer censusVillageCode;
-	
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "VILLAGE_SEQUENCE_seq_generator")
+	@SequenceGenerator(name = "VILLAGE_SEQUENCE_seq_generator", sequenceName = "VILLAGE_SEQUENCE_seq", allocationSize = 1)
+	private Long currentSequence;
 
 	@NotBlank
 	private String villageName;
 	
 	
 	@NotBlank
-	private Long censusTalukaCode;
+	private String censusVillageCode;
+	
+	
+	
+	
+	
+
 
 }

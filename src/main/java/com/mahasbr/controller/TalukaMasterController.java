@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
@@ -21,8 +22,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.mahasbr.entity.DistrictMaster;
 import com.mahasbr.entity.TalukaMaster;
 import com.mahasbr.repository.TalukaMasterRepository;
+import com.mahasbr.service.CommonService;
+import com.mahasbr.service.DistrictMasterService;
 import com.mahasbr.service.TalukaMasterService;
 
 @RestController
@@ -32,6 +36,8 @@ public class TalukaMasterController {
 	TalukaMasterService talukaMasterService;
 	@Autowired
 	TalukaMasterRepository talukaMasterRepository;
+	@Autowired
+	DistrictMasterService districtMasterService;
 
 	private static final Logger logger = LoggerFactory.getLogger(TalukaMasterController.class);
 	private static final String CSV_FILE_LOCATION ="C:\\Users\\Dipali.sonawane\\Desktop\\Book3.xlsx" /*"\\MAHASBR\\target\\Book3.xlsx"*/;
@@ -76,7 +82,9 @@ public class TalukaMasterController {
 
 						taluka.setCensusTalukaCode(Long.parseLong(dataFormatter.formatCellValue(row.getCell(2))));
 						taluka.setTalukaName(dataFormatter.formatCellValue(row.getCell(3)));
-						taluka.setCensusTalukaCode(Long.parseLong(dataFormatter.formatCellValue(row.getCell(1))));
+//						Optional<DistrictMaster> districtMaster = districtMasterService.findByDistrictCode(Long.parseLong(dataFormatter.formatCellValue(row.getCell(0))));
+					taluka.setCensusDistrictCode(Long.parseLong(dataFormatter.formatCellValue(row.getCell(1))));
+//						taluka.setDistrictMaster(districtMaster);
 
 						talukas.add(taluka);
 

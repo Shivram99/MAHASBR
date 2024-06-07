@@ -44,7 +44,8 @@ public class MstMenuRoleMappingController {
 			redirectAttributes.addFlashAttribute("message","SUCCESS");
 		}
 		model.addAttribute("language", locale.getLanguage());
-		return "redirect:/developer/mstMenuRoleMapping"; /*redirects to controller URL*/
+		return "Role Mapping Sucessfully donee";
+		//return "redirect:/developer/mstMenuRoleMapping"; /*redirects to controller URL*/
 	}
 	
 	

@@ -46,6 +46,6 @@ public class MstSubMenuController {
 			redirectAttributes.addFlashAttribute("message", "SUCCESS");
 		}
 		model.addAttribute("language", locale.getLanguage());
-		return "redirect:/developer/mstSubMenu"; /* redirects to controller URL */
+		return "Added submenu sucessfully"; /* redirects to controller URL */
 	}
 }

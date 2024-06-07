@@ -19,6 +19,7 @@ import org.springframework.security.web.authentication.logout.HttpStatusReturnin
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.mahasbr.filter.AuthEntryPointJwt;
 import com.mahasbr.filter.AuthTokenFilter;
 import com.mahasbr.service.UserDetailsServiceImpl;
@@ -43,7 +44,10 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
 
   @Bean
   public ObjectMapper objectMapper() {
-      return new ObjectMapper();
+	     ObjectMapper objectMapper = new ObjectMapper();
+	        objectMapper.registerModule(new JavaTimeModule());
+	        return objectMapper;
+     // return new ObjectMapper();
   }
   
   @Bean

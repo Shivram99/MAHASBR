@@ -1,6 +1,7 @@
 package com.mahasbr.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,7 +19,7 @@ public class DistrictMasterServiceImpl implements DistrictMasterService {
 	@Autowired
 	TalukaMasterRepository tōalukaMasterRepository;
 
-	
+
 	public List<DistrictMaster> getAllDistrict() {
 	
 		return districtMasterRepository.findAll();
@@ -28,5 +29,12 @@ public class DistrictMasterServiceImpl implements DistrictMasterService {
 		
 		return tōalukaMasterRepository.findByCensusDistrictCode(districtCode);
 	}
+
+
+	@Override
+	public Optional<DistrictMaster> findByDistrictCode(long long1) {
+		return districtMasterRepository.findById(long1);
+	}
+
 
 }

@@ -72,10 +72,11 @@ public class LoginController {
     List<String> roles = userDetails.getAuthorities().stream().map(item -> item.getAuthority())
         .collect(Collectors.toList());
     
-
-	String username =userDetails.getUsername();
-	String ipAddress = request.getRemoteAddr();
-	auditLogRepository.save(new AuditLog(username, "LOGIN_SUCCESS", LocalDateTime.now(), ipAddress));
+	/*
+	 * String username =userDetails.getUsername(); String ipAddress =
+	 * request.getRemoteAddr(); auditLogRepository.save(new AuditLog(username,
+	 * "LOGIN_SUCCESS", LocalDateTime.now(), ipAddress));
+	 */
 
     return ResponseEntity
         .ok(new JwtResponse(jwt, userDetails.getId(), userDetails.getUsername(), roles));
