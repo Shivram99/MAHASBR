@@ -12,12 +12,13 @@ import com.mahasbr.entity.VillageMaster;
 @Repository
 public interface VillageMasterRepository extends JpaRepository<VillageMaster, Long> {
 
-	//List<VillageMaster> getVillageDtlByVillageName(DetailsPage details);
 	
 	@Query("FROM VillageMaster t")
 	List<VillageMaster> getVillageDtlByVillageName(DetailsPage details);
 
 	
-	//@Query("SELECT v FROM VillageMaster v WHERE v.nameOfEstateOwner = :#{#details.nameOfEstateOwner} AND v.townVillage = :#{#details.townVillage}")
+	@Query("FROM VillageMaster t WHERE  t.censusTalukaCode=?1")
+	List<VillageMaster> findBycensusTalukaCode(Long censusTalukaCode);
+
 
 }
