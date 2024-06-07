@@ -31,7 +31,7 @@ public class MstMenuRoleMappingController {
 									BindingResult bindingResult,RedirectAttributes redirectAttributes, Model model, Locale locale, HttpSession session) {
 		if(bindingResult.hasErrors()) {
 			model.addAttribute("language", locale.getLanguage());
-			return "/views/mst-menu-role-mapping"; /*Return to HTML Page*/
+			//return "/views/mst-menu-role-mapping"; /*Return to HTML Page*/
 		} 
 		
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

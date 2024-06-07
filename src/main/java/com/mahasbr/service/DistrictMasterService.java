@@ -9,6 +9,8 @@ public interface DistrictMasterService {
 
 	Optional<DistrictMaster> findByDistrictCode(long long1);
 
+	public List<DistrictMaster> readdataCsv();
+
 
 //	public DistrictMaster insertDistrictDetail(DistrictMasterModel districtMasterModel);
 //

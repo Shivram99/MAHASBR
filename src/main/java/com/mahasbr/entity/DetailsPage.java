@@ -33,7 +33,7 @@ public class DetailsPage {
 	
 	@NotBlank
 	@Column(length = 500)
-	String StreetName;
+	String streetName;
 	
 	@NotBlank
 	@Column(length = 500)
