@@ -13,4 +13,5 @@ public interface BrnGenerationRepo {
 
 	Long saveNewSeqNo(VillageSequenceMaster villageSequenceMaster);
 
+	
 }

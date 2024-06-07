@@ -125,6 +125,7 @@ public class BrnNoConcernEntity {
 	@Column(length = 200)
 	String nameofAuth;
 	
+	
 	@Column(length = 200)
 	String NameofAct;
 	

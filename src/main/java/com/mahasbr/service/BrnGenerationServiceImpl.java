@@ -125,6 +125,7 @@ public class BrnGenerationServiceImpl implements BrnGenerationService {
 										duplicateOrgDetailsEntity.setNameofAct(dataFormatter.formatCellValue(row.getCell(12)));
 										
 										duplicateOrgDetailsRepository.save(duplicateOrgDetailsEntity);
+										
 									}
 									
 								}else {

@@ -12,6 +12,7 @@ import com.mahasbr.entity.VillageSequenceMaster;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 
+
 @Repository
 public class BrnGenerationRepoImpl implements BrnGenerationRepo {
 
