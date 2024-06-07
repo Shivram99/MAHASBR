@@ -13,12 +13,12 @@ import lombok.NoArgsConstructor;
 @Entity
 @Data
 @NoArgsConstructor
-@Table(name = "circulars")
+@Table(name = "circular")
 public class Circular extends Auditable {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "circular_seq_generator")
-	@SequenceGenerator(name = "circular_seq_generator", sequenceName = "circular_seq", allocationSize = 1)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "circulars_seq_generator")
+	@SequenceGenerator(name = "circulars_seq_generator", sequenceName = "circulars_seq", allocationSize = 1)
 	private Long id;
 
 	@NotBlank
