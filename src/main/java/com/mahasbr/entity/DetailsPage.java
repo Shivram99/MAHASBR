@@ -114,7 +114,7 @@ public class DetailsPage {
 	String townVillage;
 	
 	@Column(length = 100)
-	String Taluka;
+	String taluka;
 	
 	@Column(length = 100)
 	String district;
@@ -126,7 +126,7 @@ public class DetailsPage {
 	String nameofAuth;
 	
 	@Column(length = 200)
-	String NameofAct;
+	String nameofAct;
 	
 	@Column(length = 30)
 	String dateOfReg;
