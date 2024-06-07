@@ -1,5 +1,8 @@
 package com.mahasbr;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -15,6 +18,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class SbrBackEndProjectApplication {
 
 	public static void main(String[] args) {
+		
+		 LocalDateTime currentDateTimeIndia = LocalDateTime.now(ZoneId.of("Asia/Kolkata"));
 		SpringApplication.run(SbrBackEndProjectApplication.class, args);
 	}
 
