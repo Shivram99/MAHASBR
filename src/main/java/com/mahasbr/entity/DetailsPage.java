@@ -24,7 +24,7 @@ public class DetailsPage {
 	@Column(length = 7)
 	private Long slNo;
 	@NotBlank
-	@Column(length = 100)
+	@Column(length = 500)
 	String nameOfEstateOwner;
 	
 	@NotBlank
@@ -33,7 +33,7 @@ public class DetailsPage {
 	
 	@NotBlank
 	@Column(length = 500)
-	String StreetName;
+	String streetName;
 	
 	@NotBlank
 	@Column(length = 500)
@@ -114,24 +114,27 @@ public class DetailsPage {
 	String townVillage;
 	
 	@Column(length = 100)
-	String Taluka;
+	String taluka;
 	
 	@Column(length = 100)
 	String district;
 	
-	@Column(length = 5)
+	@Column(length = 100)
 	String sector;
 	
 	@Column(length = 200)
 	String nameofAuth;
 	
 	@Column(length = 200)
-	String NameofAct;
+	String nameofAct;
 	
 	@Column(length = 30)
 	String dateOfReg;
 	
 	@Column(length = 30)
 	String dateOfExpiry;
+	
+	@Column(length = 17)
+	String brnNo;
 
 }

@@ -12,10 +12,14 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.mahasbr.filter.AuthEntryPointJwt;
 import com.mahasbr.filter.AuthTokenFilter;
 import com.mahasbr.service.UserDetailsServiceImpl;
@@ -33,6 +37,19 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
   @Autowired
   private CustomLogoutSuccessHandler logoutSuccessHandler;   
   
+  
+ // @Autowired
+  //private CustomAuthenticationFailureHandler authenticationFailureHandler;
+
+
+  @Bean
+  public ObjectMapper objectMapper() {
+	     ObjectMapper objectMapper = new ObjectMapper();
+	        objectMapper.registerModule(new JavaTimeModule());
+	        return objectMapper;
+     // return new ObjectMapper();
+  }
+  
   @Bean
   public AuthTokenFilter authenticationJwtTokenFilter() {
     return new AuthTokenFilter();
@@ -44,7 +61,6 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
        
       authProvider.setUserDetailsService(userDetailsService);
       authProvider.setPasswordEncoder(passwordEncoder());
-   
       return authProvider;
   }
  
@@ -75,6 +91,7 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
     http.csrf(csrf -> csrf.disable())
         .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+       // .failureHandler(authenticationFailureHandler)
         .authorizeHttpRequests(auth -> 
           auth.requestMatchers("/api/auth/**").permitAll()
               .requestMatchers("/api/auth/signup").permitAll()
@@ -88,18 +105,25 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
               .requestMatchers("/developer/**").hasRole("DEVELOPER")
             .requestMatchers("/user/**").permitAll()
               .anyRequest().authenticated()
-        ). logout().logoutUrl("/logout").permitAll();
-        
-	/*
-	 * logout(logout -> logout .logoutUrl("/logout")
-	 * .logoutSuccessHandler(logoutSuccessHandler) //
-	 * .logoutFailureHandler(logoutFailureHandler()) );
-	 */
-    
+        ). logout().logoutUrl("/logout").permitAll().logoutSuccessHandler(logoutSuccessHandler);
+ 
     http.authenticationProvider(authenticationProvider());
     http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
     return http.build();
   }
+	
+  
+	  @Bean public AuthenticationFailureHandler authenticationFailureHandler() {
+	  return new CustomAuthenticationFailureHandler(objectMapper()); }
+	 
+	
+	@Bean
+	public AuthenticationSuccessHandler myAuthenticationSuccessHandler(){
+	    return new CustomSimpleUrlAuthenticationSuccessHandler();
+	}
+  
+	
+	
   
   
 

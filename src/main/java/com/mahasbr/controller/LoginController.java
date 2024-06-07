@@ -1,5 +1,6 @@
 package com.mahasbr.controller;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -15,13 +16,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.mahasbr.entity.AuditLog;
 import com.mahasbr.model.LoginRequest;
+import com.mahasbr.repository.AuditLogRepository;
 import com.mahasbr.repository.RoleRepository;
 import com.mahasbr.repository.UserRepository;
 import com.mahasbr.response.JwtResponse;
 import com.mahasbr.service.UserDetailsImpl;
 import com.mahasbr.util.JwtUtils;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
@@ -44,9 +48,15 @@ public class LoginController {
 
   @Autowired
   JwtUtils jwtUtils;
+  
+  
+
+
+	@Autowired
+	private AuditLogRepository auditLogRepository;
 
  @PostMapping("/signin")
-  public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest,HttpSession httpSession) {
+  public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest,HttpSession httpSession,HttpServletRequest request) {
 
     Authentication authentication = authenticationManager
         .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
@@ -61,6 +71,12 @@ public class LoginController {
     
     List<String> roles = userDetails.getAuthorities().stream().map(item -> item.getAuthority())
         .collect(Collectors.toList());
+    
+	/*
+	 * String username =userDetails.getUsername(); String ipAddress =
+	 * request.getRemoteAddr(); auditLogRepository.save(new AuditLog(username,
+	 * "LOGIN_SUCCESS", LocalDateTime.now(), ipAddress));
+	 */
 
     return ResponseEntity
         .ok(new JwtResponse(jwt, userDetails.getId(), userDetails.getUsername(), roles));

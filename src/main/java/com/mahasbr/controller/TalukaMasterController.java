@@ -3,9 +3,8 @@ package com.mahasbr.controller;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.Optional;
 
 import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
@@ -23,8 +22,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.mahasbr.entity.DistrictMaster;
 import com.mahasbr.entity.TalukaMaster;
 import com.mahasbr.repository.TalukaMasterRepository;
+import com.mahasbr.service.CommonService;
+import com.mahasbr.service.DistrictMasterService;
 import com.mahasbr.service.TalukaMasterService;
 
 @RestController
@@ -34,9 +36,12 @@ public class TalukaMasterController {
 	TalukaMasterService talukaMasterService;
 	@Autowired
 	TalukaMasterRepository talukaMasterRepository;
+	@Autowired
+	DistrictMasterService districtMasterService;
 
 	private static final Logger logger = LoggerFactory.getLogger(TalukaMasterController.class);
-	private static final String CSV_FILE_LOCATION = "\\MAHASBR\\target\\Book3.xlsx";
+	private static final String CSV_FILE_LOCATION ="C:\\Users\\Dipali.sonawane\\Desktop\\Book3.xlsx" /*"\\MAHASBR\\target\\Book3.xlsx"*/;
+	
 
 	/*
 	 * @PostMapping("/taluka") public ResponseEntity<MessageResponse>
@@ -47,14 +52,12 @@ public class TalukaMasterController {
 	 * 
 	 * }
 	 */
-	@GetMapping("/{districtCode}")
+	@GetMapping("/talukamaster/{districtCode}")
 	public @ResponseBody void getDistrictDetails(@PathVariable String districtCode) {
 		List<TalukaMaster> talukas = new ArrayList<>();
 		Workbook workbook = null;
-		Set<Integer> talukaCodes = new HashSet<>(); // Set to store unique taluka
-		// codes
-		// Set<String> districtCodes = new HashSet<>(); // Set to store unique district
-		// codes
+		//Set<Integer> talukaCodes = new HashSet<>(); // Set to store unique taluka codes
+		// Set<String> districtCodes = new HashSet<>(); // Set to store unique district codes
 		try {
 			// Creating a Workbook from an Excel file (.xls or .xlsx)
 			workbook = WorkbookFactory.create(new File(CSV_FILE_LOCATION));
@@ -69,7 +72,8 @@ public class TalukaMasterController {
 				DataFormatter dataFormatter = new DataFormatter();
 				// loop through all rows and columns and create Course object
 				for (Row row : sheet) {
-					// if(index++ == 0) continue;
+					int index = 0;
+					if(index++ == 0) continue;
 					Cell cell = row.getCell(1);
 					String cellValue = dataFormatter.formatCellValue(cell);
 					if (cellValue.equals(districtCode)) {
@@ -78,7 +82,9 @@ public class TalukaMasterController {
 
 						taluka.setCensusTalukaCode(Long.parseLong(dataFormatter.formatCellValue(row.getCell(2))));
 						taluka.setTalukaName(dataFormatter.formatCellValue(row.getCell(3)));
-						taluka.setCensusTalukaCode(Long.parseLong(dataFormatter.formatCellValue(row.getCell(1))));
+//						Optional<DistrictMaster> districtMaster = districtMasterService.findByDistrictCode(Long.parseLong(dataFormatter.formatCellValue(row.getCell(0))));
+					taluka.setCensusDistrictCode(Long.parseLong(dataFormatter.formatCellValue(row.getCell(1))));
+//						taluka.setDistrictMaster(districtMaster);
 
 						talukas.add(taluka);
 
