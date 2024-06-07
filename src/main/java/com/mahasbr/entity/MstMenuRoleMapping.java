@@ -1,18 +1,11 @@
 
-
 package com.mahasbr.entity;
-
-import java.util.HashSet;
-import java.util.Set;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.Data;
@@ -24,11 +17,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class MstMenuRoleMapping extends Auditable {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "mstmenurolemapping_seq_generator")
-    @SequenceGenerator(name = "mstmenurolemapping_seq_generator", sequenceName = "mstMenuRoleMapping_seq", allocationSize = 1)
-    @Column(name = "MENU_MAP_ID")
-    private Long menuMapID;
+	@Id
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "mstmenurolemapping_seq_generator")
+	@SequenceGenerator(name = "mstmenurolemapping_seq_generator", sequenceName = "mstMenuRoleMapping_seq", allocationSize = 1)
+	@Column(name = "MENU_MAP_ID")
+	private Long menuMapID;
 
 	/*
 	 * @ManyToMany
@@ -43,12 +36,12 @@ public class MstMenuRoleMapping extends Auditable {
 	 * "MENU_MAP_ID"), inverseJoinColumns = @JoinColumn(name = "ROLE_ID")) Set<Role>
 	 * role = new HashSet<>();
 	 */
-    @Column(name = "is_active")
-    private Character isActive;
+	@Column(name = "is_active")
+	private Character isActive;
 
-    public MstMenuRoleMapping(Character isActive) {
-       //this.mstMenu = mstMenu;
-     //   this.role = role;
-        this.isActive = isActive;
-    }
+	public MstMenuRoleMapping(Character isActive) {
+		// this.mstMenu = mstMenu;
+		// this.role = role;
+		this.isActive = isActive;
+	}
 }
