@@ -21,7 +21,7 @@ public class ImportExcelSheetServiceImpl implements ImportExcelSheetService {
 	@Override
 	public DetailsPage findOrgData(DetailsPage details) {
 		return detailsPageRepository.getDetailsByColumn(details.getNameOfEstateOwner(),details.getHouseNo(), details.getStreetName(), details.getLocality(), details.getTownVillage(),
-				details.getTaluka(),details.getDistrict(),details.getPincode(), details.getSector(), details.getNameofAuth(),
+				details.getTaluka(),details.getDistrict(), details.getSector(), details.getNameofAuth(),
 				details.getNameofAct());
 	}
 	

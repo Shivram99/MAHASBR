@@ -24,8 +24,8 @@ public class BrnGenerationRepoImpl implements BrnGenerationRepo {
 		String hql = "select c.CENSUS_VILLAGE_CODE,c.VILLAGE_NAME from district_master a "
 				+ "inner join taluka_master  b on a.census_district_code=b.census_district_code "
 				+ "inner join VILLAGE_MASTER c on c.census_taluka_code=b.census_taluka_code "
-				+ "where a.district_name='" + details.getDistrict() + "' and b.taluka_name='" + details.getTaluka()
-				+ "' and c.village_name like '%" + details.getTownVillage() + "%' " + "";
+				+ "where Upper(a.district_name)=Upper('" + details.getDistrict() + "') and Upper(b.taluka_name)=Upper('" + details.getTaluka()
+				+ "') and Upper(c.village_name)=Upper('" + details.getTownVillage() + "') " + "";
 		Session session = enManager.unwrap(Session.class);
 		Query query = session.createNativeQuery(hql);
 		return query.list();
