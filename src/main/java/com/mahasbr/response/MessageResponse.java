@@ -46,20 +46,9 @@ public class MessageResponse {
 		this.object = feedbackdetails;
 	}
 
-	public MessageResponse(String message, List<DistrictMaster> district) {
+	public MessageResponse(String message, List<?> list) {
 		this.message=message;
-		this.object=district;
-	}
-
-	
-	public MessageResponse(String message, List<TalukaMaster> talukaList ,boolean b) {
-        this.message = message;
-        this.object = talukaList;
-    }
-
-	
-	public MessageResponse(String string, List<VillageMaster> village,int a) {
-		// TODO Auto-generated constructor stub
+		this.object=list;
 	}
 
 	public String getMessage() {

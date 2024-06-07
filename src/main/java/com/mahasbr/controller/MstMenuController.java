@@ -48,6 +48,6 @@ public class MstMenuController {
 			redirectAttributes.addFlashAttribute("message","SUCCESS");
 		}
 		model.addAttribute("language", locale.getLanguage());
-		return "redirect:/developer/mstMenu"; /*redirects to controller URL*/
+		return "Added Menu Suscessfully"; /*redirects to controller URL*/
 	}
 }
