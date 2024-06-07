@@ -8,5 +8,9 @@ import com.mahasbr.entity.CensusEntity;
 
 @Repository
 public interface CensusEntityRepository extends JpaRepository<CensusEntity, Long> {
+	
+	
+	//
+	//@Query("SELECT v FROM VillageMaster v WHERE v.nameOfEstateOwner = :#{#details.nameOfEstateOwner} AND v.townVillage = :#{#details.townVillage}");
 
 }

@@ -1,36 +1,46 @@
 package com.mahasbr.controller;
 
-import java.io.File;
-import java.io.IOException;
-import java.time.LocalDate;
-
-import org.apache.poi.EncryptedDocumentException;
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.DataFormatter;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
-import com.mahasbr.entity.DetailsPage;
-import com.mahasbr.repository.DetailsPageRepository;
+import com.mahasbr.service.BrnGenerationService;
 
 
 @RestController
 @RequestMapping("/user")
 public class ImportExcelDataController {
+	
+
 	@Autowired
-	DetailsPageRepository detailsPageRepository;
+	BrnGenerationService brnGenerationService;
+	
+	
 	private static final Logger logger = LoggerFactory.getLogger(DetailsPageController.class);
+	
+	
 	private static final String CSV_FILE_LOCATION = "D:\\SBR PROJECT\\Docs\\12_AKOLA_7Act Sample.xlsx";
+	
+	@PostMapping(value="/uploadExcel",
+		    consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	    public ResponseEntity<String> uploadExcelFile(@RequestParam("file") MultipartFile file) {
+	        try {
+	        	brnGenerationService.uploadExcelFile(file);
+	            return ResponseEntity.status(HttpStatus.OK).body("File uploaded successfully");
+	        } catch (Exception e) {
+	            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body("Error uploading file");
+	        }
+	    }
+	/*
 
 	@GetMapping("/importExcelSheet")
 	public @ResponseBody void readCSV() {
@@ -70,9 +80,99 @@ public class ImportExcelDataController {
 							details.setActRegNo(dataFormatter.formatCellValue(row.getCell(10)));
 							details.setNameofAuth(dataFormatter.formatCellValue(row.getCell(11)));
 							details.setNameofAct(dataFormatter.formatCellValue(row.getCell(12)));
-							detailsPageRepository.save(details);
+							
+							if(details.getNameOfEstateOwner()!=null  && details.getHouseNo()!=null  && details.getStreetName()!=null && details.getLocality()!=null &&  details.getTownVillage()!=null 
+									&& details.getTaluka()!=null && details.getDistrict()!=null && details.getSector()!=null && details.getNameofAuth()!=null && details.getNameofAct()!=null
+									) {
+								DetailsPage dbDetailsPage=importExcelSheetService.findOrgData(details);
+								if(dbDetailsPage!=null) {
+									if(dbDetailsPage.getActRegNo()!=dbDetailsPage.getActRegNo()) {
+										DuplicateOrgDetailsEntity duplicateOrgDetailsEntity=new DuplicateOrgDetailsEntity();
+										
+										duplicateOrgDetailsEntity.setNameOfEstateOwner(dataFormatter.formatCellValue(row.getCell(1)));
+										duplicateOrgDetailsEntity.setHouseNo(dataFormatter.formatCellValue(row.getCell(2)));
+										duplicateOrgDetailsEntity.setStreetName(dataFormatter.formatCellValue(row.getCell(3)));
+										duplicateOrgDetailsEntity.setLocality(dataFormatter.formatCellValue(row.getCell(4)));
+										duplicateOrgDetailsEntity.setTownVillage(dataFormatter.formatCellValue(row.getCell(5)));
+										duplicateOrgDetailsEntity.setTaluka(dataFormatter.formatCellValue(row.getCell(6)));
+										duplicateOrgDetailsEntity.setDistrict(dataFormatter.formatCellValue(row.getCell(7)));
+										
+										if(row.getCell(8)!=null && !(dataFormatter.formatCellValue(row.getCell(8)) instanceof String))
+										duplicateOrgDetailsEntity.setPincode(Integer.parseInt(dataFormatter.formatCellValue(row.getCell(8))));
+										
+										duplicateOrgDetailsEntity.setSector(dataFormatter.formatCellValue(row.getCell(9)));
+										duplicateOrgDetailsEntity.setActRegNo(dataFormatter.formatCellValue(row.getCell(10)));
+										duplicateOrgDetailsEntity.setNameofAuth(dataFormatter.formatCellValue(row.getCell(11)));
+										duplicateOrgDetailsEntity.setNameofAct(dataFormatter.formatCellValue(row.getCell(12)));
+										
+										duplicateOrgDetailsService.save(duplicateOrgDetailsEntity);
+									}
+								}else {
+									
+									String villageCensusCode=brnGenerationService.getVillageDtlByVillageName(details);  
+									if(villageCensusCode!=null) {
+										Long seqNo=brnGenerationService.findSeqNoByVillageCensusCode(villageCensusCode);
+										
+										VillageSequenceMaster villageSequenceMaster=new VillageSequenceMaster();
+										villageSequenceMaster.setCensusVillageCode(villageCensusCode);
+										villageSequenceMaster.setVillageName(villageCensusCode);
+										villageSequenceMaster.setCurrentSequence(seqNo);
+										Long saveId=brnGenerationService.saveNewSeqNo(villageSequenceMaster);
+										
+										
+										String brnNumber =villageCensusCode+"0000"+String.format("%0d", seqNo.toString()); //String.format("%06d0000%06d", villageCensusCode, seqNo);
+										details.setBrnNo(brnNumber);
+										
+										
+										importExcelSheetService.save(details);	
+									}else {
+										BrnNoConcernEntity brnNoConcernEntity=new BrnNoConcernEntity();
+										brnNoConcernEntity.setNameOfEstateOwner(dataFormatter.formatCellValue(row.getCell(1)));
+										brnNoConcernEntity.setHouseNo(dataFormatter.formatCellValue(row.getCell(2)));
+										brnNoConcernEntity.setStreetName(dataFormatter.formatCellValue(row.getCell(3)));
+										brnNoConcernEntity.setLocality(dataFormatter.formatCellValue(row.getCell(4)));
+										brnNoConcernEntity.setTownVillage(dataFormatter.formatCellValue(row.getCell(5)));
+										brnNoConcernEntity.setTaluka(dataFormatter.formatCellValue(row.getCell(6)));
+										brnNoConcernEntity.setDistrict(dataFormatter.formatCellValue(row.getCell(7)));
+										
+										if(row.getCell(8)!=null && !(dataFormatter.formatCellValue(row.getCell(8)) instanceof String))
+										brnNoConcernEntity.setPincode(Integer.parseInt(dataFormatter.formatCellValue(row.getCell(8))));
+										
+										brnNoConcernEntity.setSector(dataFormatter.formatCellValue(row.getCell(9)));
+										brnNoConcernEntity.setActRegNo(dataFormatter.formatCellValue(row.getCell(10)));
+										brnNoConcernEntity.setNameofAuth(dataFormatter.formatCellValue(row.getCell(11)));
+										brnNoConcernEntity.setNameofAct(dataFormatter.formatCellValue(row.getCell(12)));
+										brnNoConcernEntity.setRemark("village not found");
+										
+										brnNoConcernService.save(brnNoConcernEntity);
+									}
+									
+									
+								
+								}
+							}else {
+								
+								BrnNoConcernEntity brnNoConcernEntity=new BrnNoConcernEntity();
+								
+								brnNoConcernEntity.setNameOfEstateOwner(dataFormatter.formatCellValue(row.getCell(1)));
+								brnNoConcernEntity.setHouseNo(dataFormatter.formatCellValue(row.getCell(2)));
+								brnNoConcernEntity.setStreetName(dataFormatter.formatCellValue(row.getCell(3)));
+								brnNoConcernEntity.setLocality(dataFormatter.formatCellValue(row.getCell(4)));
+								brnNoConcernEntity.setTownVillage(dataFormatter.formatCellValue(row.getCell(5)));
+								brnNoConcernEntity.setTaluka(dataFormatter.formatCellValue(row.getCell(6)));
+								brnNoConcernEntity.setDistrict(dataFormatter.formatCellValue(row.getCell(7)));
+								
+								if(row.getCell(8)!=null && !(dataFormatter.formatCellValue(row.getCell(8)) instanceof String))
+								brnNoConcernEntity.setPincode(Integer.parseInt(dataFormatter.formatCellValue(row.getCell(8))));
+								
+								brnNoConcernEntity.setSector(dataFormatter.formatCellValue(row.getCell(9)));
+								brnNoConcernEntity.setActRegNo(dataFormatter.formatCellValue(row.getCell(10)));
+								brnNoConcernEntity.setNameofAuth(dataFormatter.formatCellValue(row.getCell(11)));
+								brnNoConcernEntity.setNameofAct(dataFormatter.formatCellValue(row.getCell(12)));
+								brnNoConcernEntity.setRemark("Mandatory Parameter are missing");
+								brnNoConcernService.save(brnNoConcernEntity);
+							}
 						}
-
 						index++;
 					}
 				}
@@ -88,9 +188,5 @@ public class ImportExcelDataController {
 				}
 			}
 		}
-		
-		
-		
-
-	}
+	}*/
 }

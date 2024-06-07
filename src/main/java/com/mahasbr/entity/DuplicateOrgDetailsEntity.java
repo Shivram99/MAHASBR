@@ -16,11 +16,13 @@ import lombok.NoArgsConstructor;
 @Entity
 @Data
 @NoArgsConstructor
-@Table(name = "DetailsPage")
-public class DetailsPage {
+@Table(name = "Duplicate_Org_Dtls")
+public class DuplicateOrgDetailsEntity {
+	
+
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "detailPage_seq_generator")
-	@SequenceGenerator(name = "detailPage_seq_generator", sequenceName = "deatilspage_seq", allocationSize = 1)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "duplicate_Org_Dtls_seq_generator")
+	@SequenceGenerator(name = "duplicate_Org_Dtls_seq_generator", sequenceName = "Duplicate_Org_Dtls_seq", allocationSize = 1)
 	@Column(length = 7)
 	private Long slNo;
 	@NotBlank
@@ -134,7 +136,10 @@ public class DetailsPage {
 	@Column(length = 30)
 	String dateOfExpiry;
 	
+
 	@Column(length = 17)
 	String brnNo;
+
+
 
 }
