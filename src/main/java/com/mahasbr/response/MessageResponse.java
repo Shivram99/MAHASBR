@@ -1,5 +1,7 @@
 package com.mahasbr.response;
 
+import java.util.List;
+
 import com.mahasbr.entity.DistrictMaster;
 import com.mahasbr.entity.FeedbackForm;
 import com.mahasbr.entity.StatesMaster;
@@ -44,6 +46,11 @@ public class MessageResponse {
 		this.object = feedbackdetails;
 	}
 
+	public MessageResponse(String message, List<?> list) {
+		this.message=message;
+		this.object=list;
+	}
+
 	public String getMessage() {
 		return message;
 	}
@@ -51,4 +58,6 @@ public class MessageResponse {
 	public void setMessage(String message) {
 		this.message = message;
 	}
+	
+	
 }

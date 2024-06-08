@@ -27,7 +27,7 @@ public class MstSubMenuController {
 	MstSubMenuService mstSubMenuService;
 
 	@PostMapping("/savemstSubMenu")
-	public String saveMenuRoleMapping(@ModelAttribute("mstSubMenuModel") @RequestBody MstSubMenuModel mstSubMenuModel,
+	public String saveMenuRoleMapping(@RequestBody MstSubMenuModel mstSubMenuModel,
 			BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model, Locale locale,
 			HttpSession session) {
 		if (bindingResult.hasErrors()) {
@@ -46,6 +46,6 @@ public class MstSubMenuController {
 			redirectAttributes.addFlashAttribute("message", "SUCCESS");
 		}
 		model.addAttribute("language", locale.getLanguage());
-		return "redirect:/developer/mstSubMenu"; /* redirects to controller URL */
+		return "Added submenu sucessfully"; /* redirects to controller URL */
 	}
 }

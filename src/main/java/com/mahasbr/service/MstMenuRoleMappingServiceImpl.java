@@ -1,8 +1,6 @@
 package com.mahasbr.service;
 
-import java.util.HashSet;
 import java.util.Optional;
-import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,18 +27,18 @@ public class MstMenuRoleMappingServiceImpl implements MstMenuRoleMappingService 
 
 	@Override
 	public long saveMenuRoleMapping(MstMenuRoleMappingModel mstMenuRoleMappingModel, User messages) {
-		Optional<MstMenu> mstMenu = mstMenuRepo.findById(mstMenuRoleMappingModel.getMstmenu());
+		Optional<MstMenu> mstMenu = mstMenuRepo.findById(mstMenuRoleMappingModel.getMstMenu());
 		Optional<Role> role = RoleRepository.findById(mstMenuRoleMappingModel.getRoles());
 		if (mstMenu.isPresent() && role.isPresent()) {
-			Set<MstMenu> mstMenus = new HashSet<>();
-			Set<Role> roles = new HashSet<>();
-			  mstMenus.add(mstMenu.get());
-			  roles.add(role.get());
-		         MstMenuRoleMapping mstMenuRoleMapping = new MstMenuRoleMapping(mstMenus, roles, mstMenuRoleMappingModel.getIsActive());
+//			Set<MstMenu> mstMenus = new HashSet<>();
+//			Set<Role> roles = new HashSet<>();
+//			  mstMenus.add(mstMenu.get());
+//			  roles.add(role.get());
+		         MstMenuRoleMapping mstMenuRoleMapping = new MstMenuRoleMapping(mstMenuRoleMappingModel.getIsActive());
 			mstMenuRoleMappingRepository.save(mstMenuRoleMapping);
 
 		}
-		long saveId = mstMenuRoleMappingModel.getMstmenu();
+		long saveId = mstMenuRoleMappingModel.getMstMenu();
 
 		return saveId;
 

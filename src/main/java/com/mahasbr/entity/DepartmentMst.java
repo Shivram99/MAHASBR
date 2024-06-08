@@ -32,6 +32,7 @@ public class DepartmentMst extends Auditable {
 	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id") // name of the foreign key column in department_mst table
 	private User user;
+
 	@Column(length = 20)
 	private String departmentName;
 

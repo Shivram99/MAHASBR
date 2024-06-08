@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class MstMenuRoleMappingModel {
 	
-	long mstmenu;
+	long mstMenu;
 	long roles;
 	private Character isActive;
 

@@ -16,20 +16,20 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class MstMenu extends Auditable {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "mstmenu_seq_generator")
-    @SequenceGenerator(name = "mstmenu_seq_generator", sequenceName = "mstmenu_seq", allocationSize = 1)
-    @Column(name = "menu_id")
-    private Long menuId;
+	@Id
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "mstmenu_seq_generator")
+	@SequenceGenerator(name = "mstmenu_seq_generator", sequenceName = "mstmenu_seq", allocationSize = 1)
+	@Column(name = "menu_id")
+	private Long menuId;
 
-    @Column(name = "menu_name_english")
-    private String menuNameEnglish;
+	@Column(name = "menu_name_english")
+	private String menuNameEnglish;
 
-    @Column(name = "menu_name_marathi")
-    private String menuNameMarathi;
+	@Column(name = "menu_name_marathi")
+	private String menuNameMarathi;
 
-    @Column(name = "is_active")
-    private String isActive;
+	@Column(name = "is_active")
+	private String isActive;
 	/*
 	 * @ManyToMany(mappedBy = "mstMenu", cascade = CascadeType.ALL)
 	 * Set<MstMenuRoleMapping> mstMenuRoleMapping;
