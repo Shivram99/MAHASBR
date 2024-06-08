@@ -1,6 +1,9 @@
 package com.mahasbr.entity;
 
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -15,20 +18,17 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor  
+@EntityListeners(AuditingEntityListener.class)
 @Table(name = "state_master")
 public class StatesMaster extends Auditable {
 
 	@Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "state_master_seq_generator")
-    @SequenceGenerator(name="state_master_seq_generator", sequenceName = "state_seq", allocationSize=1)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "state_master_seq_generator")
+	@SequenceGenerator(name = "state_master_seq_generator", sequenceName = "state_seq", allocationSize = 1)
 	@NotBlank
 	private Integer censusStateCode;
-		
-	
 
 	@NotBlank
 	private String stateName;
-	
-	
 
 }

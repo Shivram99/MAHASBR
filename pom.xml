@@ -52,7 +52,7 @@
 			<artifactId>jjwt-api</artifactId>
 			<version>0.11.5</version>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml -->
+		<!-- https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml to get csv data -->
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-ooxml</artifactId>
@@ -94,10 +94,15 @@
 			<version>4.4.0</version>
 		</dependency>
 
-		<dependency>
+		<!--<dependency>
 			<groupId>com.oracle.database.jdbc</groupId>
 			<artifactId>ojdbc8</artifactId>
 			<scope>12.2.0.1</scope>
+		</dependency>-->
+		<dependency>
+		    <groupId>com.oracle.database.jdbc</groupId>
+		    <artifactId>ojdbc8</artifactId>
+		    <version>19.8.0.0</version>
 		</dependency>
 
 		<dependency>
@@ -143,6 +148,8 @@
 			<artifactId>spring-boot-starter-webflux</artifactId>
 		</dependency>
 
+		
+	
 
 		<!--<dependency>
 		    <groupId>org.springdoc</groupId>
@@ -175,7 +182,6 @@
 		    <version>3.0.0</version>
 		</dependency>
 
-		
 	</dependencies>
 
 	<build>

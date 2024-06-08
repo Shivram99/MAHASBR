@@ -2,10 +2,10 @@ package com.mahasbr.entity;
 
 import java.util.Date;
 
+import org.hibernate.annotations.CreationTimestamp;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
 import lombok.Data;
 
 
@@ -14,9 +14,7 @@ import lombok.Data;
 @MappedSuperclass
 public abstract class Auditable {
 	
-	
-	
-	
+
     @Column(name = "created_user_id")
     private Long createdUserId;
 
