@@ -26,8 +26,10 @@ import com.mahasbr.repository.DetailsPageRepository;
 @RestController
 @RequestMapping("/api/auth")
 public class DetailsPageController {
+	
 	@Autowired
 	DetailsPageRepository detailsPageRepository;
+	
 	private static final Logger logger = LoggerFactory.getLogger(DetailsPageController.class);
 	private static final String CSV_FILE_LOCATION = "C:\\Users\\Dipali.sonawane\\Desktop\\Book1.xlsx";
 

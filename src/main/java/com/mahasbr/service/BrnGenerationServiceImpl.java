@@ -57,7 +57,7 @@ public class BrnGenerationServiceImpl implements BrnGenerationService {
 		if (lstObjectArr.size() > 0) {
 			for (Object[] objL : lstObjectArr) {
 				//villageCensusName = objL[0].toString();
-				villageCensusCode = objL[1].toString();
+				villageCensusCode = objL[0].toString();
 				return villageCensusCode;
 			}
 		}
@@ -98,14 +98,18 @@ public class BrnGenerationServiceImpl implements BrnGenerationService {
 							details.setNameofAuth(dataFormatter.formatCellValue(row.getCell(11)));
 							details.setNameofAct(dataFormatter.formatCellValue(row.getCell(12)));
 							
-							if(details.getNameOfEstateOwner()!=null  && details.getHouseNo()!=null  && details.getStreetName()!=null && details.getLocality()!=null &&  details.getTownVillage()!=null 
-									&& details.getTaluka()!=null && details.getDistrict()!=null && details.getSector()!=null && details.getNameofAuth()!=null && details.getNameofAct()!=null
-									) {
+							if((details.getNameOfEstateOwner()!=""  && details.getHouseNo()!=""  && details.getStreetName()!="" && details.getLocality()!="" &&  details.getTownVillage()!="" 
+									&& details.getTaluka()!="" && details.getDistrict()!="" && details.getSector()!="" && details.getNameofAuth()!="" && details.getNameofAct()!=""
+									)) {
+								
 								DetailsPage dbDetailsPage=detailsPageRepository.getDetailsByColumn(details.getNameOfEstateOwner(),details.getHouseNo(), details.getStreetName(), details.getLocality(), details.getTownVillage(),
-										details.getTaluka(),details.getDistrict(),details.getPincode(), details.getSector(), details.getNameofAuth(),
+										details.getTaluka(),details.getDistrict(), details.getSector(), details.getNameofAuth(),
+										
+										
+										
 										details.getNameofAct());
 								if(dbDetailsPage!=null) {
-									if(dbDetailsPage.getActRegNo()!=dbDetailsPage.getActRegNo()) {
+									if(details.getActRegNo()!=dbDetailsPage.getActRegNo()) {
 										DuplicateOrgDetailsEntity duplicateOrgDetailsEntity=new DuplicateOrgDetailsEntity();
 										
 										duplicateOrgDetailsEntity.setNameOfEstateOwner(dataFormatter.formatCellValue(row.getCell(1)));
@@ -142,7 +146,15 @@ public class BrnGenerationServiceImpl implements BrnGenerationService {
 										Long saveId=brnGenerationRepo.saveNewSeqNo(villageSequenceMaster);
 										
 										String sixDigitSeqNo =String.format("%06d",seqNo.intValue());
-										details.setBrnNo(villageCensusCode+"0000"+sixDigitSeqNo);
+										
+										
+										String brnNo=villageCensusCode+"0000"+sixDigitSeqNo;
+										
+										if(brnNo.length()>16) {
+											System.out.println("brnNo"+brnNo);
+										}
+										
+										details.setBrnNo(brnNo);
 										
 										detailsPageRepository.save(details);	
 									}else {
