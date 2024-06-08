@@ -1,10 +1,20 @@
 package com.mahasbr.service;
 
-import com.mahasbr.entity.User;
-import com.mahasbr.model.MstMenuRoleMappingModel;
+import java.util.List;
 
-public interface MstMenuRoleMappingService {
+import org.springframework.stereotype.Service;
 
-	long saveMenuRoleMapping(MstMenuRoleMappingModel mstMenuRoleMappingModel, User messages);
+import com.mahasbr.entity.MstMenuRoleMapping;
 
+@Service
+public interface MstMenuRoleMappingService{
+	
+    public List<MstMenuRoleMapping> getAllMappings() ;
+
+    public MstMenuRoleMapping getMappingById(Long id);
+
+    public MstMenuRoleMapping createMapping(MstMenuRoleMapping mapping);
+
+    public MstMenuRoleMapping updateMapping(Long id, MstMenuRoleMapping mapping);
+    public void deleteMapping(Long id);
 }

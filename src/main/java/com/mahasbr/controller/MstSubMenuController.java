@@ -1,51 +1,53 @@
 package com.mahasbr.controller;
 
-import java.util.Locale;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.mahasbr.entity.User;
-import com.mahasbr.model.MstSubMenuModel;
+import com.mahasbr.entity.MstSubMenu;
 import com.mahasbr.service.MstSubMenuService;
 
-import jakarta.servlet.http.HttpSession;
-
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/developer")
 public class MstSubMenuController {
-	@Autowired
-	MstSubMenuService mstSubMenuService;
+    @Autowired
+    private MstSubMenuService subMenuService;
 
-	@PostMapping("/savemstSubMenu")
-	public String saveMenuRoleMapping(@RequestBody MstSubMenuModel mstSubMenuModel,
-			BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model, Locale locale,
-			HttpSession session) {
-		if (bindingResult.hasErrors()) {
-			model.addAttribute("language", locale.getLanguage());
-			return "/views/mst-menu-role-mapping"; /* Return to HTML Page */
-		}
-		
+    @GetMapping("/getAllSubMenus")
+    public List<MstSubMenu> getAllSubMenus() {
+        return subMenuService.getAllSubMenus();
+    }
 
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		
-		User messages  =new User();
-		messages.setId(1l); 
-		messages.setUsername("ADMIN");
-		long afterSaveId = mstSubMenuService.saveSubMenu(mstSubMenuModel, messages);
-		if (afterSaveId > 0) {
-			redirectAttributes.addFlashAttribute("message", "SUCCESS");
-		}
-		model.addAttribute("language", locale.getLanguage());
-		return "Added submenu sucessfully"; /* redirects to controller URL */
-	}
+    @GetMapping("/getSubMenuById/{id}")
+    public MstSubMenu getSubMenuById(@PathVariable Long id) {
+        return subMenuService.getSubMenuById(id);
+    }
+
+    @PostMapping("/createSubMenu}")
+    public MstSubMenu createSubMenu(@RequestBody MstSubMenu subMenu) {
+        return subMenuService.createSubMenu(subMenu);
+    }
+
+    @PutMapping("/updateSubMenu/{id}")
+    public MstSubMenu updateSubMenu(@PathVariable Long id, @RequestBody MstSubMenu subMenu) {
+        return subMenuService.updateSubMenu(id, subMenu);
+    }
+
+    @DeleteMapping("/deleteSubMenu/{id}")
+    public void deleteSubMenu(@PathVariable Long id) {
+        subMenuService.deleteSubMenu(id);
+    }
+
+    @GetMapping("/getSubMenusByUserRole/{userRoleId}")
+    public List<MstSubMenu> getSubMenusByUserRole(@PathVariable Long userRoleId) {
+        return subMenuService.getSubMenusByUserRole(userRoleId);
+    }
 }
