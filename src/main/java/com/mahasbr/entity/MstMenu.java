@@ -2,6 +2,8 @@ package com.mahasbr.entity;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -34,9 +36,11 @@ public class MstMenu extends Auditable {
 	@Column(name = "is_active")
 	private String isActive;
 
+	@JsonIgnore
 	@OneToMany(mappedBy = "menu")
 	private List<MstMenuRoleMapping> menuRoleMappings;
 
+	@JsonIgnore // Ignore serialization of this property
 	@OneToMany(mappedBy = "menu")
 	private List<MstSubMenu> subMenus;
 

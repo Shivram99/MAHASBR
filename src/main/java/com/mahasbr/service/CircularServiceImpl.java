@@ -73,7 +73,6 @@ public class CircularServiceImpl implements CircularService {
 
 	@Override
 	public String deleteFile() {
-		;
 		circularRepository.deleteAll();
 		return "Data Delete sucessfully";
 	}

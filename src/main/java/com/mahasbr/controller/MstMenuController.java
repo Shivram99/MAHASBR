@@ -47,12 +47,5 @@ public class MstMenuController {
 		service.deleteMenu(id);
 	}
 
-	@GetMapping("/getMenusByUserId/{userId}")
-	public List<MstMenu> getMenusByUserId(Long userId) {
-		List<MstMenu> lstMstMenu = service.getMenusByUserId(userId);
-		if (lstMstMenu == null) {
-			return null;
-		}
-		return lstMstMenu;
-	}
+	
 }

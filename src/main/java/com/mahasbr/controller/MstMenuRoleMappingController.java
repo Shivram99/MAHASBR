@@ -13,14 +13,26 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mahasbr.entity.MstMenuRoleMapping;
+import com.mahasbr.entity.Role;
+import com.mahasbr.model.MstMenuRoleMappingModel;
 import com.mahasbr.service.MstMenuRoleMappingService;
+import com.mahasbr.service.MstMenuService;
+import com.mahasbr.service.RoleService;
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/developer")
 public class MstMenuRoleMappingController {
 
     @Autowired
     private MstMenuRoleMappingService service;
+    
+    @Autowired
+	private MstMenuService mstMenuService;
+    
+    
+    @Autowired
+    private RoleService roleService;
+    
 
     @GetMapping("/MstMenuRoleMapping")
     public List<MstMenuRoleMapping> getAllMappings() {
@@ -33,8 +45,13 @@ public class MstMenuRoleMappingController {
     }
 
     @PostMapping("/createMapping")
-    public MstMenuRoleMapping createMapping(@RequestBody MstMenuRoleMapping mapping) {
-        return service.createMapping(mapping);
+    public MstMenuRoleMapping createMapping(@RequestBody MstMenuRoleMappingModel mapping) {
+    	MstMenuRoleMapping mstMenuRoleMapping=new MstMenuRoleMapping();
+    	mstMenuRoleMapping.setRole(roleService.findRoleById(mapping.getRoleId()).get());
+    	mstMenuRoleMapping.setMenu(mstMenuService.getMenuById(mapping.getMenuId()));
+    	
+    	//mstMenuService
+        return service.createMapping(mstMenuRoleMapping);
     }
 
     @PutMapping("/updateMapping/{id}")
@@ -45,5 +62,10 @@ public class MstMenuRoleMappingController {
     @DeleteMapping("/deleteMapping/{id}")
     public void deleteMapping(@PathVariable Long id) {
         service.deleteMapping(id);
+    }
+    
+    @GetMapping("/getAllRoles")
+    public List<Role> getAllRoles() {
+        return roleService.getAllRoles();
     }
 }
