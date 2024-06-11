@@ -48,7 +48,6 @@ public class BrnGenerationServiceImpl implements BrnGenerationService {
 	DetailsPageRepository detailsPageRepository;
 	
 	
-	
 	@Override
 	public String getVillageDtlByVillageName(DetailsPage details) {
 	//	String villageCensusName = null;
