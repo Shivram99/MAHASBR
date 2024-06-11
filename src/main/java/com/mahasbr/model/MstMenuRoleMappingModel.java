@@ -8,8 +8,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class MstMenuRoleMappingModel {
 	
-	long mstMenu;
-	long roles;
-	private Character isActive;
+	long menuId;
+	long roleId;
+	private String isActive;
+	String menuMapID;
 
 }

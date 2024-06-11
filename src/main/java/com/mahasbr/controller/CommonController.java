@@ -10,10 +10,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mahasbr.entity.DistrictMaster;
+import com.mahasbr.entity.MstMenu;
+import com.mahasbr.entity.MstSubMenu;
 import com.mahasbr.entity.TalukaMaster;
 import com.mahasbr.entity.VillageMaster;
 import com.mahasbr.response.MessageResponse;
 import com.mahasbr.service.CommonService;
+import com.mahasbr.service.MstMenuService;
+import com.mahasbr.service.MstSubMenuService;
 
 @RestController
 @RequestMapping("/user")
@@ -21,6 +25,12 @@ public class CommonController {
 	@Autowired
 	CommonService commonService;
 
+	@Autowired
+	private MstMenuService service;
+	
+	@Autowired
+	private MstSubMenuService subMenuService;
+	
 	@GetMapping("/getDistrictData")
 	public ResponseEntity<?> getDistrictDetails() {
 		List<DistrictMaster> district = commonService.getAllDistrict();
@@ -43,6 +53,20 @@ public class CommonController {
 	public ResponseEntity<?> getVillageDetailByTalukaCode(@PathVariable long censusTalukaCode) throws Exception {
 		List<VillageMaster> village = commonService.getAllVillageTalukaCode(censusTalukaCode);
 		return ResponseEntity.ok(new MessageResponse(" village List by taluka Code ", village));
+	}
+	
+	@GetMapping("/getMenusByUserId/{userId}")
+	public List<MstMenu> getMenusByUserId(@PathVariable Long userId) {
+		List<MstMenu> lstMstMenu = service.getMenusByUserId(userId);
+		if (lstMstMenu == null) {
+			return null;
+		}
+		return lstMstMenu;
+	}
+	
+	@GetMapping("/getAllSubMenus")
+	public List<MstSubMenu> getAllSubMenus() {
+		return subMenuService.getAllSubMenus();
 	}
 
 }

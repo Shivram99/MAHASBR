@@ -1,5 +1,6 @@
 package com.mahasbr.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,31 +17,32 @@ import com.mahasbr.repository.RoleRepository;
 
 @Service
 public class MstMenuRoleMappingServiceImpl implements MstMenuRoleMappingService {
-	@Autowired
-	MstMenuRoleMappingRepository mstMenuRoleMappingRepository;
-	
-	@Autowired
-	MstMenuRepo mstMenuRepo;
-	
-	@Autowired
-	RoleRepository RoleRepository;
 
-	@Override
-	public long saveMenuRoleMapping(MstMenuRoleMappingModel mstMenuRoleMappingModel, User messages) {
-		Optional<MstMenu> mstMenu = mstMenuRepo.findById(mstMenuRoleMappingModel.getMstMenu());
-		Optional<Role> role = RoleRepository.findById(mstMenuRoleMappingModel.getRoles());
-		if (mstMenu.isPresent() && role.isPresent()) {
-//			Set<MstMenu> mstMenus = new HashSet<>();
-//			Set<Role> roles = new HashSet<>();
-//			  mstMenus.add(mstMenu.get());
-//			  roles.add(role.get());
-		         MstMenuRoleMapping mstMenuRoleMapping = new MstMenuRoleMapping(mstMenuRoleMappingModel.getIsActive());
-			mstMenuRoleMappingRepository.save(mstMenuRoleMapping);
+    @Autowired
+    private MstMenuRoleMappingRepository repository;
 
-		}
-		long saveId = mstMenuRoleMappingModel.getMstMenu();
+    public List<MstMenuRoleMapping> getAllMappings() {
+        return repository.findAll();
+    }
 
-		return saveId;
+    public MstMenuRoleMapping getMappingById(Long id) {
+        return repository.findById(id).orElse(null);
+    }
 
-	}
+    public MstMenuRoleMapping createMapping(MstMenuRoleMapping mapping) {
+        return repository.save(mapping);
+    }
+
+    public MstMenuRoleMapping updateMapping(Long id, MstMenuRoleMapping mapping) {
+        if (repository.existsById(id)) {
+            mapping.setMenuMapID(id);
+            return repository.save(mapping);
+        } else {
+            return null; // Or handle the case where the mapping with the given id doesn't exist
+        }
+    }
+
+    public void deleteMapping(Long id) {
+        repository.deleteById(id);
+    }
 }

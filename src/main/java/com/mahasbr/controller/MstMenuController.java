@@ -1,53 +1,60 @@
 package com.mahasbr.controller;
 
-import java.util.Locale;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.mahasbr.entity.User;
-import com.mahasbr.model.MstMenuModel;
+import com.mahasbr.entity.MstMenu;
 import com.mahasbr.service.MstMenuService;
 
-
-import jakarta.servlet.http.HttpSession;
-
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/developer")
 public class MstMenuController {
+
 	@Autowired
-	MstMenuService mstMenuService;
-	
-	@PostMapping("/saveMenu")
-	public String saveMenu(@RequestBody MstMenuModel mstMenuModel,
-			BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model, Locale locale,
-			HttpSession session) {
-       	if(bindingResult.hasErrors()) {
-			model.addAttribute("language", locale.getLanguage());
-			return "/views/mst-menu"; /*Return to HTML Page*/
-		} 
-		
-		
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		
-		User messages  =new User();
-		messages.setId(1l); 
-		messages.setUsername("ADMIN");
-		
-		long afterSaveId = mstMenuService.saveMenu(mstMenuModel,messages);
-		if(afterSaveId > 0) {
-			redirectAttributes.addFlashAttribute("message","SUCCESS");
-		}
-		model.addAttribute("language", locale.getLanguage());
-		return "Added Menu Suscessfully"; /*redirects to controller URL*/
+	private MstMenuService service;
+
+	@GetMapping("getAllMenus")
+	public List<MstMenu> getAllMenus() {
+		return service.getAllMenus();
 	}
+
+	@GetMapping("/getMenuById/{id}")
+	public MstMenu getMenuById(@PathVariable Long id) {
+		return service.getMenuById(id);
+	}
+
+	@PostMapping("/createMenu")
+	public MstMenu createMenu(@RequestBody MstMenu menu) {
+		return service.createMenu(menu);
+	}
+
+	@PutMapping("/updateMenu/{id}")
+	public MstMenu updateMenu(@PathVariable Long id, @RequestBody MstMenu menu) {
+		return service.updateMenu(id, menu);
+	}
+
+	@DeleteMapping("/deleteMenu/{id}")
+	public void deleteMenu(@PathVariable Long id) {
+		service.deleteMenu(id);
+	}
+
+	
+	@GetMapping("/getMenusByUserId/{userId}")
+	public List<MstMenu> getMenusByUserId(Long userId) {
+		List<MstMenu> lstMstMenu = service.getMenusByUserId(userId);
+		if (lstMstMenu == null) {
+			return null;
+		}
+		return lstMstMenu;
+	}
+
 }

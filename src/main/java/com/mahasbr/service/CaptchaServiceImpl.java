@@ -1,46 +1,46 @@
 package com.mahasbr.service;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
 
-import com.mahasbr.model.Captcha;
+import com.mahasbr.response.RecaptchaResponse;
 
+@PropertySource("classpath:application.properties")
 @Service
 public class CaptchaServiceImpl implements CaptchaService {
 
-    private Map<String, String> captchaStorage = new HashMap<>();
 
-    @Override
-    public Captcha generateCaptcha() {
-        // Generate CAPTCHA code
-        String captchaCode = generateCaptchaCode();
-        
-        // Store CAPTCHA code with a unique ID
-        String captchaId = UUID.randomUUID().toString();
-        captchaStorage.put(captchaId, captchaCode);
-        
-        // Return CAPTCHA with ID
-        return new Captcha(captchaId, captchaCode);
-    }
+    @Autowired
+    private RestTemplate restTemplate;
 
-    @Override
-    public boolean verifyCaptcha(String captchaId, String userInput) {
-        // Retrieve CAPTCHA code associated with the provided ID
-        String captchaCode = captchaStorage.get(captchaId);
-        if (captchaCode != null) {
-            return userInput.equals(captchaCode);
+    
+    @Value("${google.recaptcha.secret.key}")
+    public String recaptchaSecret;
+    @Value("${google.recaptcha.verify.url}")
+    public String recaptchaVerifyUrl;
+
+    public boolean verify(String response) {
+        MultiValueMap<String, String> param= new LinkedMultiValueMap<>();
+        param.add("secret", recaptchaSecret);
+        param.add("response", response);
+
+        RecaptchaResponse recaptchaResponse = null;
+        try {
+            recaptchaResponse = this.restTemplate.postForObject(recaptchaVerifyUrl, param, RecaptchaResponse.class);
+        }catch(RestClientException e){
+            System.out.print(e.getMessage());
         }
-        return false;
-    }
-
-    private String generateCaptchaCode() {
-    	 String captchaCode = generateCaptchaCode();
-         
-         // Store CAPTCHA code with a unique ID
-         String captchaId = UUID.randomUUID().toString();
-         return captchaId;
+       if(recaptchaResponse.isSuccess()){
+            return true;
+        }else {
+            return false;
+        }
     }
 }

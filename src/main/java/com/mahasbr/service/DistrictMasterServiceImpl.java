@@ -21,23 +21,32 @@ import org.springframework.stereotype.Service;
 
 import com.mahasbr.controller.DistrictMasterController;
 import com.mahasbr.entity.DistrictMaster;
+import com.mahasbr.entity.TalukaMaster;
 import com.mahasbr.repository.DistrictMasterRepository;
+import com.mahasbr.repository.TalukaMasterRepository;
 
 @Service
-public abstract class DistrictMasterServiceImpl implements DistrictMasterService {
+public class DistrictMasterServiceImpl implements DistrictMasterService {
+	
 	@Autowired
 	DistrictMasterRepository districtMasterRepository;
+	@Autowired
+	TalukaMasterRepository tōalukaMasterRepository;
+	
 	private static final Logger logger = LoggerFactory.getLogger(DistrictMasterController.class);
 	private static final String CSV_FILE_LOCATION = "\\MAHASBR\\target\\Book3.xlsx";
 
 
-//	@Override
-//	public DistrictMaster insertDistrictDetail(DistrictMasterModel districtMasterModel) {
-//		DistrictMaster data = new DistrictMaster(districtMasterModel);
-//		districtMasterRepository.save(data);
-//		return data;
-//	}
+	public List<DistrictMaster> getAllDistrict() {
 	
+
+		return districtMasterRepository.findAll();
+	}
+	
+	public List<TalukaMaster> getAllDistrictTaluka(Long districtCode) {
+		
+		return tōalukaMasterRepository.findByCensusDistrictCode(districtCode);
+	}
 
 	@Override
 	public Optional<DistrictMaster> findByDistrictCode(long long1) {

@@ -1,56 +1,50 @@
 package com.mahasbr.service;
 
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.mahasbr.entity.MstMenu;
 import com.mahasbr.entity.MstSubMenu;
-import com.mahasbr.entity.Role;
-import com.mahasbr.entity.User;
-import com.mahasbr.model.MstSubMenuModel;
-import com.mahasbr.repository.MstMenuRepo;
 import com.mahasbr.repository.MstSubMenuRepository;
-import com.mahasbr.repository.RoleRepository;
 
 @Service
 public class MstSubMenuServiceImpl implements MstSubMenuService {
-	@Autowired
-	MstMenuRepo mstMenuRepo;
+    @Autowired
+    private MstSubMenuRepository repository;
 
-	@Autowired
-	RoleRepository RoleRepository;
-	@Autowired
-	MstSubMenuRepository mstSubMenuRepository;
+    @Override
+    public List<MstSubMenu> getAllSubMenus() {
+        return repository.findAll();
+    }
 
-	@Override
-	public long saveSubMenu(MstSubMenuModel mstSubMenuModel, User messages) {
-		Optional<MstMenu> mstMenu = mstMenuRepo.findById(mstSubMenuModel.getMenuId());
-		Optional<Role> role = RoleRepository.findById(mstSubMenuModel.getRoleId());
-		if (mstMenu.isPresent() && role.isPresent()) {
-			Set<MstMenu> mstMenus = new HashSet<>();
-			Set<Role> roles = new HashSet<>();
-			mstMenus.add(mstMenu.get());
-			roles.add(role.get());
-			MstSubMenu mstSubMenu = new MstSubMenu();
-		//	mstSubMenu.setMstmenu(mstMenus);
-//			mstSubMenu.setRole(roles);
-//			mstSubMenu.setMstmenu(mstMenu.get());
-//			mstSubMenu.setRole(role.get());
-			mstSubMenu.setSubMenuNameEnglish(mstSubMenuModel.getSubMenuEnglish());
-			mstSubMenu.setSubMenuNameMarathi(mstSubMenuModel.getSubMenuMarathi());
-			mstSubMenu.setControllerName(mstSubMenuModel.getControllerName());
-			mstSubMenu.setLinkName(mstSubMenuModel.getLinkName());
-			mstSubMenu.setIsActive('1');
+    @Override
+    public MstSubMenu getSubMenuById(Long id) {
+        return repository.findById(id).orElse(null);
+    }
 
-			mstSubMenuRepository.save(mstSubMenu);
+    @Override
+    public MstSubMenu createSubMenu(MstSubMenu subMenu) {
+        return repository.save(subMenu);
+    }
 
-		}
-		long saveId = mstSubMenuModel.getMenuId();
-		return saveId;
-	}
+    @Override
+    public MstSubMenu updateSubMenu(Long id, MstSubMenu subMenu) {
+        if (repository.existsById(id)) {
+            subMenu.setSubMenuId(id);
+            return repository.save(subMenu);
+        } else {
+            return null; // Or handle the case where the submenu with the given id doesn't exist
+        }
+    }
 
-}
+    @Override
+    public void deleteSubMenu(Long id) {
+        repository.deleteById(id);
+    }
+
+    @Override
+    public List<MstSubMenu> getSubMenusByUserRole(Long userRoleId) {
+        // Implement your logic to retrieve submenus by user role ID
+        return null;
+    }}
