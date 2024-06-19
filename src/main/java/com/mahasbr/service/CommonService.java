@@ -1,7 +1,12 @@
 package com.mahasbr.service;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
+
+import org.springframework.web.multipart.MultipartFile;
 
 import com.mahasbr.entity.DistrictMaster;
 import com.mahasbr.entity.TalukaMaster;
@@ -29,6 +34,10 @@ public interface CommonService {
 
 	List<VillageMaster> getAllVillageTalukaCode(Long censusTalukaCode);
 
+	boolean isSafe(File tmpFile) throws IllegalStateException, IOException;
+	
+	
+	public void safelyRemoveFile(Path p);
 
 	
 }

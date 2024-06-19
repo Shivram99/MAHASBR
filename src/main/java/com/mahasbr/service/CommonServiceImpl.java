@@ -1,12 +1,24 @@
 package com.mahasbr.service;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.itextpdf.text.pdf.PdfArray;
+import com.itextpdf.text.pdf.PdfDictionary;
+import com.itextpdf.text.pdf.PdfName;
+import com.itextpdf.text.pdf.PdfReader;
 import com.mahasbr.entity.DistrictMaster;
 import com.mahasbr.entity.TalukaMaster;
 import com.mahasbr.entity.User;
@@ -24,7 +36,7 @@ import jakarta.transaction.Transactional;
 @Service
 @Transactional
 public class CommonServiceImpl implements CommonService {
-
+	private static final Logger logger = LoggerFactory.getLogger(CircularServiceImpl.class);
 	@Autowired
 	UserRepository userRepository;
 
@@ -125,6 +137,70 @@ public class CommonServiceImpl implements CommonService {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	
+		  // Helper method to convert MultipartFile to File
+	    private java.io.File convertMultiPartToFile(MultipartFile file) throws IOException {
+	        java.io.File convFile = new java.io.File(file.getOriginalFilename());
+	        file.transferTo(convFile);
+	        return convFile;
+	    }
+
+	
+	    
+
+	    @Override
+		public boolean isSafe(File f) {
+			boolean safeState = false;
+			try {
+				if ((f != null) && f.exists()) {
+					// Load stream in PDF parser
+					// If the stream is not a PDF then exception will be throwed
+					// here and safe state will be set to FALSE
+					PdfReader reader = new PdfReader(f.getAbsolutePath());
+					// Check 1:
+					// Detect if the document contains any JavaScript code
+					String jsCode = reader.getJavaScript();
+					if (jsCode == null) {
+						// OK no JS code then when pass to check 2:
+						// Detect if the document has any embedded files
+						PdfDictionary root = reader.getCatalog();
+						PdfDictionary names = root.getAsDict(PdfName.NAMES);
+						PdfArray namesArray = null;
+						if (names != null) {
+							PdfDictionary embeddedFiles = names.getAsDict(PdfName.EMBEDDEDFILES);
+							namesArray = embeddedFiles.getAsArray(PdfName.NAMES);
+						}
+						// Get safe state from number of embedded files
+						safeState = ((namesArray == null) || namesArray.isEmpty());
+					}
+				}
+			} catch (Exception e) {
+				safeState = false;
+				logger.warn("Error during Pdf file analysis !", e);
+			}
+			return safeState;
+		}
+
+
+		@Override
+		public void safelyRemoveFile(Path p) {
+	        try {
+	            if (p != null) {
+	                // Remove temporary file
+	                if (!Files.deleteIfExists(p)) {
+	                    // If remove fail then overwrite content to sanitize it
+	                    Files.write(p, "-".getBytes("utf8"), StandardOpenOption.CREATE);
+	                }
+	            }
+	        } catch (Exception e) {
+	        	logger.warn("Cannot safely remove file !", e);
+	        }
+	    }
+
+
+		
+
 
 
 }

@@ -30,5 +30,7 @@ public class DistrictMaster extends Auditable {
 	private Long censusStateCode;
 
 	
+	private int is_active;
+	
 
 }
