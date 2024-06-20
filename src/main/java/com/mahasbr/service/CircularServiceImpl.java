@@ -1,5 +1,6 @@
 package com.mahasbr.service;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -21,14 +22,18 @@ import com.mahasbr.repository.CircularRepository;
 @PropertySource("application.properties")
 public class CircularServiceImpl implements CircularService {
 	private static final Logger logger = LoggerFactory.getLogger(CircularServiceImpl.class);
+
 	@Autowired
 	private Environment env;
 
 	@Autowired
 	CircularRepository circularRepository;
+	@Autowired
+	CommonService commonService;
 
 	@Override
 	public String processPDFFile(MultipartFile file) throws IOException {
+
 		// Ensure the directory exists or create it if it doesn't
 		String fileUploadPath = null;
 		logger.info((System.getProperty("os.name")));
@@ -59,6 +64,7 @@ public class CircularServiceImpl implements CircularService {
 			filePath = uploadDir.resolve(fileName);
 			counter++;
 		}
+
 
 		// Save the file to the specified location
 		Files.copy(file.getInputStream(), filePath);

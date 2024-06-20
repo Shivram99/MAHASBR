@@ -64,4 +64,10 @@ public class MstMenuServiceImpl implements MstMenuService {
                 .collect(Collectors.toList());
 
         return menus;}
+//
+//	@Override
+//	public MstMenu getMegetMenuByIdnuById(Long id) {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
 }

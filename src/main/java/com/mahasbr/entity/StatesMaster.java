@@ -30,5 +30,8 @@ public class StatesMaster extends Auditable {
 
 	@NotBlank
 	private String stateName;
+	
+	//@NotBlank
+	private int is_active;
 
 }

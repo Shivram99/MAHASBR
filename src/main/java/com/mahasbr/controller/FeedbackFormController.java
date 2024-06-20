@@ -19,11 +19,11 @@ import jakarta.validation.Valid;
 @RequestMapping("/user")
 public class FeedbackFormController {
 	@Autowired
-	FeedbackFormService feddbackFeedbackFormService;
+	FeedbackFormService feedbackFeedbackFormService;
 
 	@PostMapping("/feedbackForm")
 	public ResponseEntity<?> getFeedbackFormDetails(@Valid @RequestBody FeedbackFormModel feedbackFormModel) {
-		FeedbackForm details = feddbackFeedbackFormService.getFeedbackFormDetails(feedbackFormModel);
+		FeedbackForm details = feedbackFeedbackFormService.getFeedbackFormDetails(feedbackFormModel);
         return new ResponseEntity<>(new MessageResponse("Feedback submitted successfully", details), HttpStatus.ACCEPTED);
 	}
 
