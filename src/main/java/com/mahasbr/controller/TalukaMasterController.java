@@ -30,7 +30,8 @@ import com.mahasbr.service.DistrictMasterService;
 import com.mahasbr.service.TalukaMasterService;
 
 @RestController
-@RequestMapping("/api/auth")
+//@RequestMapping("/api/auth")
+@RequestMapping("/developer")
 public class TalukaMasterController {
 	@Autowired
 	TalukaMasterService talukaMasterService;

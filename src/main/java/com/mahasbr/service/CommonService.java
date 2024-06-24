@@ -8,6 +8,7 @@ import java.util.Optional;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import com.itextpdf.text.DocumentException;
 import com.mahasbr.entity.DistrictMaster;
 import com.mahasbr.entity.TalukaMaster;
 import com.mahasbr.entity.User;
@@ -38,6 +39,8 @@ public interface CommonService {
 	
 	
 	public void safelyRemoveFile(Path p);
+	
+	public  boolean processPdf(String pdfFilePath) throws IOException, DocumentException;
 
 	
 }
