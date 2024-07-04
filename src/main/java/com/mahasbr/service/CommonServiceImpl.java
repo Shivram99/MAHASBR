@@ -6,19 +6,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
-import com.aspose.cells.FileFormatInfo;
-import com.aspose.cells.FileFormatUtil;
 import com.aspose.cells.MsoDrawingType;
 import com.aspose.cells.OleObject;
 import com.aspose.cells.Workbook;
@@ -44,8 +38,8 @@ import jakarta.transaction.Transactional;
 
 @Service
 @Transactional
-public class CommonServiceImpl implements CommonService {
-	private static final Logger logger = LoggerFactory.getLogger(CircularServiceImpl.class);
+public class CommonServiceImpl implements CommonService{
+	private static final Logger logger = LoggerFactory.getLogger(CommonServiceImpl.class);
 	@Autowired
 	UserRepository userRepository;
 
@@ -155,7 +149,7 @@ public class CommonServiceImpl implements CommonService {
 		String filename = f.getName();
 		// Extract the actual file extension
 		String fileExtension = getFileExtension(filename);
-		//check pdf file
+		// check pdf file
 		if (fileExtension.equalsIgnoreCase("pdf")) {
 			PdfReader reader = null;
 			try {
@@ -182,7 +176,7 @@ public class CommonServiceImpl implements CommonService {
 					reader.close();
 				}
 			}
-			//check excel file
+			// check excel file
 		} else if (fileExtension.equalsIgnoreCase("xlsx")) {
 			try {
 				// Load the file into the Excel document parser
@@ -230,7 +224,6 @@ public class CommonServiceImpl implements CommonService {
 	public void safelyRemoveFile(Path p) {
 		try {
 			if (p != null) {
-				// Remove temporary file
 				if (!Files.deleteIfExists(p)) {
 					// If remove fail then overwrite content to sanitize it
 					Files.write(p, "-".getBytes("utf8"), StandardOpenOption.CREATE);
@@ -256,5 +249,4 @@ public class CommonServiceImpl implements CommonService {
 			return false;
 		}
 	}
-
 }
