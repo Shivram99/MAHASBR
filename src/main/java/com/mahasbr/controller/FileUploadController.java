@@ -1,16 +1,13 @@
 package com.mahasbr.controller;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.file.Path;
 
 import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -21,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.mahasbr.service.CircularService;
 import com.mahasbr.service.CommonService;
 import com.mahasbr.service.FileUploadService;
 
@@ -28,63 +26,72 @@ import com.mahasbr.service.FileUploadService;
 @RequestMapping("/admin")
 public class FileUploadController {
 
-	private static final Logger logger = LoggerFactory.getLogger(FileUploadController.class);
+//	private static final Logger logger = LoggerFactory.getLogger(FileUploadController.class);
 
 	@Autowired
 	FileUploadService fileUploadService;
 	@Autowired
 	CommonService commonService;
 
+	@Autowired
+	CircularService circularservice;
+
 	@PostMapping(value = "/file", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) {
+	public ResponseEntity<String> uploadFiles(@RequestParam("file") MultipartFile file)
+			throws EncryptedDocumentException, InvalidFormatException {
+		String content = null;
 		Workbook workbook = null;
+
 		try {
 			String filename = file.getOriginalFilename();
 			if (filename == null || filename.trim().isEmpty()) {
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No file provided or file is empty.");
 			}
+			// Determine file type and validate
+			if (file.getOriginalFilename().endsWith(".pdf")) {
+				if (!circularservice.isValidPDF(file.getInputStream())) {
+					return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Invalid PDF file.");
+				}
+				content = circularservice.extractTextFromPDF(file.getInputStream());
 
-			if (filename.endsWith(".csv")) {
-				fileUploadService.processCSVFile(file);
-				return ResponseEntity.ok("CSV file uploaded and processed successfully.");
-			} else if (filename.endsWith(".xlsx")) {
+			} else if (file.getOriginalFilename().endsWith(".xlsx")) {
+				if (!commonService.isValidExcel(file)) {
+					return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Invalid Excel file.");
+				}
 				workbook = WorkbookFactory.create(file.getInputStream());
-				String fileType = file.getContentType();
+				content = commonService.extractTextFromXlsx(file.getInputStream());
 
-				if (fileType == null || fileType.trim().isEmpty()
-						|| !fileType.equals("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")) {
-					return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid file type or size.");
+			} else if (file.getOriginalFilename().endsWith(".csv")) {
+				if (!commonService.isValidCSV(file)) {
+					return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Invalid CSV file.");
 				}
-
-				boolean isSafe = false;
-				File tmpFile = null;
-				Path tmpPath = null;
-
-				tmpFile = File.createTempFile("uploaded-", ".xlsx");
-				tmpPath = tmpFile.toPath();
-
-				try (FileOutputStream os = new FileOutputStream(tmpFile)) {
-					os.write(file.getBytes());
-				}
-
-				isSafe = commonService.isSafe(tmpFile);
-				if (!isSafe) {
-					commonService.safelyRemoveFile(tmpPath);
-					return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-							.body("Failed to upload file: Unsafe file.");
-				}
-
-				fileUploadService.processExcelFile(workbook);
-				return ResponseEntity.ok("Excel file uploaded and processed successfully.");
+				content = commonService.extractTextFromCsv(file.getInputStream());
 			} else {
-				throw new IllegalArgumentException("Unsupported file type");
+				return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Unsupported file type.");
 			}
 
-		} catch (EncryptedDocumentException | InvalidFormatException | IOException e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-					.body("Failed to upload file: " + e.getMessage());
+			// Check for malicious content
+			if (commonService.detectMaliciousContent(content)) {
+				return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)
+						.body("Malicious content detected! File will not be processed.");
+			}
 
+			// Process the file if no malicious content detected
+			if (file.getOriginalFilename().endsWith(".pdf")) {
+				circularservice.processPDFFile(file);
+			} else if (file.getOriginalFilename().endsWith(".xlsx")) {
+				fileUploadService.processExcelFile(workbook);
+			} else if (file.getOriginalFilename().endsWith(".csv")) {
+				fileUploadService.processCSVFile(file);
+			}
+
+			return ResponseEntity.status(HttpStatus.OK).body("File processed successfully.");
+
+		} catch (IOException e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error processing file.");
 		} finally {
+			// Close workbook if opened
 			if (workbook != null) {
 				try {
 					workbook.close();
@@ -94,4 +101,5 @@ public class FileUploadController {
 			}
 		}
 	}
+
 }

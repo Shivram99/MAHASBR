@@ -115,11 +115,8 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
         ). logout().logoutUrl("/logout").permitAll().logoutSuccessHandler(logoutSuccessHandler);
  
     http.authenticationProvider(authenticationProvider());
-    logger.info("Configuring HTTP Security1...");
     http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
-    logger.info("Configuring HTTP Security3333...");
-    http.addFilterBefore(xssFilter(), UsernamePasswordAuthenticationFilter.class);
-    logger.info("Configuring HTTP Security4444...");
+   http.addFilterBefore(xssFilter(), UsernamePasswordAuthenticationFilter.class);
     return http.build();
   }
 	

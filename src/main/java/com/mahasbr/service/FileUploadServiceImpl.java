@@ -2,6 +2,7 @@ package com.mahasbr.service;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -153,4 +154,12 @@ public class FileUploadServiceImpl implements FileUploadService {
 			}
 		}
 	}
+
+	@Override
+	public boolean isValidExcel(MultipartFile file) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	
 }
