@@ -1,6 +1,7 @@
 package com.mahasbr.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -16,5 +17,11 @@ public interface TalukaMasterRepository extends JpaRepository<TalukaMaster, Long
 
 	@Query(value = "SELECT * FROM taluka_master WHERE  CENSUS_DISTRICT_CODE = :censusDistrictCode", nativeQuery = true)
 	List<TalukaMaster> findBycensusDistrictCode(long censusDistrictCode);
+
+
+	Optional<TalukaMaster> findByCensusDistrictCodeAndTalukaName(Long censusDistrictCode, String talukaName);
+
+
+	//Optional<TalukaMaster> findByCensusDistrictCodeAndTalukaName(String censusDistrictCode, String talukaName);
 
 }

@@ -1,6 +1,7 @@
 package com.mahasbr.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,12 @@ public class VillageMasterService {
 
 	public List<VillageMaster> getVillageDtlByVillageName(DetailsPage details) {
 		return villageMasterRepository.getVillageDtlByVillageName(details);
+	}
+
+	public Optional<VillageMaster> getVillagesByCensusTalukaCodeAndVillageName(Long censusTalukaCode,
+			String villageName) {
+		// TODO Auto-generated method stub
+		return villageMasterRepository.getVillagesByCensusTalukaCodeAndVillageName(censusTalukaCode,villageName);
 	}
 	
 	

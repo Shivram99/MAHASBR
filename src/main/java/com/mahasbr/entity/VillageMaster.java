@@ -23,8 +23,7 @@ public class VillageMaster extends Auditable{
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "village_master_seq_generator")
     @SequenceGenerator(name="village_master_seq_generator", sequenceName = "village_seq", allocationSize=1)
 	@NotBlank
-	private Integer censusVillageCode;
-	
+	private Long censusVillageCode;	
 
 	@NotBlank
 	private String villageName;
@@ -32,5 +31,7 @@ public class VillageMaster extends Auditable{
 	
 	@NotBlank
 	private Long censusTalukaCode;
+	
+	private Long is_active;
 
 }

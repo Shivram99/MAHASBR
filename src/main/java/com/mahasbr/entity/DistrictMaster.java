@@ -29,6 +29,6 @@ public class DistrictMaster extends Auditable {
 	@NotBlank
 	private Long censusStateCode;
 
-	
+	private Long is_active;
 
 }

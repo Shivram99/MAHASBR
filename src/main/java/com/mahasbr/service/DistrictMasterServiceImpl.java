@@ -88,7 +88,7 @@ public class DistrictMasterServiceImpl implements DistrictMasterService {
 
 			});
 
-		} catch (EncryptedDocumentException | InvalidFormatException | IOException e) {
+		} catch (EncryptedDocumentException  | IOException e) {
 			logger.error(e.getMessage(), e);
 		} finally {
 			try {

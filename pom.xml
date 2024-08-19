@@ -197,6 +197,33 @@
 			<artifactId>postgresql</artifactId>
 			<scope>runtime</scope>
 		</dependency>-->
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi</artifactId>
+			<version>5.2.3</version>
+		</dependency>
+		<!-- Apache POI for .xlsx files -->
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+			<version>5.2.3</version>
+		</dependency>
+		<!-- Apache POI for handling common compress formats -->
+
+		<!-- XMLBeans (required by POI for processing .xlsx files) -->
+		<dependency>
+			<groupId>org.apache.xmlbeans</groupId>
+			<artifactId>xmlbeans</artifactId>
+			<version>5.1.1</version>
+		</dependency>
+		<!-- Commons Compress (required by POI for handling compressed formats) -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-compress</artifactId>
+			<version>1.21</version>
+		</dependency>
+		
+		
 	</dependencies>
 
 	<build>

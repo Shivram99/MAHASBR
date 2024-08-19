@@ -1,6 +1,7 @@
 package com.mahasbr.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -19,6 +20,9 @@ public interface VillageMasterRepository extends JpaRepository<VillageMaster, Lo
 	
 	@Query("FROM VillageMaster t WHERE  t.censusTalukaCode=?1")
 	List<VillageMaster> findBycensusTalukaCode(Long censusTalukaCode);
+
+
+	Optional<VillageMaster> getVillagesByCensusTalukaCodeAndVillageName(Long censusTalukaCode, String villageName);
 
 
 }

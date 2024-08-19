@@ -65,7 +65,7 @@ public class VillageMasterController {
 					String cellValue = dataFormatter.formatCellValue(cell);
 
 					VillageMaster village = new VillageMaster();
-					village.setCensusVillageCode(Integer.parseInt(dataFormatter.formatCellValue(row.getCell(2))));
+					village.setCensusVillageCode(Long.parseLong(dataFormatter.formatCellValue(row.getCell(2))));
 					village.setVillageName(dataFormatter.formatCellValue(row.getCell(3)));
 					// village
 					villages.add(village);
@@ -73,7 +73,7 @@ public class VillageMasterController {
 				}
 				villageMasterRepository.saveAll(villages);
 			});
-		} catch (EncryptedDocumentException | InvalidFormatException | IOException e) {
+		} catch (EncryptedDocumentException | IOException e) {
 			logger.error(e.getMessage(), e);
 		} finally {
 			try {

@@ -43,7 +43,7 @@ public class FileUploadController {
 
 			return ResponseEntity.ok("File uploaded and processed successfully");
 
-		} catch (EncryptedDocumentException | InvalidFormatException | IOException e) {
+		} catch (EncryptedDocumentException | IOException e) {
 			logger.error(e.getMessage(), e);
 			return ResponseEntity.status(500).body("Failed to upload file: " + e.getMessage());
 

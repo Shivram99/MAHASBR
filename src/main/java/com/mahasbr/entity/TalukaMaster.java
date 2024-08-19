@@ -31,6 +31,8 @@ public class TalukaMaster extends Auditable {
 	@NotBlank
 	private Long censusDistrictCode;
 	
+	private Long is_active;
+	
 //	@OneToOne
 //    @JoinColumn(name = "censusDistrictCode")
 //   Optional<DistrictMaster>  districtMaster;

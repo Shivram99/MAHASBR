@@ -26,9 +26,10 @@ public class StatesMaster extends Auditable {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "state_master_seq_generator")
 	@SequenceGenerator(name = "state_master_seq_generator", sequenceName = "state_seq", allocationSize = 1)
 	@NotBlank
-	private Integer censusStateCode;
+	private Long censusStateCode;
 
 	@NotBlank
 	private String stateName;
-
+    
+	private Long is_active;
 }
