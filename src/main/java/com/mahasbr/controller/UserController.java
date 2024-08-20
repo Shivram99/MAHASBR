@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -56,14 +57,15 @@ public class UserController {
 	}
 	
 	@PostMapping("/searchBRN")
-	public ResponseEntity<?> getSearchBRN(@RequestBody SearchBrnDto searchBrnDto) throws Exception {
+	public ResponseEntity<List<MstRegistryDetailsPageEntity>> getSearchBRN(@RequestBody SearchBrnDto searchBrnDto) throws Exception {
 		//List<VillageMaster> village = commonService.getAllVillageTalukaCode(censusTalukaCode);
 		List<MstRegistryDetailsPageEntity> searchBRNAndEstablishmentDetails=new ArrayList<>();
 		StringUtils stringUtils = new StringUtils();
 		if(!searchBrnDto.getDistrict().isEmpty()) {
-		    searchBRNAndEstablishmentDetails=mstRegistryDetailsPageService.getsearchBRNAndEstablishmentDetails(stringUtils.safeUpperCase(searchBrnDto.getDistrict()),stringUtils.safeUpperCase(searchBrnDto.getBrnNo()),stringUtils.safeUpperCase(searchBrnDto.getNameOfEstablishmentOrOwner()));
+			DistrictMaster district = commonService.getAllDistrictDistrictCode(Long.parseLong(searchBrnDto.getDistrict()));
+		    searchBRNAndEstablishmentDetails=mstRegistryDetailsPageService.getsearchBRNAndEstablishmentDetails(stringUtils.safeUpperCase(district.getDistrictName()),stringUtils.safeUpperCase(searchBrnDto.getBrnNo()),stringUtils.safeUpperCase(searchBrnDto.getNameOfEstablishmentOrOwner()));
 		}
 		
-		return ResponseEntity.ok(new MessageResponse(" village List by taluka Code "));
+		 return new ResponseEntity<>(searchBRNAndEstablishmentDetails, HttpStatus.OK);
 	}
 }
