@@ -26,7 +26,9 @@ import com.mahasbr.repository.VillageMasterRepository;
 import com.mahasbr.service.VillageMasterService;
 
 @RestController
-@RequestMapping("/api/auth")
+//@RequestMapping("/api/auth")
+@RequestMapping("/developer")
+
 public class VillageMasterController {
 	@Autowired
 	VillageMasterService villageMasterService;
@@ -35,7 +37,7 @@ public class VillageMasterController {
 
 	private static final Logger logger = LoggerFactory.getLogger(VillageMasterController.class);
 	private static final String CSV_FILE_LOCATION = "\\MAHASBR\\target\\Book3.xlsx";
-	
+
 	/*
 	 * @PostMapping("/village") public ResponseEntity<?>
 	 * postVillageDetails(@RequestBody VillageMasterModel villageMasterModel) {
@@ -62,7 +64,7 @@ public class VillageMasterController {
 
 				for (Row row : sheet) {
 					Cell cell = row.getCell(3);
-					String cellValue = dataFormatter.formatCellValue(cell);
+					/* String cellValue = */dataFormatter.formatCellValue(cell);
 
 					VillageMaster village = new VillageMaster();
 					village.setCensusVillageCode(Long.parseLong(dataFormatter.formatCellValue(row.getCell(2))));

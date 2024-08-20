@@ -9,11 +9,10 @@ public class MstSubMenuModel {
 
 	private long menuId;
 	private long roleId;
-	private String subMenuEnglish;
-	private String subMenuMarathi;
+	private String subMenuNameEnglish;
+	private String subMenuNameMarathi;
 	private String controllerName;
 	private String linkName;
-
 	private Character isActive;
 
 }

@@ -26,22 +26,19 @@ import com.mahasbr.repository.CensusEntityRepository;
 @RestController
 @RequestMapping("/user")
 public class CensusDataImportController {
-	
 
 	@Autowired
 	CensusEntityRepository censusEntityRepository;
-	
+
 	private static final Logger logger = LoggerFactory.getLogger(DetailsPageController.class);
-	private static final String CSV_FILE_LOCATION ="C:\\Users\\Mahait\\Downloads\\Rdir_2011_27_MAHARASHTRA.xls";
+//private static final String CSV_FILE_LOCATION = "C:\\Users\\Mahait\\Downloads\\Rdir_2011_27_MAHARASHTRA.xls";
 
 	@GetMapping("/importCensusExcelSheet")
 	public @ResponseBody void importCensusExcelSheet() {
-		
-		
-		String fileArr[]= {"C:\\Users\\Mahait\\Downloads\\Rdir_2011_27_MAHARASHTRA.xls"};
-		
-		
-		for(String path:fileArr) {
+
+		String fileArr[] = { "C:\\Users\\Mahait\\Downloads\\Rdir_2011_27_MAHARASHTRA.xls" };
+
+		for (String path : fileArr) {
 			Workbook workbook = null;
 			try {
 				workbook = WorkbookFactory.create(new File(path));
@@ -49,35 +46,35 @@ public class CensusDataImportController {
 				// Retrieving the number of sheets in the Workbook
 				logger.info("Number of sheets: ", workbook.getNumberOfSheets());
 				// Print all sheets name
-				List<CensusEntity> lstCensusEntity=new ArrayList<>(); 
+				List<CensusEntity> lstCensusEntity = new ArrayList<>();
 				int index = 0;
 				for (Sheet sheet : workbook) {
 					DataFormatter dataFormatter = new DataFormatter();
 					// loop through all rows and columns and create Course object
 					for (Row row : sheet) {
-						if (index>1) {
-							
+						if (index > 1) {
+
 							CensusEntity censusEntity = new CensusEntity();
-							
+
 							censusEntity.setCensusStateCode(dataFormatter.formatCellValue(row.getCell(0)));
 							censusEntity.setCensusStateName(dataFormatter.formatCellValue(row.getCell(1)));
 							censusEntity.setCensusDistrictCode(dataFormatter.formatCellValue(row.getCell(2)));
 							censusEntity.setCensusDistrictName(dataFormatter.formatCellValue(row.getCell(3)));
 							censusEntity.setCensusTahsilCode(dataFormatter.formatCellValue(row.getCell(4)));
 							censusEntity.setCensusTahsilName(dataFormatter.formatCellValue(row.getCell(5)));
-							
+
 							censusEntity.setCensusVillageCode(dataFormatter.formatCellValue(row.getCell(6)));
 							censusEntity.setCensusVillageName(dataFormatter.formatCellValue(row.getCell(7)));
-							
+
 							lstCensusEntity.add(censusEntity);
-							
+
 						}
 						index++;
-						
+
 					}
-					
+
 				}
-				
+
 				censusEntityRepository.saveAll(lstCensusEntity);
 
 			} catch (EncryptedDocumentException | IOException e) {
@@ -91,13 +88,7 @@ public class CensusDataImportController {
 				}
 			}
 		}
-		
-		
-		
 
 	}
-
-	
-	
 
 }

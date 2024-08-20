@@ -6,6 +6,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.Data;
@@ -23,21 +25,18 @@ public class MstMenuRoleMapping extends Auditable {
 	@Column(name = "MENU_MAP_ID")
 	private Long menuMapID;
 
-	/*
-	 * @ManyToMany
-	 * 
-	 * @JoinTable(name = "mst_menu_role_mapping", joinColumns = @JoinColumn(name =
-	 * "MENU_MAP_ID"), inverseJoinColumns = @JoinColumn(name = "MENU_ID"))
-	 * Set<MstMenu> mstMenu = new HashSet<>();
-	 * 
-	 * @ManyToMany
-	 * 
-	 * @JoinTable(name = "mst_menu_role_mapping", joinColumns = @JoinColumn(name =
-	 * "MENU_MAP_ID"), inverseJoinColumns = @JoinColumn(name = "ROLE_ID")) Set<Role>
-	 * role = new HashSet<>();
-	 */
+	
 	@Column(name = "is_active")
 	private Character isActive;
+	
+
+    @ManyToOne
+    @JoinColumn(name = "MENU_ID")
+    private MstMenu menu;
+
+    @ManyToOne
+    @JoinColumn(name = "role_id")
+    private Role role;
 
 	public MstMenuRoleMapping(Character isActive) {
 		// this.mstMenu = mstMenu;
