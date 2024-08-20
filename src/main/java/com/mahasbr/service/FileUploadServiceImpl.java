@@ -2,23 +2,31 @@ package com.mahasbr.service;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
 
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.mahasbr.controller.FileUploadController;
 import com.mahasbr.entity.DetailsPage;
 import com.mahasbr.repository.DetailsPageRepository;
 
 @Service
 public class FileUploadServiceImpl implements FileUploadService {
-
+	private static final Logger logger = LoggerFactory.getLogger(FileUploadServiceImpl.class);
 	@Autowired
 	private DetailsPageRepository detailsPageRepository;
 
@@ -50,8 +58,22 @@ public class FileUploadServiceImpl implements FileUploadService {
 					details.setMajarActOfEst(dataFormatter.formatCellValue(row.getCell(18)));
 					details.setNicActCode(Integer.parseInt(dataFormatter.formatCellValue(row.getCell(19))));
 
-					LocalDate localDate = LocalDate.parse(dataFormatter.formatCellValue(row.getCell(20)));
-					details.setOpCurStartDate(localDate);
+//					if (dataFormatter.formatCellValue(row.getCell(20)) != null
+//							&& dataFormatter.formatCellValue(row.getCell(20)) != "") {
+//						String d = dataFormatter.formatCellValue(row.getCell(20));
+//						SimpleDateFormat dataFormatters = new SimpleDateFormat("yyyy-mm-dd");
+//						Date opsrtdate = null;
+//						try {
+//							opsrtdate = dataFormatters.parse(d);
+//						} catch (ParseException e) {
+//							// TODO Auto-generated catch block
+//							e.printStackTrace();
+//						}
+//						if (opsrtdate != null) {
+//							LocalDate localDate = opsrtdate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+//							details.setOpCurStartDate(localDate);
+//						}
+//					}
 					details.setOwnCode(Integer.parseInt(dataFormatter.formatCellValue(row.getCell(21))));
 					details.setNoOfWorkers(Integer.parseInt(dataFormatter.formatCellValue(row.getCell(22))));
 					details.setActRegNo(dataFormatter.formatCellValue(row.getCell(23)));
@@ -68,12 +90,14 @@ public class FileUploadServiceImpl implements FileUploadService {
 					details.setNameofAct(dataFormatter.formatCellValue(row.getCell(34)));
 					details.setDateOfReg(dataFormatter.formatCellValue(row.getCell(35)));
 					details.setDateOfExpiry(dataFormatter.formatCellValue(row.getCell(36)));
-
+					logger.info(details.getDistrict());
 					detailsPageRepository.save(details);
+
 				}
 				index++;
 			}
 		}
+
 	}
 
 	@Override
@@ -130,4 +154,12 @@ public class FileUploadServiceImpl implements FileUploadService {
 			}
 		}
 	}
+
+	@Override
+	public boolean isValidExcel(MultipartFile file) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	
 }

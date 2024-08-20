@@ -1,23 +1,27 @@
 package com.mahasbr.service;
 
-import java.io.File;
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.itextpdf.text.pdf.PdfArray;
-import com.itextpdf.text.pdf.PdfDictionary;
-import com.itextpdf.text.pdf.PdfName;
+import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.pdf.PdfReader;
 import com.mahasbr.entity.DistrictMaster;
 import com.mahasbr.entity.TalukaMaster;
@@ -30,29 +34,27 @@ import com.mahasbr.repository.TalukaMasterRepository;
 import com.mahasbr.repository.UserRepository;
 import com.mahasbr.repository.VillageMasterRepository;
 import com.mahasbr.util.StringHelperUtils;
+import com.opencsv.CSVReader;
+import com.opencsv.exceptions.CsvValidationException;
 
 import jakarta.transaction.Transactional;
 
 @Service
 @Transactional
-public class CommonServiceImpl implements CommonService {
-	private static final Logger logger = LoggerFactory.getLogger(CircularServiceImpl.class);
+public class CommonServiceImpl implements CommonService{
+	//private static final Logger logger = LoggerFactory.getLogger(CommonServiceImpl.class);
 	@Autowired
 	UserRepository userRepository;
 
-	
 	@Autowired
 	CommonHomeMethodsRepo commonHomeMethodsRepo;
-	
-	
-	
-	
+
 	@Autowired
 	DistrictMasterRepository districtMasterRepository;
-	
+
 	@Autowired
 	TalukaMasterRepository talukaMasterRepository;
-	
+
 	@Autowired
 	VillageMasterRepository villageMasterRepository;
 
@@ -64,34 +66,33 @@ public class CommonServiceImpl implements CommonService {
 
 // for Get All District List 
 	@Override
-	public List<DistrictMaster> getAllDistrict(){
+	public List<DistrictMaster> getAllDistrict() {
 		return districtMasterRepository.findAll();
 	}
 
 	// for Get All District List by Districtcode
 	@Override
 	public DistrictMaster getAllDistrictDistrictCode(long censusDistrictCode) throws Exception {
-		 Optional<DistrictMaster> districtCode = districtMasterRepository.findById(censusDistrictCode);
-	        if (districtCode.isPresent())
-	            return districtCode.get();
-	        else {
+		Optional<DistrictMaster> districtCode = districtMasterRepository.findById(censusDistrictCode);
+		if (districtCode.isPresent())
+			return districtCode.get();
+		else {
 
-	            throw new Exception("*** Id is not present ***");
-	       }
+			throw new Exception("*** Id is not present ***");
+		}
 	}
 
 	@Override
 	public List<TalukaMaster> getAllTalukaByDistrictCode(long censusDistrictCode) {
-		 List<TalukaMaster> taluka= talukaMasterRepository.findBycensusDistrictCode(censusDistrictCode);		 
+		List<TalukaMaster> taluka = talukaMasterRepository.findBycensusDistrictCode(censusDistrictCode);
 		return taluka;
 	}
 
 	@Override
 	public List<VillageMaster> getAllVillageTalukaCode(Long censusTalukaCode) {
-		 List<VillageMaster> village= villageMasterRepository.findBycensusTalukaCode(censusTalukaCode);	
+		List<VillageMaster> village = villageMasterRepository.findBycensusTalukaCode(censusTalukaCode);
 		return village;
 	}
-
 
 	@Override
 	public List<TopicModel> findMenuNameByRoleID(Long levelRoleVal) {
@@ -103,7 +104,7 @@ public class CommonServiceImpl implements CommonService {
 				TopicModel obj = new TopicModel();
 				obj.setKey(StringHelperUtils.isNullInt(objLst[0]));
 				obj.setMenuName(StringHelperUtils.isNullString(objLst[1]));
-				//	obj.setMenuName(StringHelperUtils.isNullString(objLst[2]));
+				// obj.setMenuName(StringHelperUtils.isNullString(objLst[2]));
 				lstMenuObj.add(obj);
 			}
 		}
@@ -120,8 +121,8 @@ public class CommonServiceImpl implements CommonService {
 				obj.setKey(StringHelperUtils.isNullInt(objLst[0]));
 				obj.setMenuKey(StringHelperUtils.isNullInt(objLst[1]));
 				obj.setRoleKey(StringHelperUtils.isNullInt(objLst[2]));
-					obj.setSubMenuName(StringHelperUtils.isNullString(objLst[3]));
-					
+				obj.setSubMenuName(StringHelperUtils.isNullString(objLst[3]));
+
 				obj.setControllerName(StringHelperUtils.isNullString(objLst[5]));
 				obj.setLinkName(StringHelperUtils.isNullString(objLst[6]));
 
@@ -138,69 +139,136 @@ public class CommonServiceImpl implements CommonService {
 		return null;
 	}
 
-	
-		  // Helper method to convert MultipartFile to File
-	    private java.io.File convertMultiPartToFile(MultipartFile file) throws IOException {
-	        java.io.File convFile = new java.io.File(file.getOriginalFilename());
-	        file.transferTo(convFile);
-	        return convFile;
-	    }
+//	// Helper method to convert MultipartFile to File
+//	private java.io.File convertMultiPartToFile(MultipartFile file) throws IOException {
+//		java.io.File convFile = new java.io.File(file.getOriginalFilename());
+//		file.transferTo(convFile);
+//		return convFile;
+	// }
 
 	
-	    
+	public boolean processPdf(String pdfFilePath) throws IOException, DocumentException {
+		PdfReader reader = null;
+		try {
+			reader = new PdfReader(pdfFilePath);
+			// Your PDF processing logic here
+			System.out.println("PDF processed successfully.");
+			return true;
 
-	    @Override
-		public boolean isSafe(File f) {
-			boolean safeState = false;
-			try {
-				if ((f != null) && f.exists()) {
-					// Load stream in PDF parser
-					// If the stream is not a PDF then exception will be throwed
-					// here and safe state will be set to FALSE
-					PdfReader reader = new PdfReader(f.getAbsolutePath());
-					// Check 1:
-					// Detect if the document contains any JavaScript code
-					String jsCode = reader.getJavaScript();
-					if (jsCode == null) {
-						// OK no JS code then when pass to check 2:
-						// Detect if the document has any embedded files
-						PdfDictionary root = reader.getCatalog();
-						PdfDictionary names = root.getAsDict(PdfName.NAMES);
-						PdfArray namesArray = null;
-						if (names != null) {
-							PdfDictionary embeddedFiles = names.getAsDict(PdfName.EMBEDDEDFILES);
-							namesArray = embeddedFiles.getAsArray(PdfName.NAMES);
-						}
-						// Get safe state from number of embedded files
-						safeState = ((namesArray == null) || namesArray.isEmpty());
-					}
-				}
-			} catch (Exception e) {
-				safeState = false;
-				logger.warn("Error during Pdf file analysis !", e);
+		} finally {
+			if (reader != null) {
+				reader.close();
 			}
-			return safeState;
+			return false;
 		}
+	}
 
 
-		@Override
-		public void safelyRemoveFile(Path p) {
-	        try {
-	            if (p != null) {
-	                // Remove temporary file
-	                if (!Files.deleteIfExists(p)) {
-	                    // If remove fail then overwrite content to sanitize it
-	                    Files.write(p, "-".getBytes("utf8"), StandardOpenOption.CREATE);
+
+	@Override
+	public boolean isValidExcel(MultipartFile file) {
+		 try (InputStream inputStream = file.getInputStream()) {
+	            Workbook workbook = WorkbookFactory.create(inputStream);
+	            // Check if the workbook has at least one sheet
+	            return workbook.getNumberOfSheets() > 0;
+	        } catch (IOException | InvalidFormatException e) {
+	            return false;
+	        }
+	    
+	}
+
+	@Override
+	public String extractTextFromXlsx(InputStream inputStream) throws IOException {
+		StringBuilder text = new StringBuilder();
+	    try (Workbook workbook = new XSSFWorkbook(inputStream)) {
+	        for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
+	            Sheet sheet = workbook.getSheetAt(i);
+	            for (Row row : sheet) {
+	                for (Cell cell : row) {
+	                    text.append(cell.toString()).append(" ");
 	                }
 	            }
-	        } catch (Exception e) {
-	        	logger.warn("Cannot safely remove file !", e);
 	        }
 	    }
+	    return text.toString();
+	}
+	
 
+	@Override
+	public boolean isValidCSV(MultipartFile file) {
+		 try (InputStreamReader reader = new InputStreamReader(file.getInputStream());
+		         BufferedReader br = new BufferedReader(reader)) {
+		        
+		        // Check if the file has at least one line
+		        String firstLine = br.readLine();
+		        return firstLine != null && !firstLine.isEmpty();
+		    } catch (IOException e) {
+		        return false;
+		    }
+		}
 
-		
+	@Override
+	public String extractTextFromCsv(InputStream inputStream) throws IOException{
+		 StringBuilder text = new StringBuilder();
+		    try (CSVReader reader = new CSVReader(new InputStreamReader(inputStream))) {
+		        String[] line;
+		        while ((line = reader.readNext()) != null) {
+		            for (String cell : line) {
+		                text.append(cell).append(" ");
+		            }
+		        }
+		    } catch (CsvValidationException e) {
+		        e.printStackTrace();
+		        throw new IOException("Error reading CSV file", e);
+		    }
+		    return text.toString();
+		}
 
+	@Override
+	public boolean detectMaliciousContent(String content) {
+		if (content.isEmpty()) {
+		        return false;
+		    }
 
+		String[] suspiciousPatterns = { "eval", // Use of eval function
+				"document.write", // Writing to document
+				"unescape", // Unescaping strings (often used in obfuscation)
+				"<script>", // Inline scripts
+				"</script>", // Closing script tags
+				"window.location", // Redirects
+				"XMLHttpRequest", // AJAX requests
+				"alert(", // Alerts
+				"confirm(", // Confirm dialogs
+				"prompt(", // Prompt dialogs
+				"setTimeout(", // Timers
+				"setInterval(", // Intervals
+				"document.location", // Document location
+				"location.href", // Location href
+				"document.cookie", // Accessing cookies
+				"document.domain" // Document domain
+		};
 
-}
+		// Regular expressions for HTML tags
+		String[] htmlTags = { "<[^>]*>", // Any HTML tag
+				"</[^>]*>", // Closing HTML tag
+				"<script[^>]*>", // Opening script tag
+				"</script>", // Closing script tag
+				"<iframe[^>]*>", // Opening iframe tag
+				"</iframe>" // Closing iframe tag
+		};
+		for (String pattern : suspiciousPatterns) {
+			if (content.contains(pattern)) {
+				return true;
+			}
+		}
+		// Check for HTML tags
+		for (String tag : htmlTags) {
+			if (content.matches("(?s).*" + tag + ".*")) {
+				return true;
+			}
+		}
+
+		    return false;
+		}
+	}
+

@@ -1,8 +1,7 @@
 package com.mahasbr.service;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,10 +33,18 @@ public interface CommonService {
 
 	List<VillageMaster> getAllVillageTalukaCode(Long censusTalukaCode);
 
-	boolean isSafe(File tmpFile) throws IllegalStateException, IOException;
-	
-	
-	public void safelyRemoveFile(Path p);
+		
+	//public void processPdfFile(MultipartFile file) throws IOException;
+
+	public boolean isValidExcel(MultipartFile file);
+
+	public String extractTextFromXlsx(InputStream inputStream) throws IOException;
+
+	public boolean isValidCSV(MultipartFile file);
+
+	public String extractTextFromCsv(InputStream inputStream) throws IOException;
+
+	public boolean detectMaliciousContent(String content);
 
 	
 }

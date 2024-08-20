@@ -1,5 +1,7 @@
 package com.mahasbr.security;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,12 +24,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.mahasbr.filter.AuthEntryPointJwt;
 import com.mahasbr.filter.AuthTokenFilter;
+import com.mahasbr.filter.XssFilter;
 import com.mahasbr.service.UserDetailsServiceImpl;
 
 @Configuration
-@EnableMethodSecurity
+@EnableMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
-	
+	private static final Logger logger = LoggerFactory.getLogger(WebSecurityConfig.class);
   @Autowired
   UserDetailsServiceImpl userDetailsService;
 
@@ -73,7 +76,10 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
   public PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder();
   }
-  
+  @Bean
+  public XssFilter xssFilter() {
+	  return new XssFilter();
+  }
   
   @Bean
   public LogoutSuccessHandler logoutSuccessHandler() {
@@ -88,6 +94,7 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
   
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+	  logger.info("Configuring HTTP Security...");
     http.csrf(csrf -> csrf.disable())
         .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -109,6 +116,7 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
  
     http.authenticationProvider(authenticationProvider());
     http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+   http.addFilterBefore(xssFilter(), UsernamePasswordAuthenticationFilter.class);
     return http.build();
   }
 	

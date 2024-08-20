@@ -1,15 +1,11 @@
 package com.mahasbr.config;
 
-import java.util.HashMap;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
-import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.multipart.MultipartException;
 /*
 @ControllerAdvice
 public class ExceptionHandlerController {
@@ -29,9 +25,15 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @ControllerAdvice
 public class ExceptionHandlerController extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<?> handleGlobalException(Exception ex, WebRequest request) {
-        // Your exception handling logic
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal Server Error");
+	@ExceptionHandler(Exception.class)
+	public ResponseEntity<?> handleGlobalException(Exception ex, WebRequest request) {
+		// Your exception handling logic
+		//return ResponseEntity.status(500).body("Failed to upload file: " + ex.getMessage());
+		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal Server Error");
+	}
+	@ExceptionHandler(MultipartException.class)
+    public ResponseEntity<String> handleMultipartException(MultipartException e) {
+        return ResponseEntity.status(500).body("Failed to upload file: " + e.getMessage());
     }
+	
 }

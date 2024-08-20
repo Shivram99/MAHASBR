@@ -24,14 +24,14 @@ public class FeedbackForm {
 	@SequenceGenerator(name = "feedbackform_seq_generator", sequenceName = "feedbackform_seq", allocationSize = 1)
 	private Long id;
 	
-	@NotBlank()
+	//@NotBlank()
 	@Size(max=100)
 	private String name;
 	
-	@NotBlank
+	//@NotBlank()
 	private String districtName;
 	
-	@NotBlank
+	//@NotBlank
 	@Email(message = "Please enter valid email id ", regexp = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$")
 	//^[a-zA-Z0-9_!#$%&'*+\=?`{|}~^.-]+@[a-zA-Z0-9.-]+$
 	private String emailId;

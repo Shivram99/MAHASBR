@@ -26,7 +26,9 @@ import com.mahasbr.repository.VillageMasterRepository;
 import com.mahasbr.service.VillageMasterService;
 
 @RestController
-@RequestMapping("/api/auth")
+//@RequestMapping("/api/auth")
+@RequestMapping("/developer")
+
 public class VillageMasterController {
 	@Autowired
 	VillageMasterService villageMasterService;
