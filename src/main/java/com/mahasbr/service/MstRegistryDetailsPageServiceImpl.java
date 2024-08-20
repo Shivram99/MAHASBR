@@ -1,6 +1,8 @@
 package com.mahasbr.service;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.apache.poi.ss.usermodel.Cell;
@@ -399,6 +401,15 @@ public class MstRegistryDetailsPageServiceImpl implements MstRegistryDetailsPage
 		}
 		return locRemark;
 
+	}
+
+	
+	public List<MstRegistryDetailsPageEntity> getsearchBRNAndEstablishmentDetails(String district, String brnNo,
+			String establishment) {
+		List<MstRegistryDetailsPageEntity> searchBRNAndEstablishmentDetails=new ArrayList<>();
+		searchBRNAndEstablishmentDetails=mstRegistryDetailsPageRepository.findByDistrictAndBrnNoOrNameOfEstablishmentOrOwner(district,brnNo,establishment);
+		
+		return searchBRNAndEstablishmentDetails;
 	}
 
 }

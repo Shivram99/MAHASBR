@@ -58,4 +58,12 @@ public interface MstRegistryDetailsPageRepository extends JpaRepository<MstRegis
 			@Param("locality") String locality, @Param("townVillage") String townVillage,
 			@Param("taluka") String taluka, @Param("district") String district, @Param("pinCode") Integer pinCode,
 			@Param("sector") String sector);
+	
+	//search brnNo or nameOfEstablishmentOrOwner form the district
+	 @Query("SELECT m FROM MstRegistryDetailsPageEntity m WHERE m.district = :district AND " +
+	           "(m.brnNo = :brnNo OR m.nameOfEstablishmentOrOwner = :nameOfEstablishmentOrOwner)")
+	    List<MstRegistryDetailsPageEntity> findByDistrictAndBrnNoOrNameOfEstablishmentOrOwner(
+	        @Param("district") String district,
+	        @Param("brnNo") String brnNo,
+	        @Param("nameOfEstablishmentOrOwner") String nameOfEstablishmentOrOwner);
 }

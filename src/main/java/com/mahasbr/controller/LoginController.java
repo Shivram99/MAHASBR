@@ -1,6 +1,5 @@
 package com.mahasbr.controller;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -16,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.mahasbr.entity.AuditLog;
 import com.mahasbr.model.LoginRequest;
 import com.mahasbr.repository.AuditLogRepository;
 import com.mahasbr.repository.RoleRepository;
