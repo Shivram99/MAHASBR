@@ -27,10 +27,10 @@ public class CommonController {
 
 	@Autowired
 	private MstMenuService service;
-	
+
 	@Autowired
 	private MstSubMenuService subMenuService;
-	
+
 	@GetMapping("/getDistrictData")
 	public ResponseEntity<?> getDistrictDetails() {
 		List<DistrictMaster> district = commonService.getAllDistrict();
@@ -54,7 +54,7 @@ public class CommonController {
 		List<VillageMaster> village = commonService.getAllVillageTalukaCode(censusTalukaCode);
 		return ResponseEntity.ok(new MessageResponse(" village List by taluka Code ", village));
 	}
-	
+
 	@GetMapping("/getMenusByUserId/{userId}")
 	public List<MstMenu> getMenusByUserId(@PathVariable Long userId) {
 		List<MstMenu> lstMstMenu = service.getMenusByUserId(userId);
@@ -63,7 +63,7 @@ public class CommonController {
 		}
 		return lstMstMenu;
 	}
-	
+
 	@GetMapping("/getAllSubMenus")
 	public List<MstSubMenu> getAllSubMenus() {
 		return subMenuService.getAllSubMenus();

@@ -31,7 +31,7 @@ public class CensusDataImportController {
 	CensusEntityRepository censusEntityRepository;
 
 	private static final Logger logger = LoggerFactory.getLogger(DetailsPageController.class);
-	private static final String CSV_FILE_LOCATION = "C:\\Users\\Mahait\\Downloads\\Rdir_2011_27_MAHARASHTRA.xls";
+//private static final String CSV_FILE_LOCATION = "C:\\Users\\Mahait\\Downloads\\Rdir_2011_27_MAHARASHTRA.xls";
 
 	@GetMapping("/importCensusExcelSheet")
 	public @ResponseBody void importCensusExcelSheet() {

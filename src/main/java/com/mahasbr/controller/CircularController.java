@@ -49,7 +49,6 @@ public class CircularController {
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid PDF file.");
 				// return "Invalid PDF file.";
 			}
-
 			// Extract JavaScript and check for malicious content
 			String jsCode = circularservice.extractTextFromPDF(file.getInputStream());
 			if (circularservice.detectMaliciousJavaScript(jsCode)) {
@@ -59,7 +58,7 @@ public class CircularController {
 				// Pass the MultipartFile to the service method
 				String filePath = circularservice.processPDFFile(file);
 				return ResponseEntity.status(HttpStatus.OK)
-						.body("PDF processed successfully. File saved at: " + filePath);
+						.body("PDF processed successfully.File saved at: " + filePath);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -68,5 +67,4 @@ public class CircularController {
 					.body("Failed to upload file: Error processing PDF.");
 		}
 	}
-
 }

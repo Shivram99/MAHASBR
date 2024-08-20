@@ -1,11 +1,9 @@
 package com.mahasbr.controller;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -17,9 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.mahasbr.entity.AuditLog;
 import com.mahasbr.model.LoginRequest;
-import com.mahasbr.repository.AuditLogRepository;
 import com.mahasbr.repository.RoleRepository;
 import com.mahasbr.repository.UserRepository;
 import com.mahasbr.response.JwtResponse;
@@ -52,8 +48,6 @@ public class LoginController {
 
 	@Autowired
 	private CaptchaService captchaService;
-
-
 
 	@PostMapping("/signin")
 	public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest, HttpSession httpSession,
