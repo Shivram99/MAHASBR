@@ -1,14 +1,28 @@
 package com.mahasbr.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.mahasbr.entity.ConcernRegistryDetailsPageEntity;
+import com.mahasbr.entity.MstRegistryDetailsPageEntity;
+import com.mahasbr.model.BRNGenerationRecordCount;
+import com.mahasbr.service.ConcernRegistryDetailsPageService;
 import com.mahasbr.service.MstRegistryDetailsPageService;
 
 @RestController
@@ -17,15 +31,65 @@ public class RegistryCSVUploadController {
 
 	@Autowired
 	MstRegistryDetailsPageService mstRegistryDetailsPageService;
-	
-	 @PostMapping("/upload")
-	    public ResponseEntity<String> uploadExcelFile(@RequestParam ("File")MultipartFile file) {
-	        if (file.isEmpty()) {
-	            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Please select a file to upload.");
-	        }
-	        mstRegistryDetailsPageService.uploadRegiteryCSVFileForBRNGeneration(file);
-	        
-	       
-			return null;
-	 }
+
+	@Autowired
+	ConcernRegistryDetailsPageService concernRegistryDetailsPageService;
+
+//	@PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	@PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public ResponseEntity<?> uploadExcelFile(@RequestPart("file") MultipartFile file) {
+		BRNGenerationRecordCount bRNGenerationRecordCount = null;
+		// Check if the file is empty
+		if (file.isEmpty()) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Please select a file to upload.");
+		}
+
+		// Get the original filename
+		String originalFilename = file.getOriginalFilename();
+		if (originalFilename == null) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid file name.");
+		}
+
+		// Check file type
+		if (!(originalFilename.endsWith(".csv") || originalFilename.endsWith(".xlsx"))) {
+			return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
+					.body("Unsupported file type. Please upload a CSV or Excel (.xlsx) file.");
+		}
+
+		try {
+			// Process the file based on its type
+			if (originalFilename.endsWith(".xlsx")) {
+				bRNGenerationRecordCount = mstRegistryDetailsPageService.uploadRegiteryCSVFileForBRNGeneration(file);
+				System.out.println("bRNGenerationRecordCount :" + bRNGenerationRecordCount);
+			}
+
+		} catch (Exception e) {
+			// Log the error and return an error response
+			// logger.error("Error processing file: {}", e.getMessage(), e);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body("Failed to upload file: " + e.getMessage());
+		}
+
+		return ResponseEntity.ok().body(bRNGenerationRecordCount);
+	}
+
+	@GetMapping("/registoryData")
+	public ResponseEntity<Page<MstRegistryDetailsPageEntity>> getMasterRegistoryDetails(
+			@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size,
+			@RequestParam(defaultValue = "siNo") String sortBy) {
+		Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
+		Page<MstRegistryDetailsPageEntity> registryDetailsPage = mstRegistryDetailsPageService.getAllRegistoryDetails(pageable);
+		return ResponseEntity.ok(registryDetailsPage);
+	}
+
+	@GetMapping("/registoryConcernData")
+	public ResponseEntity<Page<ConcernRegistryDetailsPageEntity>> getConcernRegistryDetails(
+			@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size,
+			@RequestParam(defaultValue = "siNo") String sortBy) {
+
+		Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
+		Page<ConcernRegistryDetailsPageEntity> concernRegistryDetailsPage = concernRegistryDetailsPageService
+				.getAllConcernRegistryDetails(pageable);
+		return ResponseEntity.ok(concernRegistryDetailsPage);
+	}
 }

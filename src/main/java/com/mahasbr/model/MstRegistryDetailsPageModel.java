@@ -9,11 +9,13 @@ import com.mahasbr.entity.Auditable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Component
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class MstRegistryDetailsPageModel extends Auditable  {
 	
 	private Long siNo;
@@ -86,9 +88,9 @@ public class MstRegistryDetailsPageModel extends Auditable  {
 
 	private String nameOfAct;
 
-	private LocalDate dateOfRegistration;
+	private String dateOfRegistration;
 
-	private LocalDate dateOfDeregistrationExpiry;
+	private String dateOfDeregistrationExpiry;
 
 	private String gstNumber;
 	
