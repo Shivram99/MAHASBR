@@ -703,4 +703,9 @@ public class MstRegistryDetailsPageServiceImpl implements MstRegistryDetailsPage
 		return null;
 		
 	}
+
+	@Override
+	public Optional<MstRegistryDetailsPageEntity> getBRNDetails(String brnno) {
+		return mstRegistryDetailsPageRepository.findByBrnNo(brnno);
+	}
 }

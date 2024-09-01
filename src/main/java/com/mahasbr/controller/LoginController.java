@@ -77,8 +77,7 @@ public class LoginController {
 	 */
 
     return ResponseEntity
-        .ok(new JwtResponse(jwt, userDetails.getId(), userDetails.getUsername(), roles));
+        .ok(new JwtResponse(jwt, userDetails.getId(), userDetails.getUsername(), roles,userDetails.getIsFirstTimeLogin()));
   }
 
-  
 }

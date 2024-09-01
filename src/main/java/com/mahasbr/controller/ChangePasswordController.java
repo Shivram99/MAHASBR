@@ -54,6 +54,7 @@ public class ChangePasswordController {
 				String newPass = encoder.encode(changePasswordModel.getNewPasswordConfirm());
 				if (encoder.matches(oldPass, messages.getPassword())) {
 					messages.setPassword((encoder.encode(changePasswordModel.getNewPasswordConfirm())));
+					messages.setIsFirstTimeLogin(false);
 					User message = (User) changePasswordServiceImpl.updateUser(messages);
 
 					return ResponseEntity.status(HttpStatus.OK)
