@@ -9,5 +9,4 @@ import com.mahasbr.entity.DuplicateRegistryDetailsPageEntity;
 public interface DuplicateRegistryDetailsPageRepository extends JpaRepository<DuplicateRegistryDetailsPageEntity, Long> {
 
 	
-	
 }

@@ -1,15 +1,14 @@
 package com.mahasbr.entity;
 
-import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.util.Set;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.Data;
@@ -27,21 +26,41 @@ public class MstMenu extends Auditable {
 	@Column(name = "menu_id")
 	private Long menuId;
 
-	@Column(name = "menu_name_english")
-	private String menuNameEnglish;
+	@Column(name = "lable")
+	 private String lable;
+	
+	@Column(name = "url")
+	 private String  url;
+	
+	@Column(name = "routerLink")
+	 private String routerLink;
+	
+	@Column(name = "clas")
+	private String classs;
+	
+	@Column(name = "Role")
+    @ElementCollection(fetch = FetchType.EAGER)
+    private Set<String> roles;
+	
+	
+	
+//	@Column(name = "menu_name_english")
+//	private String menuNameEnglish;
+//
+//	@Column(name = "menu_name_marathi")
+//	private String menuNameMarathi;
+//
+//	@Column(name = "is_active")
+//	private String isActive;
+//
+//	@JsonIgnore
+//	@OneToMany(mappedBy = "menu")
+//	private List<MstMenuRoleMapping> menuRoleMappings;
+//
+//	@JsonIgnore // Ignore serialization of this property
+//	@OneToMany(mappedBy = "menu")
+//	private List<MstSubMenu> subMenus;
 
-	@Column(name = "menu_name_marathi")
-	private String menuNameMarathi;
-
-	@Column(name = "is_active")
-	private String isActive;
-
-	@JsonIgnore
-	@OneToMany(mappedBy = "menu")
-	private List<MstMenuRoleMapping> menuRoleMappings;
-
-	@JsonIgnore // Ignore serialization of this property
-	@OneToMany(mappedBy = "menu")
-	private List<MstSubMenu> subMenus;
-
+	
+	
 }

@@ -5,24 +5,18 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import com.mahasbr.entity.DuplicateOrgDetailsEntity;
 import com.mahasbr.entity.DuplicateRegistryDetailsPageEntity;
-import com.mahasbr.repository.DuplicateOrgDetailsRepository;
+import com.mahasbr.repository.DuplicateRegistryDetailsPageRepository;
 
 @Service
-public class DuplicateOrgDetailsServiceImpl implements DuplicateOrgDetailsService{
+public class DuplicateRegistryDetailsPageServiceImpl implements DuplicateRegistryDetailsPageService {
 	
 	@Autowired
-	DuplicateOrgDetailsRepository duplicateOrgDetailsRepository;
+	DuplicateRegistryDetailsPageRepository DuplicateRegistryDetailsPageRepository;
 
 	@Override
-	public void save(DuplicateOrgDetailsEntity duplicateOrgDetailsEntity) {
-		duplicateOrgDetailsRepository.save(duplicateOrgDetailsEntity);
-	}
-
 	public Page<DuplicateRegistryDetailsPageEntity> getAllDuplicateRegistryDetails(Pageable pageable) {
 		// TODO Auto-generated method stub
-		return null;
+		return DuplicateRegistryDetailsPageRepository.findAll(pageable);
 	}
-
 }

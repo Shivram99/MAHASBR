@@ -12,16 +12,17 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-
 @EnableJpaAuditing
 @SpringBootApplication
-@PropertySource("application.properties")
+//@Profile("local")
+//@PropertySource("application.properties")
 public class SbrBackEndProjectApplication {
 
 	public static void main(String[] args) {
-		
-		 LocalDateTime currentDateTimeIndia = LocalDateTime.now(ZoneId.of("Asia/Kolkata"));
+
+		LocalDateTime currentDateTimeIndia = LocalDateTime.now(ZoneId.of("Asia/Kolkata"));
 		SpringApplication.run(SbrBackEndProjectApplication.class, args);
+
 	}
 
 	@Bean

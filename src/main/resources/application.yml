@@ -1,0 +1,12 @@
+spring:
+  datasource:
+    username: system
+    url: jdbc:oracle:thin:@10.0.1.145:1521/orcl.Mahaitgov.in
+    password: Password2024
+  jpa:
+    hibernate:
+      ddl-auto: update
+com:
+  mahasbr:
+    jwtExpirationMs: '86400000'
+    jwtSecret: rkv2Xu9hfEaxGlnsc1dxvukP4zyYOlQFbHsA+z6dvqD38B9WgccqqZah9MitgkrK1/ASXPTGpVrZZ7EkUr2x0w==
