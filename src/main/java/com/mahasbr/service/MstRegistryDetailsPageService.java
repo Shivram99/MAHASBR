@@ -21,4 +21,7 @@ public interface MstRegistryDetailsPageService {
 
 	Optional<MstRegistryDetailsPageEntity> getBRNDetails(String brn);
 
+	Page<MstRegistryDetailsPageEntity> getPostLoginDashboardData(Pageable pageable, List<Long> selectedDistrictIds,
+			List<Long> selectedTalukaIds, String registerDateFrom, String registerDateTo);
+
 }

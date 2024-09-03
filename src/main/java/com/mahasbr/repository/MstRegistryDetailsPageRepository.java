@@ -76,5 +76,15 @@ public interface MstRegistryDetailsPageRepository extends JpaRepository<MstRegis
 	        @Param("talukas") List<String> talukas,
 	        @Param("district") List<String> district,
 	        Pageable pageable);
-	
+
+
+    // Custom query to get paginated data based on a list of talukas and a list of districts
+    @Query("SELECT m FROM MstRegistryDetailsPageEntity m WHERE m.taluka IN :talukas AND m.district IN :districts")
+    Page<MstRegistryDetailsPageEntity> findByTalukasAndDistricts(@Param("talukas") List<String> talukas, 
+                                                                 @Param("districts") List<String> districts, 
+                                                                 Pageable pageable);
+    
+    @Query("SELECT m FROM MstRegistryDetailsPageEntity m WHERE m.district IN (:districts)")
+    Page<MstRegistryDetailsPageEntity> findByDistricts(@Param("districts") List<String> districts, Pageable pageable);
+
 }

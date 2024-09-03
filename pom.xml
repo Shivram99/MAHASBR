@@ -222,15 +222,22 @@
 			<artifactId>commons-compress</artifactId>
 			<version>1.21</version>
 		</dependency>
-		
-		
-		
-		
-		
+
+
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-annotations</artifactId>
+		</dependency>
+
+
 	</dependencies>
 
 	<build>
-	<finalName>mahasbr</finalName>
+		<finalName>mahasbr</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>

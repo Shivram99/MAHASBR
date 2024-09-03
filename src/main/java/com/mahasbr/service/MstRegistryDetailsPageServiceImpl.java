@@ -77,6 +77,8 @@ public class MstRegistryDetailsPageServiceImpl implements MstRegistryDetailsPage
 	@Autowired
 	DuplicateRegistryDetailsPageRepository duplicateRegistryDetailsPageRepository;
 	private final Pattern PAN_PATTERN = Pattern.compile("^[A-Z]{5}[0-9]{4}[A-Z]$");
+	
+	
 
 	public BRNGenerationRecordCount uploadRegiteryCSVFileForBRNGeneration(MultipartFile file) {
 		StringUtils stringUtils = new StringUtils();
@@ -707,5 +709,20 @@ public class MstRegistryDetailsPageServiceImpl implements MstRegistryDetailsPage
 	@Override
 	public Optional<MstRegistryDetailsPageEntity> getBRNDetails(String brnno) {
 		return mstRegistryDetailsPageRepository.findByBrnNo(brnno);
+	}
+
+	@Override
+	public Page<MstRegistryDetailsPageEntity> getPostLoginDashboardData(Pageable pageable,
+			List<Long> selectedDistrictIds, List<Long> selectedTalukaIds, String registerDateFrom,
+			String registerDateTo) {
+		
+		List<String> talukaName=talukaMasterRepository.findTalukaNameByCensusTalukaCode(selectedTalukaIds);
+	    List<String> districtName=	districtMasterRepository.findDistrictNamesByCensusDistrictCodes(selectedDistrictIds);
+	    if(!talukaName.isEmpty()) {
+	    Page<MstRegistryDetailsPageEntity> mstRegistoryData=  mstRegistryDetailsPageRepository.findByTalukasAndDistricts(talukaName, districtName,pageable);
+	    return mstRegistoryData;
+	    }
+	    Page<MstRegistryDetailsPageEntity> mstRegistoryData=  mstRegistryDetailsPageRepository.findByDistricts(districtName,pageable);
+	    return mstRegistoryData;
 	}
 }

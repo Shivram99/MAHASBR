@@ -1,5 +1,6 @@
 package com.mahasbr.controller;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -23,6 +25,7 @@ import com.mahasbr.entity.ConcernRegistryDetailsPageEntity;
 import com.mahasbr.entity.DuplicateRegistryDetailsPageEntity;
 import com.mahasbr.entity.MstRegistryDetailsPageEntity;
 import com.mahasbr.model.BRNGenerationRecordCount;
+import com.mahasbr.model.PostLoginDashboardRequestModel;
 import com.mahasbr.service.ConcernRegistryDetailsPageService;
 import com.mahasbr.service.DuplicateRegistryDetailsPageService;
 import com.mahasbr.service.MstRegistryDetailsPageService;
@@ -112,5 +115,25 @@ public class RegistryCSVUploadController {
         Optional<MstRegistryDetailsPageEntity> details = mstRegistryDetailsPageService.getBRNDetails(brn);
         return details.map(ResponseEntity::ok)
                       .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+	
+	@PostMapping(value="/getPostLoginDashboardData", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Page<MstRegistryDetailsPageEntity>> getPostLoginDashboardData(
+            @RequestBody PostLoginDashboardRequestModel request) {
+        
+        // Extract parameters from the request
+        int page = request.getPage();
+        int size = request.getSize();
+        String sortBy = request.getSortBy();
+        List<Long> selectedDistrictIds = request.getSelectedDistrictIds();
+        List<Long> selectedTalukaIds = request.getSelectedTalukaIds();
+        String registerDateFrom = request.getFilters().getRegisterDateFrom();
+        String registerDateTo = request.getFilters().getRegisterDateTo();
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
+        // Implement the service call to get the data based on the parameters
+        Page<MstRegistryDetailsPageEntity> response = mstRegistryDetailsPageService.getPostLoginDashboardData(
+        		pageable,selectedDistrictIds, selectedTalukaIds, registerDateFrom, registerDateTo);
+
+        return ResponseEntity.ok(response);
     }
 }
