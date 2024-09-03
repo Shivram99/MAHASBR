@@ -61,7 +61,8 @@ public class RegistrationController {
 
  if (userRepository.existsByEmail(signUpRequest.getEmail())) { return
 	 ResponseEntity.badRequest().body(new
-	  MessageResponse("Error: Email is already in use!")); }
+	  MessageResponse("Error: "
+	  		+ "")); }
 	 
     // Create new user's account
     User user = new User(signUpRequest.getUsername(), encoder.encode(signUpRequest.getPassword()),signUpRequest.getEmail(),signUpRequest.getPhoneNo());
@@ -69,6 +70,7 @@ public class RegistrationController {
     Optional<DepartmentMst>  departmentMst =departmentMstService.findDepartmentById(signUpRequest.getDepartmentId());
     
     if(departmentMst.isPresent()) {
+    	
     	 user.setDepartment(departmentMst.get());
     }
    

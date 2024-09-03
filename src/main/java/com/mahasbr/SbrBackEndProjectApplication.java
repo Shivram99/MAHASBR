@@ -13,12 +13,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-
 @EnableJpaAuditing
-
-//@EnableScheduling
-//@ComponentScan("com.mahasbr.cronjob")
-
 @SpringBootApplication
 //@Profile("local")
 //@PropertySource("classpath:application.properties")
@@ -26,11 +21,10 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class SbrBackEndProjectApplication {
 
 	public static void main(String[] args) {
-		
-		 LocalDateTime currentDateTimeIndia = LocalDateTime.now(ZoneId.of("Asia/Kolkata"));
-		  SpringApplication.run(SbrBackEndProjectApplication.class, args);
-		
-		
+
+		LocalDateTime currentDateTimeIndia = LocalDateTime.now(ZoneId.of("Asia/Kolkata"));
+		SpringApplication.run(SbrBackEndProjectApplication.class, args);
+
 	}
 
 	@Bean

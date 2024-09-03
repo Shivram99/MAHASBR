@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.mahasbr.service.StatesMasterService;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/developer")
 public class StatesMasterController {
 	@Autowired
 	StatesMasterService statesMasterService;

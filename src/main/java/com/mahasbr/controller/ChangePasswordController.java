@@ -35,7 +35,6 @@ public class ChangePasswordController {
 	@Autowired
 	CommonService commonService;
 
-
 	@PostMapping("/changePassword")
 	public ResponseEntity<MessageResponse> changePassword(@RequestBody ChangePasswordModel changePasswordModel,
 			BindingResult bindingResult, HttpSession session) {

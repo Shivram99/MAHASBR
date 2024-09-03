@@ -21,7 +21,20 @@ public class AuthEntryPointJwt implements AuthenticationEntryPoint {
   public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException)
       throws IOException, ServletException {
     logger.error("Unauthorized error: {}", authException.getMessage());
-    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Error: Unauthorized");
+   // response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Error: Unauthorized");
+    
+    logger.error("Unauthorized error: {}", authException.getMessage());
+
+    if (authException instanceof org.springframework.security.authentication.BadCredentialsException) {
+        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Error: Bad credentials");
+    } else if (authException instanceof org.springframework.security.authentication.LockedException) {
+        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Error: User account is locked");
+    } else if (authException instanceof org.springframework.security.authentication.DisabledException) {
+        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Error: User account is disabled");
+    } else {
+        // For any other type of exception, consider it as an internal server error
+        response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error: Internal server error");
+    }
   }
 }
 

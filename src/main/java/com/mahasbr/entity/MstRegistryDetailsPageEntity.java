@@ -9,7 +9,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -24,7 +23,7 @@ public class MstRegistryDetailsPageEntity extends Auditable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "siNo_generator")
 	@SequenceGenerator(name = "siNo_generator", sequenceName = "siNo_sequence", allocationSize = 1)
-	@Column(name = "siNo")
+	@Column(name = "si_No")
 	private Long siNo;
 		
 	@Column(length = 100)

@@ -1,6 +1,5 @@
 package com.mahasbr.controller;
 
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,29 +20,18 @@ public class DisplayLoginHistoryController {
 	@Autowired
 	private AuditLogRepository auditLogRepository;
 
-	
 	@GetMapping("/getAllAuditLogs")
 	public ResponseEntity<List<AuditLog>> getAllAuditLogs() {
-	    List<AuditLog> auditLogs = auditLogRepository.findAll();
-       
-	    return ResponseEntity.ok(auditLogs.stream()
-                .map(this::convertToDto)
-                .collect(Collectors.toList()));
-	}
-	
-	
+		List<AuditLog> auditLogs = auditLogRepository.findAll();
 
-    private AuditLog convertToDto(AuditLog auditLog) {
-    	
-    	
-        return new AuditLog(
-                auditLog.getId(),
-                auditLog.getUsername(),
-                auditLog.getAction(),
-                auditLog.getTimestamp().format(DateTimeFormatter.ofPattern("dd-MM-yy h:mm:ss.SSSSSSSSS a")),
-                auditLog.getIpAddress(),
-                auditLog.getStatus()
-        );
-    }
+		return ResponseEntity.ok(auditLogs.stream().map(this::convertToDto).collect(Collectors.toList()));
+	}
+
+	private AuditLog convertToDto(AuditLog auditLog) {
+
+		return new AuditLog(auditLog.getId(), auditLog.getUsername(), auditLog.getAction(),
+				auditLog.getTimestamp().format(DateTimeFormatter.ofPattern("dd-MM-yy h:mm:ss.SSSSSSSSS a")),
+				auditLog.getIpAddress(), auditLog.getStatus());
+	}
 
 }

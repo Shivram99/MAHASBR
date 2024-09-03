@@ -1,10 +1,16 @@
 package com.mahasbr.service;
 
-import com.mahasbr.entity.User;
-import com.mahasbr.model.MstSubMenuModel;
+import java.util.List;
+
+import com.mahasbr.entity.MstSubMenu;
 
 public interface MstSubMenuService {
 
-	long saveSubMenu(MstSubMenuModel mstSubMenuModel, User messages);
+    List<MstSubMenu> getAllSubMenus();
+    MstSubMenu getSubMenuById(Long id);
+    MstSubMenu createSubMenu(MstSubMenu subMenu);
+    MstSubMenu updateSubMenu(Long id, MstSubMenu subMenu);
+    void deleteSubMenu(Long id);
+    List<MstSubMenu> getSubMenusByUserRole(Long userRoleId);
 
 }
