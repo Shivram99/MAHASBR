@@ -86,5 +86,7 @@ public interface MstRegistryDetailsPageRepository extends JpaRepository<MstRegis
     
     @Query("SELECT m FROM MstRegistryDetailsPageEntity m WHERE m.district IN (:districts)")
     Page<MstRegistryDetailsPageEntity> findByDistricts(@Param("districts") List<String> districts, Pageable pageable);
-
+    
+    @Query("SELECT m FROM MstRegistryDetailsPageEntity m WHERE m.brnNo = :brn")
+    Page<MstRegistryDetailsPageEntity> findAllByBrnNo(@Param("brn") String brn, Pageable pageable);
 }

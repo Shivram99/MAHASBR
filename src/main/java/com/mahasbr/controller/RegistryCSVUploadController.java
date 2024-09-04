@@ -1,13 +1,18 @@
 package com.mahasbr.controller;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -111,10 +116,10 @@ public class RegistryCSVUploadController {
 	}
 	
 	@GetMapping("/brn-details/{brn}")
-    public ResponseEntity<MstRegistryDetailsPageEntity> getBRNDetails(@PathVariable String brn) {
-        Optional<MstRegistryDetailsPageEntity> details = mstRegistryDetailsPageService.getBRNDetails(brn);
-        return details.map(ResponseEntity::ok)
-                      .orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<Page<MstRegistryDetailsPageEntity>> getBRNDetails(@PathVariable String brn) {
+		Pageable pageable = PageRequest.of(0, 10, Sort.by("siNo"));
+		Page<MstRegistryDetailsPageEntity> details = mstRegistryDetailsPageService.getBRNData(brn,pageable);
+        return ResponseEntity.ok(details);
     }
 	
 	@PostMapping(value="/getPostLoginDashboardData", consumes = "application/json", produces = "application/json")
@@ -136,4 +141,24 @@ public class RegistryCSVUploadController {
 
         return ResponseEntity.ok(response);
     }
+	
+	@GetMapping("/download")
+	public ResponseEntity<Resource> downloadFile(@RequestParam String fileName) {
+		try {
+			// Assuming files are stored in a directory named "files"
+			Path filePath = Paths.get("src/main/resources/static/files/" + fileName);
+			Resource resource = new UrlResource(filePath.toUri());
+
+			if (!resource.exists()) {
+				throw new RuntimeException("File not found " + fileName);
+			}
+
+			return ResponseEntity.ok().contentType(MediaType.APPLICATION_OCTET_STREAM)
+					.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
+					.body(resource);
+
+		} catch (Exception e) {
+			throw new RuntimeException("Error occurred while downloading file " + fileName, e);
+		}
+	}
 }

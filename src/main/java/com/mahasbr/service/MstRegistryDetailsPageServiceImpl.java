@@ -319,136 +319,6 @@ public class MstRegistryDetailsPageServiceImpl implements MstRegistryDetailsPage
 					}
 				}
 			}
-			// backup
-//			  int totalSheets = workbook.getNumberOfSheets();
-//			  
-//			 System.out.println("Total Sheets: " + totalSheets);
-//			for (Sheet sheet : workbook) {
-//				count++;
-//				Row headerRow = sheet.getRow(0); // Assuming the first row is the header
-//		        int numberOfCells = headerRow.getPhysicalNumberOfCells();
-//		       
-//				for (Row row : sheet) {
-//					if (row.getRowNum() == 0) { // Skip header row if there's one
-//						continue;
-//					}
-//					
-//					totalRecordCount++;
-//					try {
-//
-//						MstRegistryDetailsPageModel mstRegistryDetailsPageModel = new MstRegistryDetailsPageModel();
-//						// read the excel
-//
-//						StringBuilder sb = new StringBuilder();
-//
-//						mstRegistryDetailsPageModel
-//								.setNameOfEstablishmentOrOwner(getCellValue(row.getCell(1)).toUpperCase());
-//						mstRegistryDetailsPageModel.setHouseNo(getCellValue(row.getCell(2)).toUpperCase());
-//						mstRegistryDetailsPageModel.setStreetName(getCellValue(row.getCell(3)).toUpperCase());
-//						mstRegistryDetailsPageModel.setLocality(getCellValue(row.getCell(4)).toUpperCase());
-//						mstRegistryDetailsPageModel.setTownVillage(getCellValue(row.getCell(5)).toUpperCase());
-//						mstRegistryDetailsPageModel.setTaluka(getCellValue(row.getCell(6)).toUpperCase());
-//						mstRegistryDetailsPageModel.setDistrict(getCellValue(row.getCell(7)).toUpperCase());
-//						mstRegistryDetailsPageModel.setPinCode(parseIntCellValue(row.getCell(8)));
-//						mstRegistryDetailsPageModel.setSector(getCellValue(row.getCell(9)).toUpperCase());
-//						mstRegistryDetailsPageModel.setNameOfAuthority(getCellValue(row.getCell(11)).toUpperCase());
-//						mstRegistryDetailsPageModel.setNameOfAct(getCellValue(row.getCell(12)).toUpperCase());
-//						logger.info(" Sheet  no "+count+" row no "+row.getRowNum()+" Excell data " + mstRegistryDetailsPageModel.toString());
-//						BRNGenartionRemark bRNGenartionRemark = getLocationCodeAndCheckMandatoryDetails("MAHARASHTRA",
-//								stringUtils.safeUpperCase(mstRegistryDetailsPageModel.getDistrict()),
-//								stringUtils.safeUpperCase(mstRegistryDetailsPageModel.getTaluka()),
-//								stringUtils.safeUpperCase(mstRegistryDetailsPageModel.getTownVillage()),
-//								stringUtils.safeUpperCase(mstRegistryDetailsPageModel.getNameOfEstablishmentOrOwner()),
-//								stringUtils.safeUpperCase(mstRegistryDetailsPageModel.getPanNumber()),
-//								stringUtils.safeUpperCase(mstRegistryDetailsPageModel.getTanNumber()),
-//								stringUtils.safeUpperCase(mstRegistryDetailsPageModel.getEmailAddress()),
-//								mstRegistryDetailsPageModel.getTelephoneMobNumber(),
-//								stringUtils.safeUpperCase(mstRegistryDetailsPageModel.getGstNumber()),
-//								mstRegistryDetailsPageModel.getNic2008ActivityCode(),
-//								stringUtils.safeUpperCase(mstRegistryDetailsPageModel.getNic2008ActivityCodeDesicripton()),
-//								stringUtils.safeUpperCase(mstRegistryDetailsPageModel.getHouseNo()),
-//								stringUtils.safeUpperCase(mstRegistryDetailsPageModel.getStreetName()),
-//								stringUtils.safeUpperCase(mstRegistryDetailsPageModel.getLocality()),
-//								mstRegistryDetailsPageModel.getPinCode(),
-//								stringUtils.safeUpperCase(mstRegistryDetailsPageModel.getSector()));
-//
-//						    
-//						
-//						if (!Objects.equals(bRNGenartionRemark.getLocationCode(), "NA")) {
-//							MstRegistryDetailsPageEntity entity = objectMapper.convertValue(mstRegistryDetailsPageModel,
-//									MstRegistryDetailsPageEntity.class);
-//							//ADD THE LOCATION CODE
-//							mstRegistryDetailsPageModel.setLocationCode(bRNGenartionRemark.getLocationCode());
-//							// checking the Duplicate Data
-//							Optional<MstRegistryDetailsPageEntity> existing = mstRegistryDetailsPageRepository
-//									.findByRegistryDetails(
-//											stringUtils.safeUpperCase(
-//													mstRegistryDetailsPageModel.getNameOfEstablishmentOrOwner()),
-//											mstRegistryDetailsPageModel.getTelephoneMobNumber(),
-//											stringUtils.safeUpperCase(mstRegistryDetailsPageModel.getEmailAddress()),
-//											stringUtils.safeUpperCase(mstRegistryDetailsPageModel.getPanNumber()),
-//											stringUtils.safeUpperCase(mstRegistryDetailsPageModel.getTanNumber()),
-//											mstRegistryDetailsPageModel.getNic2008ActivityCode(),
-//											stringUtils.safeUpperCase(mstRegistryDetailsPageModel.getGstNumber()),
-//											stringUtils.safeUpperCase(mstRegistryDetailsPageModel.getHouseNo()),
-//											stringUtils.safeUpperCase(mstRegistryDetailsPageModel.getStreetName()),
-//											stringUtils.safeUpperCase(mstRegistryDetailsPageModel.getLocality()),
-//											stringUtils.safeUpperCase(mstRegistryDetailsPageModel.getTownVillage()),
-//											stringUtils.safeUpperCase(mstRegistryDetailsPageModel.getTaluka()),
-//											stringUtils.safeUpperCase(mstRegistryDetailsPageModel.getDistrict()),
-//											mstRegistryDetailsPageModel.getPinCode(),
-//											stringUtils.safeUpperCase(mstRegistryDetailsPageModel.getSector()));
-//
-//							if (existing.isPresent()) {
-//								// save the duplicate record
-//								DuplicateRegistryDetailsPageEntity duplicate = objectMapper.convertValue(
-//										mstRegistryDetailsPageModel, DuplicateRegistryDetailsPageEntity.class);
-//								duplicate.setBrnNo(existing.get().getBrnNo());
-//								duplicate.setRemarks("DUPLICATE");
-//								try {
-//									logger.info(" Sheet  no "+count+" row no "+row.getRowNum()+" Duplicate data " + duplicate.toString());
-//									duplicateRegistryDetailsPageRepository.save(duplicate);
-//									duplicateCount++;
-//								} catch (Exception e) {
-//
-//								}
-//
-//							} else {
-//								// save the new record
-//								MstRegistryDetailsPageEntity mstRegistryDetailsPageEntity = objectMapper
-//										.convertValue(mstRegistryDetailsPageModel, MstRegistryDetailsPageEntity.class);
-//								mstRegistryDetailsPageEntity.setBrnNo(bRNGenerator.getBRNNumber());
-//								try {
-//									logger.info(" Sheet  no "+count+" row no "+row.getRowNum()+" BRN Data Info " + mstRegistryDetailsPageEntity.toString());
-//								//	mstRegistryDetailsPageRepository.save(mstRegistryDetailsPageEntity);
-//									brnCount++;
-//								} catch (Exception e) {
-//									logger.error(" Sheet  no "+count+" row no "+row.getRowNum()+"BRN Data Info " + e.getMessage());
-//								}
-//
-//							}
-//
-//						} else {
-//							// save the concern record
-//							ConcernRegistryDetailsPageEntity concernRegistryDetailsPageEntity = objectMapper
-//									.convertValue(mstRegistryDetailsPageModel, ConcernRegistryDetailsPageEntity.class);
-//							try {
-//								concernRegistryDetailsPageEntity.setRemarks(bRNGenartionRemark.getRemark());
-//								logger.info(" Sheet  no "+count+" row no "+row.getRowNum()+" concern Data Info " + concernRegistryDetailsPageEntity.toString());
-//							//	concernRegistryDetailsPageRepository.save(concernRegistryDetailsPageEntity);
-//								concernCount++;
-//							} catch (Exception e) {
-//								logger.info(" Sheet  no "+count+" row no "+row.getRowNum()+"concerson Info" + e.getMessage());
-//							}
-//						}
-
-//					} catch (Exception e) {
-//						logger.info("ABCD Info" + e);
-//					}
-//					
-//					
-//				}
-//			}
 
 		} catch (IOException e) {
 			logger.info("OUTER Info" , e.getMessage());
@@ -724,5 +594,11 @@ public class MstRegistryDetailsPageServiceImpl implements MstRegistryDetailsPage
 	    }
 	    Page<MstRegistryDetailsPageEntity> mstRegistoryData=  mstRegistryDetailsPageRepository.findByDistricts(districtName,pageable);
 	    return mstRegistoryData;
+	}
+
+	@Override
+	public Page<MstRegistryDetailsPageEntity> getBRNData(String brn ,Pageable pageable) {
+		
+		return mstRegistryDetailsPageRepository.findAllByBrnNo(brn,pageable);
 	}
 }
