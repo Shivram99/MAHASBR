@@ -145,5 +145,7 @@ public class MstRegistryDetailsPageEntity extends Auditable {
 
 	@Column(name = "brn_number", unique = true, nullable = false)
 	private String brnNo;
+	
+	private Long regUserId;
 
 }

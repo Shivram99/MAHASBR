@@ -15,7 +15,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Table(name = "state_region")
 public class RegionEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -25,6 +24,12 @@ public class RegionEntity {
 
     @Column(name = "is_active", nullable = false)
     private Long isActive;
+
+	public RegionEntity(String regionName, Long isActive) {
+		super();
+		this.regionName = regionName;
+		this.isActive = isActive;
+	}
     
 }
 

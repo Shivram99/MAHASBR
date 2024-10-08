@@ -46,10 +46,10 @@ public class DistrictController {
 	  @Autowired
 	    private DistrictService districtService;
 
-//	    @GetMapping
-//	    public ResponseEntity<List<District>> getAllDistricts() {
-//	        return ResponseEntity.ok(districtService.getAllDistricts());
-//	    }
+	    @GetMapping
+	    public ResponseEntity<List<District>> getAllDistricts1() {
+	        return ResponseEntity.ok(districtService.getAllDistricts());
+	    }
 
 	    @GetMapping("/{id}")
 	    public ResponseEntity<District> getDistrictById(@PathVariable Long id) {

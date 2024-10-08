@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -30,6 +31,8 @@ import com.mahasbr.entity.CensusEntity;
 import com.mahasbr.entity.ConcernRegistryDetailsPageEntity;
 import com.mahasbr.entity.DuplicateRegistryDetailsPageEntity;
 import com.mahasbr.entity.MstRegistryDetailsPageEntity;
+import com.mahasbr.entity.User;
+import com.mahasbr.filter.AuthTokenFilter;
 import com.mahasbr.model.BRNGenartionRemark;
 import com.mahasbr.model.BRNGenerationRecordCount;
 import com.mahasbr.model.MstRegistryDetailsPageModel;
@@ -39,7 +42,9 @@ import com.mahasbr.repository.DistrictMasterRepository;
 import com.mahasbr.repository.DuplicateRegistryDetailsPageRepository;
 import com.mahasbr.repository.MstRegistryDetailsPageRepository;
 import com.mahasbr.repository.TalukaMasterRepository;
+import com.mahasbr.repository.UserRepository;
 import com.mahasbr.util.BRNGenerator;
+import com.mahasbr.util.JwtUtils;
 import com.mahasbr.util.StringUtils;
 
 @Service
@@ -78,8 +83,25 @@ public class MstRegistryDetailsPageServiceImpl implements MstRegistryDetailsPage
 	DuplicateRegistryDetailsPageRepository duplicateRegistryDetailsPageRepository;
 	private final Pattern PAN_PATTERN = Pattern.compile("^[A-Z]{5}[0-9]{4}[A-Z]$");
 	
+	AuthTokenFilter authTokenFilter=new AuthTokenFilter();
 	
-
+	@Autowired
+	UserRepository userRepository ;
+	
+	@Autowired
+	private JwtUtils jwtUtils;
+	
+	Long userId=0L;
+	
+	public Long getLoginUsernameId() {
+		String username = SecurityContextHolder.getContext().getAuthentication().getName();
+		Optional<User>  user= userRepository.findByUsername(username);
+		
+		if(user.isPresent()) {
+			userId=user.get().getId();
+		}
+		return userId;
+	}
 	public BRNGenerationRecordCount uploadRegiteryCSVFileForBRNGeneration(MultipartFile file) {
 		StringUtils stringUtils = new StringUtils();
 		int count = 0;
@@ -89,6 +111,22 @@ public class MstRegistryDetailsPageServiceImpl implements MstRegistryDetailsPage
 		Integer duplicateCount = 0;
 		BRNGenerationRecordCount bRNGenerationRecordCount = new BRNGenerationRecordCount();
 		StringBuilder errorMessages = new StringBuilder();
+		
+		//String username = authTokenFilter.getUsername();
+		 
+		// String username = jwtUtils.getUserNameFromJwtToken(jwtToken);
+		
+	//	Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+//		if (principal instanceof UserDetails) {
+//		     userId = ((Us; // Assuming the username is the user ID
+//		    System.out.println("User ID: " + userId);
+//		} else {
+//		    // If the principal is not an instance of UserDetails, it might be a string (in case of anonymous authentication)
+//		    String userId = principal.toString();
+//		    System.out.println("User ID: " + userId);
+//		}
+		 
 		
 		final Set<String> REQUIRED_HEADERS = Set.of("NAME_OF_ESTABLISHMENT/OWNER","PAN","TAN","EMAIL","TEL/MOB_NO","NIC_2008_ACTIVITY_CODE",
 		            "GST_NUMBER","HOUSE_NO","STREET_NAME","LOCALITY","TOWN_VILLAGE","TALUKA","DISTRICT","SECTOR(RURAL/URBAN)",
@@ -114,6 +152,7 @@ public class MstRegistryDetailsPageServiceImpl implements MstRegistryDetailsPage
 					Row row = sheet.getRow(i);
 					MstRegistryDetailsPageModel mstRegistryDetailsPageModel = new MstRegistryDetailsPageModel();
 					totalRecordCount++;
+					mstRegistryDetailsPageModel.setRegUserId(userId);
 					for (int j = 0; j < numberOfCells; j++) {
 						Cell cell = row.getCell(j);
 						String header = stringUtils.safeUpperCase(headerRow.getCell(j).getStringCellValue());
@@ -558,7 +597,7 @@ public class MstRegistryDetailsPageServiceImpl implements MstRegistryDetailsPage
 
 	@Override
 	public Page<MstRegistryDetailsPageEntity> getAllRegistoryDetails(Pageable pageable) {
-		return mstRegistryDetailsPageRepository.findAll(pageable);
+		return mstRegistryDetailsPageRepository.findAllByRegUserId(getLoginUsernameId(),pageable);
 	}
 
 	private void writeErrorLog(String errorMessages) {
@@ -589,16 +628,16 @@ public class MstRegistryDetailsPageServiceImpl implements MstRegistryDetailsPage
 		List<String> talukaName=talukaMasterRepository.findTalukaNameByCensusTalukaCode(selectedTalukaIds);
 	    List<String> districtName=	districtMasterRepository.findDistrictNamesByCensusDistrictCodes(selectedDistrictIds);
 	    if(!talukaName.isEmpty()) {
-	    Page<MstRegistryDetailsPageEntity> mstRegistoryData=  mstRegistryDetailsPageRepository.findByTalukasAndDistricts(talukaName, districtName,pageable);
+	    Page<MstRegistryDetailsPageEntity> mstRegistoryData=  mstRegistryDetailsPageRepository.findByTalukasAndDistrictsAndRegUserId(talukaName, districtName,getLoginUsernameId(),pageable);
 	    return mstRegistoryData;
 	    }
-	    Page<MstRegistryDetailsPageEntity> mstRegistoryData=  mstRegistryDetailsPageRepository.findByDistricts(districtName,pageable);
+	    Page<MstRegistryDetailsPageEntity> mstRegistoryData=  mstRegistryDetailsPageRepository.findByDistrictsAndRegUserId(districtName,getLoginUsernameId(),pageable);
 	    return mstRegistoryData;
 	}
 
 	@Override
 	public Page<MstRegistryDetailsPageEntity> getBRNData(String brn ,Pageable pageable) {
 		
-		return mstRegistryDetailsPageRepository.findAllByBrnNo(brn,pageable);
+		return mstRegistryDetailsPageRepository.findAllByBrnNoAndRegUserId(brn,getLoginUsernameId(),pageable);
 	}
 }

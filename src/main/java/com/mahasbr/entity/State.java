@@ -2,6 +2,8 @@ package com.mahasbr.entity;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -31,6 +33,7 @@ public class State {
     private String name;
 
     @OneToMany(mappedBy = "state", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference // Prevents circular reference
     private List<District> districts;
 
     private Boolean isActive;

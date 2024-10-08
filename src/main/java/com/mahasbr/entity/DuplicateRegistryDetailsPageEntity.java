@@ -144,5 +144,7 @@ public class DuplicateRegistryDetailsPageEntity extends Auditable {
 	private String recordStatus;
 
 	private String brnNo;
+	
+	private Long regUserId;
 
 }

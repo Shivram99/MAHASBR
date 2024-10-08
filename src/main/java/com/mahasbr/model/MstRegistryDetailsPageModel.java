@@ -99,4 +99,6 @@ public class MstRegistryDetailsPageModel extends Auditable  {
 	private String recordStatus;
 
 	private String brnNo;
+	
+	private Long regUserId;
 }

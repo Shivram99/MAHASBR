@@ -147,5 +147,6 @@ public class ConcernRegistryDetailsPageEntity extends Auditable  {
 	@Column(name = "brn_number")
 	private String brnNo;
 	
+	private Long regUserId;
 	
 }
