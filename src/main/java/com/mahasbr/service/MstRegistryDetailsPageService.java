@@ -7,7 +7,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.mahasbr.entity.District;
+import com.mahasbr.entity.DistrictMaster;
 import com.mahasbr.entity.MstRegistryDetailsPageEntity;
+import com.mahasbr.entity.RegionEntity;
 import com.mahasbr.model.BRNGenerationRecordCount;
 
 public interface MstRegistryDetailsPageService {
@@ -25,5 +28,12 @@ public interface MstRegistryDetailsPageService {
 
 	Page<MstRegistryDetailsPageEntity> getPostLoginDashboardData(Pageable pageable, List<Long> selectedDistrictIds,
 			List<Long> selectedTalukaIds, String registerDateFrom, String registerDateTo);
+
+
+//	List<RegionEntity> getAllRegions();
+//
+//	List<DistrictMaster> getAllDistrict();
+//
+//	List<MstRegistryDetailsPageEntity> getAllByDistrictNames(List<String> matchingDistricts, Pageable pageable);
 
 }

@@ -29,8 +29,11 @@ import org.springframework.web.multipart.MultipartFile;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mahasbr.entity.CensusEntity;
 import com.mahasbr.entity.ConcernRegistryDetailsPageEntity;
+import com.mahasbr.entity.District;
+import com.mahasbr.entity.DistrictMaster;
 import com.mahasbr.entity.DuplicateRegistryDetailsPageEntity;
 import com.mahasbr.entity.MstRegistryDetailsPageEntity;
+import com.mahasbr.entity.RegionEntity;
 import com.mahasbr.entity.User;
 import com.mahasbr.filter.AuthTokenFilter;
 import com.mahasbr.model.BRNGenartionRemark;
@@ -41,6 +44,7 @@ import com.mahasbr.repository.ConcernRegistryDetailsPageRepository;
 import com.mahasbr.repository.DistrictMasterRepository;
 import com.mahasbr.repository.DuplicateRegistryDetailsPageRepository;
 import com.mahasbr.repository.MstRegistryDetailsPageRepository;
+import com.mahasbr.repository.RegionRepository;
 import com.mahasbr.repository.TalukaMasterRepository;
 import com.mahasbr.repository.UserRepository;
 import com.mahasbr.util.BRNGenerator;
@@ -50,8 +54,13 @@ import com.mahasbr.util.StringUtils;
 @Service
 public class MstRegistryDetailsPageServiceImpl implements MstRegistryDetailsPageService {
 
+	  
+	    
 	private static final Logger logger = LoggerFactory.getLogger(MstRegistryDetailsPageServiceImpl.class);
 
+	@Autowired
+    private RegionRepository regionRepository; 
+	
 	@Autowired
 	MstRegistryDetailsPageRepository mstRegistryDetailsPageRepository;
 
@@ -640,4 +649,22 @@ public class MstRegistryDetailsPageServiceImpl implements MstRegistryDetailsPage
 		
 		return mstRegistryDetailsPageRepository.findAllByBrnNoAndRegUserId(brn,getLoginUsernameId(),pageable);
 	}
-}
+
+	
+//	    // Fetch all regions from the database
+//	    public List<RegionEntity> getAllRegions() {
+//	        return regionRepository.findAll();
+//}
+//		@Override
+//		public List<DistrictMaster> getAllDistrict() {
+//			return districtMasterRepository.findAll();
+//		}
+//		@Override
+//		public Page<MstRegistryDetailsPageEntity> getAllByDistrictNames(List<String> matchingDistricts,
+//				Pageable pageable) {
+//			Page<MstRegistryDetailsPageEntity> mstRegistoryData=	mstRegistryDetailsPageRepository.findByDistrictName(matchingDistricts);
+//			
+//			return null;
+		}
+		
+	    

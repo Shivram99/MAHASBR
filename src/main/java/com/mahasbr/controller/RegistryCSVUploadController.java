@@ -2,6 +2,7 @@ package com.mahasbr.controller;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,13 +28,18 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.mahasbr.entity.ConcernRegistryDetailsPageEntity;
+import com.mahasbr.entity.District;
+import com.mahasbr.entity.DistrictMaster;
 import com.mahasbr.entity.DuplicateRegistryDetailsPageEntity;
 import com.mahasbr.entity.MstRegistryDetailsPageEntity;
+import com.mahasbr.entity.RegionEntity;
+import com.mahasbr.entity.User;
 import com.mahasbr.model.BRNGenerationRecordCount;
 import com.mahasbr.model.PostLoginDashboardRequestModel;
 import com.mahasbr.service.ConcernRegistryDetailsPageService;
 import com.mahasbr.service.DuplicateRegistryDetailsPageService;
 import com.mahasbr.service.MstRegistryDetailsPageService;
+import com.mahasbr.util.CommonMethod;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -44,7 +50,7 @@ public class RegistryCSVUploadController {
 
 	@Autowired
 	ConcernRegistryDetailsPageService concernRegistryDetailsPageService;
-	
+
 	@Autowired
 	DuplicateRegistryDetailsPageService duplicateRegistryDetailsPageService;
 
@@ -91,9 +97,13 @@ public class RegistryCSVUploadController {
 			@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size,
 			@RequestParam(defaultValue = "siNo") String sortBy) {
 		Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
-		Page<MstRegistryDetailsPageEntity> registryDetailsPage = mstRegistryDetailsPageService.getAllRegistoryDetails(pageable);
+		Page<MstRegistryDetailsPageEntity> registryDetailsPage = mstRegistryDetailsPageService
+				.getAllRegistoryDetails(pageable);
 		return ResponseEntity.ok(registryDetailsPage);
 	}
+
+	
+
 	@GetMapping("/registoryDuplicateData")
 	public ResponseEntity<Page<DuplicateRegistryDetailsPageEntity>> getDuplicateRegistryDetails(
 			@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size,
@@ -104,6 +114,7 @@ public class RegistryCSVUploadController {
 				.getAllDuplicateRegistryDetails(pageable);
 		return ResponseEntity.ok(duplcateRegistryDetailsPage);
 	}
+
 	@GetMapping("/registoryConcernData")
 	public ResponseEntity<Page<ConcernRegistryDetailsPageEntity>> getConcernRegistryDetails(
 			@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size,
@@ -114,34 +125,34 @@ public class RegistryCSVUploadController {
 				.getAllConcernRegistryDetails(pageable);
 		return ResponseEntity.ok(concernRegistryDetailsPage);
 	}
-	
-	@GetMapping("/brn-details/{brn}")
-    public ResponseEntity<Page<MstRegistryDetailsPageEntity>> getBRNDetails(@PathVariable String brn) {
-		Pageable pageable = PageRequest.of(0, 10, Sort.by("siNo"));
-		Page<MstRegistryDetailsPageEntity> details = mstRegistryDetailsPageService.getBRNData(brn,pageable);
-        return ResponseEntity.ok(details);
-    }
-	
-	@PostMapping(value="/getPostLoginDashboardData", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Page<MstRegistryDetailsPageEntity>> getPostLoginDashboardData(
-            @RequestBody PostLoginDashboardRequestModel request) {
-        
-        // Extract parameters from the request
-        int page = request.getPage();
-        int size = request.getSize();
-        String sortBy = request.getSortBy();
-        List<Long> selectedDistrictIds = request.getSelectedDistrictIds();
-        List<Long> selectedTalukaIds = request.getSelectedTalukaIds();
-        String registerDateFrom = request.getFilters().getRegisterDateFrom();
-        String registerDateTo = request.getFilters().getRegisterDateTo();
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
-        // Implement the service call to get the data based on the parameters
-        Page<MstRegistryDetailsPageEntity> response = mstRegistryDetailsPageService.getPostLoginDashboardData(
-        		pageable,selectedDistrictIds, selectedTalukaIds, registerDateFrom, registerDateTo);
 
-        return ResponseEntity.ok(response);
-    }
-	
+	@GetMapping("/brn-details/{brn}")
+	public ResponseEntity<Page<MstRegistryDetailsPageEntity>> getBRNDetails(@PathVariable String brn) {
+		Pageable pageable = PageRequest.of(0, 10, Sort.by("siNo"));
+		Page<MstRegistryDetailsPageEntity> details = mstRegistryDetailsPageService.getBRNData(brn, pageable);
+		return ResponseEntity.ok(details);
+	}
+
+	@PostMapping(value = "/getPostLoginDashboardData", consumes = "application/json", produces = "application/json")
+	public ResponseEntity<Page<MstRegistryDetailsPageEntity>> getPostLoginDashboardData(
+			@RequestBody PostLoginDashboardRequestModel request) {
+
+		// Extract parameters from the request
+		int page = request.getPage();
+		int size = request.getSize();
+		String sortBy = request.getSortBy();
+		List<Long> selectedDistrictIds = request.getSelectedDistrictIds();
+		List<Long> selectedTalukaIds = request.getSelectedTalukaIds();
+		String registerDateFrom = request.getFilters().getRegisterDateFrom();
+		String registerDateTo = request.getFilters().getRegisterDateTo();
+		Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
+		// Implement the service call to get the data based on the parameters
+		Page<MstRegistryDetailsPageEntity> response = mstRegistryDetailsPageService.getPostLoginDashboardData(pageable,
+				selectedDistrictIds, selectedTalukaIds, registerDateFrom, registerDateTo);
+
+		return ResponseEntity.ok(response);
+	}
+
 	@GetMapping("/download")
 	public ResponseEntity<Resource> downloadFile(@RequestParam String fileName) {
 		try {
