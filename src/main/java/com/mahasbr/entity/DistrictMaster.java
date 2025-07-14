@@ -28,9 +28,10 @@ public class DistrictMaster extends Auditable {
 	
 	@NotBlank
 	private Long censusStateCode;
+    
+	private Long regionid;
 
-	
-	private int is_active;
-	
+	private Long is_active;
+
 
 }

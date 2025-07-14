@@ -23,15 +23,19 @@ public class UserDetailsImpl implements UserDetails {
 
 	  @JsonIgnore
 	  private String password;
+	  
+	  @JsonIgnore
+	  private Boolean isFirstTimeLogin;
 
 	  private Collection<? extends GrantedAuthority> authorities;
 
 	  public UserDetailsImpl(Long id, String username,String password,
-	      Collection<? extends GrantedAuthority> authorities) {
+	      Collection<? extends GrantedAuthority> authorities,Boolean isFirstTimeLogin) {
 	    this.id = id;
 	    this.username = username;
 	    this.password = password;
 	    this.authorities = authorities;
+	    this.isFirstTimeLogin = isFirstTimeLogin;
 	  }
 
 	  public static UserDetailsImpl build(User user) {
@@ -42,7 +46,7 @@ public class UserDetailsImpl implements UserDetails {
 	    return new UserDetailsImpl(user.getId(), 
 	                               user.getUsername(), 
 	                               user.getPassword(), 
-	                               authorities);
+	                               authorities, user.getIsFirstTimeLogin());
 	  }
 
 	  @Override
@@ -95,4 +99,12 @@ public class UserDetailsImpl implements UserDetails {
 	    UserDetailsImpl user = (UserDetailsImpl) o;
 	    return Objects.equals(id, user.id);
 	  }
+
+	public Boolean getIsFirstTimeLogin() {
+		return isFirstTimeLogin;
+	}
+
+	public void setIsFirstTimeLogin(Boolean isFirstTimeLogin) {
+		this.isFirstTimeLogin = isFirstTimeLogin;
+	}
 	}

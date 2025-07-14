@@ -16,6 +16,8 @@ import jakarta.servlet.http.HttpServletResponse;
 public class AuthEntryPointJwt implements AuthenticationEntryPoint {
 
   private static final Logger logger = LoggerFactory.getLogger(AuthEntryPointJwt.class);
+  
+  private static String username=null;
 
   @Override
   public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException)
@@ -24,6 +26,7 @@ public class AuthEntryPointJwt implements AuthenticationEntryPoint {
    // response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Error: Unauthorized");
     
     logger.error("Unauthorized error: {}", authException.getMessage());
+    
 
     if (authException instanceof org.springframework.security.authentication.BadCredentialsException) {
         response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Error: Bad credentials");

@@ -54,6 +54,8 @@ public class User extends Auditable {
 	@NotBlank
 	@Size(max = 120)
 	private String password;
+	
+	private Boolean isFirstTimeLogin = true;
 
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
@@ -65,12 +67,20 @@ public class User extends Auditable {
 	public User() {
 
 	}
-
+	
 	public User(String username, String password, String email, String phoneNo) {
 		this.username = username;
 		this.password = password;
 		this.email = email;
 		this.phoneNo = phoneNo;
+	}
+	
+	public User(String username, String password, String email, String phoneNo,Boolean isFirstTimeLogin) {
+		this.username = username;
+		this.password = password;
+		this.email = email;
+		this.phoneNo = phoneNo;
+		this.isFirstTimeLogin = isFirstTimeLogin;
 	}
 
 }

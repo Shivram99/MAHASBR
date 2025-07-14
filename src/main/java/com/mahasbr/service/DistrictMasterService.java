@@ -9,11 +9,12 @@ import com.mahasbr.entity.TalukaMaster;
 public interface DistrictMasterService {
 
 	public List<DistrictMaster> getAllDistrict();
-	public List<TalukaMaster> getAllDistrictTaluka(Long districtCode);
+	
 	public Optional<DistrictMaster> findByDistrictCode(long long1);
 
 
 	public List<DistrictMaster> readdataCsv();
+	public List<TalukaMaster> getAllDistrictTaluka(List<Long> districtCodes);
 
 
 //	public DistrictMaster insertDistrictDetail(DistrictMasterModel districtMasterModel);

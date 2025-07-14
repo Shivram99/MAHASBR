@@ -2,18 +2,26 @@ package com.mahasbr.response;
 
 import java.util.List;
 
+import lombok.Data;
+
+
 public class JwtResponse {
   private String token;
   private String type = "Bearer";
   private Long id;
   private String username;
   private List<String> roles;
+  
+  private Boolean isFirstTimeLogin;
+  
 
-  public JwtResponse(String accessToken, Long id, String username,List<String> roles) {
+
+public JwtResponse(String accessToken, Long id, String username,List<String> roles,Boolean isFirstTimeLogin) {
     this.token = accessToken;
     this.id = id;
     this.username = username;
     this.roles = roles;
+    this.isFirstTimeLogin = isFirstTimeLogin;
   }
 
   public String getAccessToken() {
@@ -51,4 +59,12 @@ public class JwtResponse {
   public List<String> getRoles() {
     return roles;
   }
+
+public Boolean getIsFirstTimeLogin() {
+	return isFirstTimeLogin;
+}
+
+public void setIsFirstTimeLogin(Boolean isFirstTimeLogin) {
+	this.isFirstTimeLogin = isFirstTimeLogin;
+}
 }

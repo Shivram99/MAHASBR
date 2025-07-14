@@ -42,7 +42,7 @@ import jakarta.transaction.Transactional;
 @Service
 @Transactional
 public class CommonServiceImpl implements CommonService{
-	//private static final Logger logger = LoggerFactory.getLogger(CommonServiceImpl.class);
+	private static final Logger logger = LoggerFactory.getLogger(CommonServiceImpl.class);
 	@Autowired
 	UserRepository userRepository;
 
@@ -166,12 +166,12 @@ public class CommonServiceImpl implements CommonService{
 
 
 	@Override
-	public boolean isValidExcel(MultipartFile file) {
+	public boolean isValidExcel(MultipartFile file) throws InvalidFormatException {
 		 try (InputStream inputStream = file.getInputStream()) {
 	            Workbook workbook = WorkbookFactory.create(inputStream);
 	            // Check if the workbook has at least one sheet
 	            return workbook.getNumberOfSheets() > 0;
-	        } catch (IOException | InvalidFormatException e) {
+	        } catch (IOException e) {
 	            return false;
 	        }
 	    

@@ -88,7 +88,7 @@ public class DistrictMasterServiceImpl implements DistrictMasterService {
 
 			});
 
-		} catch (EncryptedDocumentException | InvalidFormatException | IOException e) {
+		} catch (EncryptedDocumentException  | IOException e) {
 			logger.error(e.getMessage(), e);
 		} finally {
 			try {
@@ -99,6 +99,13 @@ public class DistrictMasterServiceImpl implements DistrictMasterService {
 			}
 		}
 		return districts;
+	}
+
+	@Override
+	public List<TalukaMaster> getAllDistrictTaluka(List<Long> districtCodes) {
+		// TODO Auto-generated method stub
+		
+		return tōalukaMasterRepository.findByCensusDistrictCodeIn(districtCodes);
 	}
 	}
 
