@@ -1,17 +1,23 @@
 package com.mahasbr.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import java.io.IOException;
+import java.util.List;
 
-import com.mahasbr.repository.StatesMasterRepository;
+import org.springframework.web.multipart.MultipartFile;
 
-@Service
-public class StatesMasterService {
-	@Autowired
-	StatesMasterRepository statesMasterRepository;
+import com.mahasbr.entity.StatesMaster;
 
-	/*
-	 * public StatesMaster postState(StatesMasterModel stateMasterModel) {
-	 * statesMasterRepository.save(data); return data; }
-	 */
+public interface StatesMasterService {
+	StatesMaster create(StatesMaster state);
+
+	StatesMaster update(Long id, StatesMaster state);
+
+	StatesMaster getById(Long id);
+
+	List<StatesMaster> getAll();
+
+	void delete(Long id);
+	
+	void importStatesFromExcel(MultipartFile file) throws IOException;
+
 }

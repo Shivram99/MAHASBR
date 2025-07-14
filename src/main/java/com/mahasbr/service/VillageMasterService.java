@@ -1,31 +1,23 @@
 package com.mahasbr.service;
 
+import java.io.IOException;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
-import com.mahasbr.entity.DetailsPage;
 import com.mahasbr.entity.VillageMaster;
-import com.mahasbr.repository.VillageMasterRepository;
 
-@Service
-public class VillageMasterService {
-	@Autowired
-	VillageMasterRepository villageMasterRepository;
+public interface VillageMasterService {
+	VillageMaster create(VillageMaster village);
 
-	public List<VillageMaster> getVillageDtlByVillageName(DetailsPage details) {
-		return villageMasterRepository.getVillageDtlByVillageName(details);
-	}
-	
-	
-	
-	
-	
-	/*
-	 * public VillageMaster insertVillageDetails(VillageMasterModel
-	 * villageMasterModel) { VillageMaster data = new
-	 * VillageMaster(villageMasterModel); villageMasterRepository.save(data); return
-	 * data; }
-	 */
+	VillageMaster update(Long id, VillageMaster village);
+
+	void delete(Long id);
+
+	VillageMaster getById(Long id);
+
+	List<VillageMaster> getAll();
+
+	void importFromExcel(MultipartFile file) throws IOException;
+
 }

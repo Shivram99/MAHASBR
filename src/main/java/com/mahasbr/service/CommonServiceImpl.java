@@ -72,8 +72,8 @@ public class CommonServiceImpl implements CommonService{
 
 	// for Get All District List by Districtcode
 	@Override
-	public DistrictMaster getAllDistrictDistrictCode(long censusDistrictCode) throws Exception {
-		Optional<DistrictMaster> districtCode = districtMasterRepository.findById(censusDistrictCode);
+	public DistrictMaster getAllDistrictDistrictCode(String censusDistrictCode) throws Exception {
+		Optional<DistrictMaster> districtCode = districtMasterRepository.findByCensusDistrictCode(censusDistrictCode);
 		if (districtCode.isPresent())
 			return districtCode.get();
 		else {
@@ -83,14 +83,14 @@ public class CommonServiceImpl implements CommonService{
 	}
 
 	@Override
-	public List<TalukaMaster> getAllTalukaByDistrictCode(long censusDistrictCode) {
+	public List<TalukaMaster> getAllTalukaByDistrictCode(String censusDistrictCode) {
 		List<TalukaMaster> taluka = talukaMasterRepository.findBycensusDistrictCode(censusDistrictCode);
 		return taluka;
 	}
 
 	@Override
-	public List<VillageMaster> getAllVillageTalukaCode(Long censusTalukaCode) {
-		List<VillageMaster> village = villageMasterRepository.findBycensusTalukaCode(censusTalukaCode);
+	public List<VillageMaster> getAllVillageTalukaCode(String censusTalukaCode) {
+		List<VillageMaster> village = villageMasterRepository.findByCensusTalukaCode(censusTalukaCode);
 		return village;
 	}
 
@@ -133,11 +133,7 @@ public class CommonServiceImpl implements CommonService{
 
 	}
 
-	@Override
-	public List<VillageMaster> getAllVillageTalukaCode(long censusTalukaCode) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	
 
 //	// Helper method to convert MultipartFile to File
 //	private java.io.File convertMultiPartToFile(MultipartFile file) throws IOException {

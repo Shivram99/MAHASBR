@@ -38,19 +38,19 @@ public class CommonController {
 	}
 
 	@GetMapping("/getDistrictByCode/{CensusDistrictCode}")
-	public ResponseEntity<?> getDistrictDetailByDistrictCode(@PathVariable long CensusDistrictCode) throws Exception {
+	public ResponseEntity<?> getDistrictDetailByDistrictCode(@PathVariable String CensusDistrictCode) throws Exception {
 		DistrictMaster district = commonService.getAllDistrictDistrictCode(CensusDistrictCode);
 		return ResponseEntity.ok(new MessageResponse(" District List by District Code ", district));
 	}
 
 	@GetMapping("/getTalukaByCode/{CensusDistrictCode}")
-	public ResponseEntity<?> getTalukaDetailByDistrictCode(@PathVariable long CensusDistrictCode) throws Exception {
+	public ResponseEntity<?> getTalukaDetailByDistrictCode(@PathVariable String CensusDistrictCode) throws Exception {
 		List<TalukaMaster> taluka = commonService.getAllTalukaByDistrictCode(CensusDistrictCode);
 		return ResponseEntity.ok(new MessageResponse(" Taluka List by District Code ", taluka));
 	}
 
 	@GetMapping("/getVillagetByCode/{censusTalukaCode}")
-	public ResponseEntity<?> getVillageDetailByTalukaCode(@PathVariable long censusTalukaCode) throws Exception {
+	public ResponseEntity<?> getVillageDetailByTalukaCode(@PathVariable String censusTalukaCode) throws Exception {
 		List<VillageMaster> village = commonService.getAllVillageTalukaCode(censusTalukaCode);
 		return ResponseEntity.ok(new MessageResponse(" village List by taluka Code ", village));
 	}

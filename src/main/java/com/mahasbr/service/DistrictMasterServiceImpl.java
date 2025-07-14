@@ -1,106 +1,115 @@
 package com.mahasbr.service;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 
-import org.apache.poi.EncryptedDocumentException;
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.ss.usermodel.DataFormatter;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
-import com.mahasbr.controller.DistrictMasterController;
 import com.mahasbr.entity.DistrictMaster;
-import com.mahasbr.entity.TalukaMaster;
 import com.mahasbr.repository.DistrictMasterRepository;
-import com.mahasbr.repository.TalukaMasterRepository;
 
+import jakarta.persistence.EntityNotFoundException;
 @Service
 public class DistrictMasterServiceImpl implements DistrictMasterService {
-	
-	@Autowired
-	DistrictMasterRepository districtMasterRepository;
-	@Autowired
-	TalukaMasterRepository tōalukaMasterRepository;
-	
-	private static final Logger logger = LoggerFactory.getLogger(DistrictMasterController.class);
-	private static final String CSV_FILE_LOCATION = "\\MAHASBR\\target\\Book3.xlsx";
 
+    private final DistrictMasterRepository repository;
 
-	public List<DistrictMaster> getAllDistrict() {
-	
+    public DistrictMasterServiceImpl(DistrictMasterRepository repository) {
+        this.repository = repository;
+    }
 
-		return districtMasterRepository.findAll();
-	}
-	
-	public List<TalukaMaster> getAllDistrictTaluka(Long districtCode) {
-		
-		return tōalukaMasterRepository.findByCensusDistrictCode(districtCode);
-	}
+    @Override
+    public DistrictMaster create(DistrictMaster district) {
+        return repository.save(district);
+    }
+
+    @Override
+    public DistrictMaster update(Long id, DistrictMaster district) {
+        DistrictMaster existing = repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("District not found"));
+
+        existing.setDistrictName(district.getDistrictName());
+        existing.setCensusStateCode(district.getCensusStateCode());
+        existing.setIsActive(district.getIsActive());
+
+        return repository.save(existing);
+    }
+
+    @Override
+    public void delete(Long id) {
+        if (!repository.existsById(id)) {
+            throw new EntityNotFoundException("District not found");
+        }
+        repository.deleteById(id);
+    }
+
+    @Override
+    public DistrictMaster getById(Long id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("District not found"));
+    }
+
+    @Override
+    public List<DistrictMaster> getAll() {
+        return repository.findAll();
+    }
+    
+    @Override
+    public void importDistrictsFromExcel(MultipartFile file) throws IOException {
+        List<DistrictMaster> districtList = new ArrayList<>();
+
+        try (InputStream inputStream = file.getInputStream();
+             Workbook workbook = new XSSFWorkbook(inputStream)) {
+
+            Sheet sheet = workbook.getSheetAt(0);
+            int rowIndex = 0;
+
+            for (Row row : sheet) {
+                if (rowIndex++ == 0) continue; // Skip header row
+
+                String censusDistrictCode = getCellStringValue(row.getCell(0));
+                String districtName = getCellStringValue(row.getCell(1));
+                String censusStateCode = getCellStringValue(row.getCell(2));
+//                String isActiveStr = getCellStringValue(row.getCell(3));
+//                Boolean isActive = Boolean.parseBoolean(isActiveStr.trim());
+
+                // Optional: skip invalid rows
+                if (censusDistrictCode == null || districtName == null || censusStateCode == null) continue;
+
+                DistrictMaster district = new DistrictMaster();
+                district.setCensusDistrictCode(censusDistrictCode);
+                district.setDistrictName(districtName);
+                district.setCensusStateCode(censusStateCode);
+                district.setIsActive(true);
+
+                districtList.add(district);
+            }
+
+            repository.saveAll(districtList);
+        }
+    }
+
+    private String getCellStringValue(Cell cell) {
+        if (cell == null) return null;
+        cell.setCellType(CellType.STRING);
+        return cell.getStringCellValue().trim();
+    }
 
 	@Override
-	public Optional<DistrictMaster> findByDistrictCode(long long1) {
-		return districtMasterRepository.findById(long1);
+	public List<DistrictMaster> findByIsActiveTrue() {
+		return repository.findByIsActiveTrue();
 	}
 
-	
-	@Override
-	public List<DistrictMaster> readdataCsv() {
-		List<DistrictMaster> districts = new ArrayList<>();
-		Workbook workbook = null;
-		Set<Long> districtCodes = new HashSet<>(); // Set to store unique district codes
-		try {
-			workbook = WorkbookFactory.create(new File(CSV_FILE_LOCATION));
-
-			// Retrieving the number of sheets in the Workbook
-			logger.info("Number of sheets: ", workbook.getNumberOfSheets());
-			// Print all sheets name
-			workbook.forEach(sheet -> {
-				logger.info(" => " + sheet.getSheetName());
-
-				// Create a DataFormatter to format and get each cell's value as String
-				DataFormatter dataFormatter = new DataFormatter();
-				// loop through all rows and columns and create Course object
-				int index = 0;
-				for (Row row : sheet) {
-					DistrictMaster district = new DistrictMaster();
-					district.setCensusDistrictCode(Long.parseLong(dataFormatter.formatCellValue(row.getCell(1))));
-					district.setDistrictName(dataFormatter.formatCellValue(row.getCell(2)));
-
-					// Check if district code is already in set, if not add to list and set
-					if (!districtCodes.contains(district.getCensusDistrictCode())) {
-						districts.add(district);
-					//	districtCodes.add(district.getCensusDistrictCode());
-				}
-				//	DistrictMaster data = new DistrictMaster(district);
-				districtMasterRepository.saveAll(districts);
-				}
-
-			});
-
-		} catch (EncryptedDocumentException | InvalidFormatException | IOException e) {
-			logger.error(e.getMessage(), e);
-		} finally {
-			try {
-				if (workbook != null)
-					workbook.close();
-			} catch (IOException e) {
-				logger.error(e.getMessage(), e);
-			}
-		}
-		return districts;
-	}
-	}
+}
 
 
 

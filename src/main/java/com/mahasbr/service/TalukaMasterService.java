@@ -1,18 +1,23 @@
 package com.mahasbr.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import java.io.IOException;
+import java.util.List;
 
-import com.mahasbr.repository.TalukaMasterRepository;
+import org.springframework.web.multipart.MultipartFile;
 
-@Service
-public class TalukaMasterService {
-	@Autowired
-	TalukaMasterRepository talukaMasterRepository;
+import com.mahasbr.entity.TalukaMaster;
 
-	/*
-	 * public TalukaMaster insertTalukaDetails(TalukaMasterModel talukaMasterModel)
-	 * { TalukaMaster data = new TalukaMaster(talukaMasterModel);
-	 * talukaMasterRepository.save(data); return data; }
-	 */
+public interface TalukaMasterService {
+	TalukaMaster create(TalukaMaster taluka);
+
+	TalukaMaster update(Long id, TalukaMaster taluka);
+
+	void delete(Long id);
+
+	TalukaMaster getById(Long id);
+
+	List<TalukaMaster> getAll();
+
+	void importTalukasFromExcel(MultipartFile file) throws IOException;
+
 }

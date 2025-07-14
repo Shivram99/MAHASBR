@@ -1,107 +1,69 @@
 package com.mahasbr.controller;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.poi.EncryptedDocumentException;
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.DataFormatter;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.mahasbr.entity.TalukaMaster;
-import com.mahasbr.repository.TalukaMasterRepository;
-import com.mahasbr.service.DistrictMasterService;
 import com.mahasbr.service.TalukaMasterService;
 
+import jakarta.validation.Valid;
+
 @RestController
-//@RequestMapping("/api/auth")
-@RequestMapping("/developer")
+@RequestMapping("/api/talukas")
 public class TalukaMasterController {
-	@Autowired
-	TalukaMasterService talukaMasterService;
-	@Autowired
-	TalukaMasterRepository talukaMasterRepository;
-	@Autowired
-	DistrictMasterService districtMasterService;
 
-	private static final Logger logger = LoggerFactory.getLogger(TalukaMasterController.class);
-	private static final String CSV_FILE_LOCATION ="C:\\Users\\Dipali.sonawane\\Desktop\\Book3.xlsx" /*"\\MAHASBR\\target\\Book3.xlsx"*/;
-	
+	private final TalukaMasterService service;
 
-	/*
-	 * @PostMapping("/taluka") public ResponseEntity<MessageResponse>
-	 * postMethodName(@RequestBody TalukaMasterModel talukaMasterModel) {
-	 * TalukaMaster taluka =
-	 * talukaMasterService.insertTalukaDetails(talukaMasterModel); return
-	 * ResponseEntity.ok(new MessageResponse("Added successfully!", taluka));
-	 * 
-	 * }
-	 */
-	@GetMapping("/talukamaster/{districtCode}")
-	public @ResponseBody void getDistrictDetails(@PathVariable String districtCode) {
-		List<TalukaMaster> talukas = new ArrayList<>();
-		Workbook workbook = null;
-		//Set<Integer> talukaCodes = new HashSet<>(); // Set to store unique taluka codes
-		// Set<String> districtCodes = new HashSet<>(); // Set to store unique district codes
-		try {
-			// Creating a Workbook from an Excel file (.xls or .xlsx)
-			workbook = WorkbookFactory.create(new File(CSV_FILE_LOCATION));
-
-			// Retrieving the number of sheets in the Workbook
-			logger.info("Number of sheets: ", workbook.getNumberOfSheets());
-			// Print all sheets name
-			workbook.forEach(sheet -> {
-				logger.info(" => " + sheet.getSheetName());
-
-				// Create a DataFormatter to format and get each cell's value as String
-				DataFormatter dataFormatter = new DataFormatter();
-				// loop through all rows and columns and create Course object
-				for (Row row : sheet) {
-					int index = 0;
-					if(index++ == 0) continue;
-					Cell cell = row.getCell(1);
-					String cellValue = dataFormatter.formatCellValue(cell);
-					if (cellValue.equals(districtCode)) {
-
-						TalukaMaster taluka = new TalukaMaster();
-
-						taluka.setCensusTalukaCode(Long.parseLong(dataFormatter.formatCellValue(row.getCell(2))));
-						taluka.setTalukaName(dataFormatter.formatCellValue(row.getCell(3)));
-//						Optional<DistrictMaster> districtMaster = districtMasterService.findByDistrictCode(Long.parseLong(dataFormatter.formatCellValue(row.getCell(0))));
-					taluka.setCensusDistrictCode(Long.parseLong(dataFormatter.formatCellValue(row.getCell(1))));
-//						taluka.setDistrictMaster(districtMaster);
-
-						talukas.add(taluka);
-
-						talukaMasterRepository.saveAll(talukas);
-					}
-				}
-
-			});
-
-		} catch (EncryptedDocumentException | InvalidFormatException | IOException e) {
-			logger.error(e.getMessage(), e);
-		} finally {
-			try {
-				if (workbook != null)
-					workbook.close();
-			} catch (IOException e) {
-				logger.error(e.getMessage(), e);
-			}
-		}
-
+	public TalukaMasterController(TalukaMasterService service) {
+		this.service = service;
 	}
+
+	@PostMapping
+	public ResponseEntity<TalukaMaster> create(@Valid @RequestBody TalukaMaster taluka) {
+		return new ResponseEntity<>(service.create(taluka), HttpStatus.CREATED);
+	}
+
+	@PutMapping("/{id}")
+	public ResponseEntity<TalukaMaster> update(@PathVariable Long id, @Valid @RequestBody TalukaMaster taluka) {
+		return ResponseEntity.ok(service.update(id, taluka));
+	}
+
+	@DeleteMapping("/{id}")
+	public ResponseEntity<Void> delete(@PathVariable Long id) {
+		service.delete(id);
+		return ResponseEntity.noContent().build();
+	}
+
+	@GetMapping("/{id}")
+	public ResponseEntity<TalukaMaster> getById(@PathVariable Long id) {
+		return ResponseEntity.ok(service.getById(id));
+	}
+
+	@GetMapping
+	public ResponseEntity<List<TalukaMaster>> getAll() {
+		return ResponseEntity.ok(service.getAll());
+	}
+	@PostMapping("/upload")
+	public ResponseEntity<String> uploadTalukaExcel(@RequestParam("file") MultipartFile file) {
+	    try {
+	        service.importTalukasFromExcel(file);
+	        return ResponseEntity.ok("Taluka data uploaded successfully.");
+	    } catch (Exception e) {
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+	                .body("Failed to upload file: " + e.getMessage());
+	    }
+	}
+
 }

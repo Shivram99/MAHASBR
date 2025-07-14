@@ -19,11 +19,11 @@ public interface CommonService {
 
 	public List<DistrictMaster> getAllDistrict();
 
-	public DistrictMaster getAllDistrictDistrictCode(long censusDistrictCode)throws Exception ;
+	public DistrictMaster getAllDistrictDistrictCode(String censusDistrictCode)throws Exception ;
 
-	public List<TalukaMaster> getAllTalukaByDistrictCode(long censusDistrictCode);
+	public List<TalukaMaster> getAllTalukaByDistrictCode(String censusDistrictCode);
 
-	public List<com.mahasbr.entity.VillageMaster> getAllVillageTalukaCode(long censusTalukaCode);
+	public List<VillageMaster> getAllVillageTalukaCode(String censusTalukaCode);
 
 
 	public List<TopicModel> findMenuNameByRoleID(Long levelRoleVal);
@@ -31,7 +31,6 @@ public interface CommonService {
 
 	List<TopicModel> findSubMenuByRoleID(Long levelRoleVal);
 
-	List<VillageMaster> getAllVillageTalukaCode(Long censusTalukaCode);
 
 		
 	//public void processPdfFile(MultipartFile file) throws IOException;

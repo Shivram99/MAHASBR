@@ -1,22 +1,25 @@
 package com.mahasbr.service;
 
+import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
+
+import org.springframework.web.multipart.MultipartFile;
 
 import com.mahasbr.entity.DistrictMaster;
-import com.mahasbr.entity.TalukaMaster;
 
 public interface DistrictMasterService {
+	DistrictMaster create(DistrictMaster district);
 
-	public List<DistrictMaster> getAllDistrict();
-	public List<TalukaMaster> getAllDistrictTaluka(Long districtCode);
-	public Optional<DistrictMaster> findByDistrictCode(long long1);
+	DistrictMaster update(Long id, DistrictMaster district);
 
+	void delete(Long id);
 
-	public List<DistrictMaster> readdataCsv();
+	DistrictMaster getById(Long id);
 
+	List<DistrictMaster> getAll();
 
-//	public DistrictMaster insertDistrictDetail(DistrictMasterModel districtMasterModel);
-//
-//}
+	void importDistrictsFromExcel(MultipartFile file) throws IOException;
+	
+	List<DistrictMaster> findByIsActiveTrue();
+
 }
