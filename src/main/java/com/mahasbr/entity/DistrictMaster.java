@@ -34,6 +34,7 @@ public class DistrictMaster extends Auditable {
 	@Column(name = "district_name", nullable = false)
 	private String districtName;
 
+
 	@NotBlank(message = "Census state code is mandatory")
 	@Column(name = "census_state_code", nullable = false)
 	private String censusStateCode; // FK to StatesMaster.censusStateCode

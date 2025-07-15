@@ -25,4 +25,7 @@ public interface VillageMasterRepository extends JpaRepository<VillageMaster, Lo
 	Optional<VillageMaster> findByCensusVillageCode(String censusVillageCode);
 
 
+//	Optional<VillageMaster> getVillagesByCensusTalukaCodeAndVillageName(Long censusTalukaCode, String villageName);
+
+
 }

@@ -31,6 +31,7 @@ public class StatesMaster extends Auditable {
 	@Column(name = "state_id")
 	private Long stateId;
 
+
 	@NotBlank(message = "Census state code is mandatory")
 	@Column(name = "census_state_code", unique = true, nullable = false, updatable = false)
 	private String censusStateCode;

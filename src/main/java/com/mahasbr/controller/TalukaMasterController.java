@@ -24,6 +24,7 @@ import jakarta.validation.Valid;
 @RequestMapping("/api/talukas")
 public class TalukaMasterController {
 
+
 	private final TalukaMasterService service;
 
 	public TalukaMasterController(TalukaMasterService service) {

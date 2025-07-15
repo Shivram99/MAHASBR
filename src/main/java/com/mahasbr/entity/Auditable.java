@@ -3,9 +3,14 @@ package com.mahasbr.entity;
 import java.util.Date;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import lombok.Data;
 
 
@@ -33,6 +38,7 @@ public abstract class Auditable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedDateTime;
 
+
     @PrePersist
     protected void onCreate() {
         this.createdDateTime = new Date();
@@ -44,3 +50,4 @@ public abstract class Auditable {
         this.updatedDateTime = new Date();
     }
 }
+

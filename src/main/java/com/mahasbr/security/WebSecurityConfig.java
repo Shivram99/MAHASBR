@@ -100,7 +100,7 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
        // .failureHandler(authenticationFailureHandler)
         .authorizeHttpRequests(auth -> 
-          auth.requestMatchers("/api/auth/**").permitAll()
+          auth.requestMatchers("/api/**").permitAll()
               .requestMatchers("/api/auth/signup").permitAll()
               .requestMatchers("/api/auth/signup").permitAll()
               .requestMatchers("/api/**").permitAll()
@@ -108,7 +108,8 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
               .requestMatchers("/common/api**").permitAll()
               .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
               .requestMatchers(" /common/department**").permitAll()
-              .requestMatchers("/admin/**").hasRole("ADMIN")
+              .requestMatchers("/admin/**").permitAll()
+//              .requestMatchers("/admin/**").hasRole("ADMIN")
               .requestMatchers("/moderator/**").hasRole("MODERATOR")
               .requestMatchers("/developer/**").hasRole("DEVELOPER")
             .requestMatchers("/user/**").permitAll()

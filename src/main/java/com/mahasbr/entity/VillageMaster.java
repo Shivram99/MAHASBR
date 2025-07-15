@@ -17,8 +17,9 @@ import lombok.NoArgsConstructor;
 @Entity
 @Data
 @NoArgsConstructor
-@AllArgsConstructor   
-   @Table(name = "village_master", indexes = { @Index(name = "idx_census_village_code", columnList = "census_village_code"),
+@AllArgsConstructor
+@Table(name = "village_master", indexes = {
+		@Index(name = "idx_census_village_code", columnList = "census_village_code"),
 		@Index(name = "idx_census_taluka_code_fk", columnList = "census_taluka_code") })
 public class VillageMaster extends Auditable {
 
@@ -28,7 +29,7 @@ public class VillageMaster extends Auditable {
 	@Column(name = "village_id")
 	private Long villageId;
 
-	@NotNull(message = "Village code is mandatory")   
+	@NotNull(message = "Village code is mandatory")
 	@Column(name = "census_village_code", unique = true, nullable = false, updatable = false)
 	private String censusVillageCode;
 
@@ -37,13 +38,13 @@ public class VillageMaster extends Auditable {
 	private String villageName;
 
 	@NotBlank(message = "Taluka code is mandatory")
-	@Column(name = "census_taluka_code", nullable = false)   
+	@Column(name = "census_taluka_code", nullable = false)
 	private String censusTalukaCode; // FK to TalukaMaster.talukaCode
-	
+
 	@NotBlank(message = "District code is mandatory")
 	@Column(name = "census_district_code")
 	private String censusDistrictCode;
 
 	@Column(name = "is_active", nullable = false)
 	private Boolean isActive = true;
-}   
+}

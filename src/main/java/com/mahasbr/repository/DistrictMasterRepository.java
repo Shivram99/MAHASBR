@@ -17,5 +17,10 @@ public interface DistrictMasterRepository extends JpaRepository<DistrictMaster, 
 	@Query("SELECT d FROM DistrictMaster d WHERE d.isActive = true")
 	List<DistrictMaster> findByIsActiveTrue();
 
+	//Optional<DistrictMaster> findByCensusStateCodeAndDistrictName(Long censusStateCode, String districtName);
+
+	@Query("SELECT d.districtName FROM DistrictMaster d WHERE d.censusDistrictCode IN :censusDistrictCodes")
+	List<String> findDistrictNamesByCensusDistrictCodes(List<Long> censusDistrictCodes);
+	
 
 }

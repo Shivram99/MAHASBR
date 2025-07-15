@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
@@ -109,7 +110,15 @@ public class DistrictMasterServiceImpl implements DistrictMasterService {
 		return repository.findByIsActiveTrue();
 	}
 
+	@Override
+	public Optional<DistrictMaster> findByCensusDistrictCode(String long1) {
+		// TODO Auto-generated method stub
+		return repository.findByCensusDistrictCode(long1);
+	}
+
+		
 }
+
 
 
 

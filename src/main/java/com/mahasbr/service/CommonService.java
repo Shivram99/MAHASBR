@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.mahasbr.entity.DistrictMaster;
@@ -35,7 +36,7 @@ public interface CommonService {
 		
 	//public void processPdfFile(MultipartFile file) throws IOException;
 
-	public boolean isValidExcel(MultipartFile file);
+	public boolean isValidExcel(MultipartFile file) throws InvalidFormatException;
 
 	public String extractTextFromXlsx(InputStream inputStream) throws IOException;
 
@@ -44,6 +45,8 @@ public interface CommonService {
 	public String extractTextFromCsv(InputStream inputStream) throws IOException;
 
 	public boolean detectMaliciousContent(String content);
+
+	public DistrictMaster getAllDistrictDistrictCode(long long1);
 
 	
 }

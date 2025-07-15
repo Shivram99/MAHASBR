@@ -13,4 +13,7 @@ public interface StatesMasterRepository extends JpaRepository<StatesMaster, Long
 	Optional<StatesMaster> findByCensusStateCode(String censusCode);
     boolean existsByCensusStateCode(String censusCode);
 
+	Optional<StatesMaster> findByStateName(String stateName);
+	/* Optional<StatesMaster> FindByStateName(String stateName); */
+
 }

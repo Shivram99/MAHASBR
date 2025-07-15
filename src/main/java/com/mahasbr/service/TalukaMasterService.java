@@ -1,5 +1,6 @@
 package com.mahasbr.service;
 
+
 import java.io.IOException;
 import java.util.List;
 
@@ -19,5 +20,4 @@ public interface TalukaMasterService {
 	List<TalukaMaster> getAll();
 
 	void importTalukasFromExcel(MultipartFile file) throws IOException;
-
 }

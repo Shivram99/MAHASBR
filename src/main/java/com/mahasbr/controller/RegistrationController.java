@@ -53,6 +53,7 @@ public class RegistrationController {
 
   @PostMapping("/signup")
   public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
+	  
     if (userRepository.existsByUsername(signUpRequest.getUsername())) {
       return ResponseEntity.badRequest().body(new MessageResponse("Error: Username is already taken!"));
     }
@@ -76,36 +77,32 @@ public class RegistrationController {
     String strRoles = signUpRequest.getRoles();
     Set<Role> roles = new HashSet<>();
 
-    if (strRoles == null) {
-      Role userRole = roleRepository.findByName(ERole.ROLE_USER)
-          .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-      roles.add(userRole);
-    } else {
-        switch (strRoles) {
-        case "ROLE_ADMIN":
-          Role adminRole = roleRepository.findByName(ERole.ROLE_ADMIN)
-              .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-          roles.add(adminRole);
-
-          break;
-        case "ROLE_MODERATOR":
-          Role modRole = roleRepository.findByName(ERole.ROLE_MODERATOR)
-              .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-          roles.add(modRole);
-
-          break;
-        case "ROLE_DEVELOPER":
-            Role devRole = roleRepository.findByName(ERole.ROLE_DEVELOPER)
-                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-            roles.add(devRole);
-
-            break;
-        default:
-          Role userRole = roleRepository.findByName(ERole.ROLE_USER)
-              .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-          roles.add(userRole);
-        }
-    }
+    
+    Role userRole = roleRepository.findByName(ERole.valueOf(strRoles))
+            .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+        roles.add(userRole);
+    
+        
+		/*
+		 * if (strRoles == null) { Role userRole =
+		 * roleRepository.findByName(ERole.valueOf(strRoles)) .orElseThrow(() -> new
+		 * RuntimeException("Error: Role is not found.")); roles.add(userRole); } else {
+		 * switch (strRoles) { case "ROLE_ADMIN": Role adminRole =
+		 * roleRepository.findByName(ERole.ROLE_ADMIN) .orElseThrow(() -> new
+		 * RuntimeException("Error: Role is not found.")); roles.add(adminRole);
+		 * 
+		 * break; case "ROLE_MODERATOR": Role modRole =
+		 * roleRepository.findByName(ERole.ROLE_MODERATOR) .orElseThrow(() -> new
+		 * RuntimeException("Error: Role is not found.")); roles.add(modRole);
+		 * 
+		 * break; case "ROLE_DEVELOPER": Role devRole =
+		 * roleRepository.findByName(ERole.ROLE_DEVELOPER) .orElseThrow(() -> new
+		 * RuntimeException("Error: Role is not found.")); roles.add(devRole);
+		 * 
+		 * break; default: Role userRole = roleRepository.findByName(ERole.ROLE_USER)
+		 * .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+		 * roles.add(userRole); } }
+		 */
 
     user.setRoles(roles);
     userRepository.save(user);

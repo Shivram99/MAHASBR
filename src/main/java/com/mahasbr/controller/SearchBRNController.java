@@ -2,6 +2,9 @@ package com.mahasbr.controller;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -9,9 +12,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.mahasbr.dto.BrnSearchDTO;
 import com.mahasbr.entity.DistrictMaster;
+import com.mahasbr.entity.MstRegistryDetailsPageEntity;
+import com.mahasbr.exception.ResourceNotFoundException;
+import com.mahasbr.model.SearchBrnDto;
+import com.mahasbr.service.CommonService;
 import com.mahasbr.service.DistrictMasterService;
+import com.mahasbr.service.MstRegistryDetailsPageService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -21,23 +28,38 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SearchBRNController {
 
-	 private final DistrictMasterService service;
-	 
-	 
+	private final DistrictMasterService districtservice;
 	
+	
+	private final CommonService commonService;
+	
+	private final MstRegistryDetailsPageService mstRegistryDetailsPageService;
+
 	@GetMapping("/districts")
-    public ResponseEntity<List<DistrictMaster>> getAll() {
-        return ResponseEntity.ok(service.findByIsActiveTrue());
-    }
-	
-	
+	public ResponseEntity<List<DistrictMaster>> getAll() {
+		return ResponseEntity.ok(districtservice.findByIsActiveTrue());
+	}
+
 	@PostMapping("/searchBRN")
-    public ResponseEntity<?> searchBRN(@Valid @RequestBody BrnSearchDTO request) {
-        
-        return (ResponseEntity<?>) ResponseEntity.ok();
+    public ResponseEntity<List<MstRegistryDetailsPageEntity>> searchBRN(@Valid @RequestBody SearchBrnDto searchBrnDto) {
+        if (StringUtils.isBlank(searchBrnDto.getDistrict())) {
+            throw new IllegalArgumentException("District code must not be blank");
+        }
+
+        DistrictMaster district = districtservice.findByCensusDistrictCode(searchBrnDto.getDistrict())
+                .orElseThrow(() -> new ResourceNotFoundException("District", "CensusDistrictCode", searchBrnDto.getDistrict()));
+
+        String districtName = StringUtils.upperCase(district.getDistrictName());
+        String brnNo = StringUtils.upperCase(searchBrnDto.getBrnNo());
+        String establishmentOrOwnerName = StringUtils.upperCase(searchBrnDto.getNameOfEstablishmentOrOwner());
+
+        List<MstRegistryDetailsPageEntity> result = mstRegistryDetailsPageService
+                .getsearchBRNAndEstablishmentDetails(districtName, brnNo, establishmentOrOwnerName);
+
+        return ResponseEntity.ok(result);
     }
-	/*
-	 * @GetMapping("/searchBRN") public ResponseEntity<List<DistrictMaster>>
-	 * getSerachBRN() { return ResponseEntity.ok(service.findByIsActiveTrue()); }
-	 */
+
+
+
+
 }

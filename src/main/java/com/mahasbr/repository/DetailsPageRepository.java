@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.mahasbr.entity.DetailsPage;
+import com.mahasbr.entity.MstRegistryDetailsPageEntity;
 
 @Repository
 @EnableJpaRepositories
@@ -46,7 +47,7 @@ public interface DetailsPageRepository extends JpaRepository<DetailsPage, Long> 
 	@Query("SELECT r.district, r.nameOfEstateOwner, COUNT(r) AS count " + "FROM Details"
 			+ "Page r "
 			+ "WHERE r.dateOfReg = :maxDate " + "GROUP BY r.district, r.nameOfEstateOwner")
-	List<DetailsPage> getIndustryWiseStats(@Param("maxDate") String maxDate);
+	List<MstRegistryDetailsPageEntity> getIndustryWiseStats(@Param("maxDate") String maxDate);
 
 	@Query(value = "SELECT nameofAct, " + "EXTRACT(YEAR FROM " + "CASE "
 			+ "   WHEN REGEXP_LIKE(dateOfReg, '^\\d{2}/\\d{2}/\\d{2}$') THEN TO_DATE(dateOfReg, 'DD/MM/YY') "
@@ -54,7 +55,7 @@ public interface DetailsPageRepository extends JpaRepository<DetailsPage, Long> 
 			+ "FROM DetailsPage " + "GROUP BY nameofAct, EXTRACT(YEAR FROM " + "CASE "
 			+ "   WHEN REGEXP_LIKE(dateOfReg, '^\\d{2}/\\d{2}/\\d{2}$') THEN TO_DATE(dateOfReg, 'DD/MM/YY') "
 			+ "   ELSE DATE '1900-01-01' + (TO_NUMBER(dateOfReg) - 2) " + "END)", nativeQuery = true)
-	List<DetailsPage> findActAndYearCounts();
+	List<MstRegistryDetailsPageEntity> findActAndYearCounts();
 
 	@Query(value = "SELECT b.district AS district, " + "       b.nameofAct AS nameofAct, " + "       COUNT(*) AS count "
 			+ "FROM DetailsPage b " + "WHERE REGEXP_LIKE(b.dateOfReg, '^\\d{2}/\\d{2}/\\d{2}$') "
@@ -63,7 +64,7 @@ public interface DetailsPageRepository extends JpaRepository<DetailsPage, Long> 
 			+ "      SELECT MAX(EXTRACT(YEAR FROM TO_DATE(r.dateOfReg, 'DD/MM/YY'))) " + "      FROM DetailsPage r "
 			+ "      WHERE REGEXP_LIKE(r.dateOfReg, '^\\d{2}/\\d{2}/\\d{2}$')" + "  ) "
 			+ "GROUP BY b.district, b.NAME_OF_ACT", nativeQuery = true)
-	List<DetailsPage> findDistrictAndActWiseForLatestYear();
+	List<MstRegistryDetailsPageEntity> findDistrictAndActWiseForLatestYear();
 
 
     @Query(value = "SELECT " +
@@ -117,7 +118,7 @@ public interface DetailsPageRepository extends JpaRepository<DetailsPage, Long> 
             "            END " +
             "    END, " +
             "    r.nameOfEstateOwner", nativeQuery = true)
-	List<DetailsPage> getTimeAndIndustryWise();
+	List<MstRegistryDetailsPageEntity> getTimeAndIndustryWise();
 
 	@Query(value = "SELECT r.district, " + "CASE "
 			+ "    WHEN EXTRACT(MONTH FROM TO_DATE(r.dateOfReg, 'DD/MM/YY')) BETWEEN 1 AND 3 THEN 'Q1' "
@@ -133,7 +134,7 @@ public interface DetailsPageRepository extends JpaRepository<DetailsPage, Long> 
 			+ "    WHEN EXTRACT(MONTH FROM TO_DATE(r.dateOfReg, 'DD/MM/YY')) BETWEEN 7 AND 9 THEN 'Q3' "
 			+ "    WHEN EXTRACT(MONTH FROM TO_DATE(r.dateOfReg, 'DD/MM/YY')) BETWEEN 10 AND 12 THEN 'Q4'"
 			+ "END", nativeQuery = true)
-	List<DetailsPage> getDistricrtAndTimeWise();
+	List<MstRegistryDetailsPageEntity> getDistricrtAndTimeWise();
 
 //	@Query("FROM DetailsPage t WHERE t.nameOfEstateOwner=?1 and t.houseNo=?2 AND t.streetName=?3 AND t.locality=?4  AND t.taluka=?5  AND t.district=?6  AND t.sector=?7 AND t.pincode=?8 AND t.nameofAuth=?9  AND t.nameofAct=?10")
 //    DetailsPage getDetailsByColumn(String nameOfEstateOwner, String houseNo, String streetName, String locality,

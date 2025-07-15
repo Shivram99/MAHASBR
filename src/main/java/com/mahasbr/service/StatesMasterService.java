@@ -20,4 +20,5 @@ public interface StatesMasterService {
 	
 	void importStatesFromExcel(MultipartFile file) throws IOException;
 
+
 }

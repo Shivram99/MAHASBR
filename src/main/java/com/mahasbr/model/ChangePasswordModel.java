@@ -14,6 +14,9 @@ public class ChangePasswordModel {
 	
 	@NotEmpty
 	private String password;
+	
+	@NotEmpty
+	private Boolean isFirstTimeLogin;
 
     
 
