@@ -20,4 +20,7 @@ public interface TalukaMasterService {
 	List<TalukaMaster> getAll();
 
 	void importTalukasFromExcel(MultipartFile file) throws IOException;
+
+	List<TalukaMaster> findByCensusDistrictCodeInAndIsActiveTrue(List<String> districtCode);
+	
 }

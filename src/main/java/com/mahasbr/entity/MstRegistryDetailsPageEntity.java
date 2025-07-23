@@ -13,139 +13,180 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
+import lombok.*;
+import java.time.LocalDate;
+
 @Entity
-@Data
-@NoArgsConstructor
 @Table(name = "mst_reg_details")
-@ToString
+@Getter
+@Setter
+@NoArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
+@ToString(callSuper = true)
 public class MstRegistryDetailsPageEntity extends Auditable {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "siNo_generator")
-	@SequenceGenerator(name = "siNo_generator", sequenceName = "siNo_sequence", allocationSize = 1)
-	@Column(name = "si_No")
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "mst_reg_details_seq_gen")
+	@SequenceGenerator(name = "mst_reg_details_seq_gen", sequenceName = "mst_reg_details_seq", allocationSize = 1)
+	@Column(name = "si_no", nullable = false, updatable = false)
+	@EqualsAndHashCode.Include
 	private Long siNo;
-		
-	@Column(length = 100)
+
+	@Size(max = 100)
+	@Column(name = "establishment_or_owner_name", length = 100)
 	private String nameOfEstablishmentOrOwner;
 
-	@Column(length = 500)
+	@Size(max = 500)
+	@Column(name = "house_no", length = 500)
 	private String houseNo;
 
-	@Column(length = 500)
+	@Size(max = 500)
+	@Column(name = "street_name", length = 500)
 	private String streetName;
 
-	@Column(length = 500)
+	@Size(max = 500)
+	@Column(name = "locality", length = 500)
 	private String locality;
 
-	@Column(length = 6)
+	@Column(name = "pin_code")
 	private Integer pinCode;
 
-	@Column(length = 10)
+	@Column(name = "telephone_mob_number")
 	private Long telephoneMobNumber;
 
-	@Column(length = 320)
+	@Email
+	@Size(max = 320)
+	@Column(name = "email_address", length = 320)
 	private String emailAddress;
 
-	@Column(length = 10)
+	@Size(max = 10)
+	@Column(name = "pan_number", length = 10)
 	private String panNumber;
 
-	@Column(length = 10)
+	@Size(max = 10)
+	@Column(name = "tan_number", length = 10)
 	private String tanNumber;
 
-	@Column(length = 500)
+	@Size(max = 500)
+	@Column(name = "head_office_house_no", length = 500)
 	private String headOfficeHouseNo;
 
-	@Column(length = 500)
+	@Size(max = 500)
+	@Column(name = "head_office_street_name", length = 500)
 	private String headOfficeStreetName;
 
-	@Column(length = 500)
+	@Size(max = 500)
+	@Column(name = "head_office_locality", length = 500)
 	private String headOfficeLocality;
 
-	@Column(length = 6)
+	@Column(name = "head_office_pin_code")
 	private Integer headOfficePinCode;
 
-	@Column(length = 10)
+	@Column(name = "head_office_telephone_mob_number")
 	private Long headOfficeTelephoneMobNumber;
 
-	@Column(length = 320)
+	@Email
+	@Size(max = 320)
+	@Column(name = "head_office_email_address", length = 320)
 	private String headOfficeEmailAddress;
 
-	@Column(length = 10)
+	@Size(max = 10)
+	@Column(name = "head_office_pan_number", length = 10)
 	private String headOfficePanNumber;
 
-	@Column(length = 10)
+	@Size(max = 10)
+	@Column(name = "head_office_tan_number", length = 10)
 	private String headOfficeTanNumber;
 
-	@Column(length = 100)
+	@Size(max = 100)
+	@Column(name = "major_activity_description", length = 100)
 	private String descriptionOfMajorActivity;
 
-	@Column(length = 5)
+	@Column(name = "nic2008_activity_code")
 	private Integer nic2008ActivityCode;
 
-	@Column(length = 5)
-	private String nic2008ActivityCodeDesicripton;
+	@Size(max = 5)
+	@Column(name = "nic2008_activity_code_description", length = 5)
+	private String nic2008ActivityCodeDescription;
 
-	@Column(length = 4)
+	@Column(name = "operation_start_year")
 	private Integer yearOfStartOfOperation;
 
-	@Column(length = 1)
+	@Column(name = "ownership_code")
 	private Integer ownershipCode;
 
-	@Column(length = 7)
+	@Column(name = "total_persons_working")
 	private Integer totalNumberOfPersonsWorking;
 
-	@Column(length = 100)
+	@Size(max = 100)
+	@Column(name = "act_authority_reg_numbers", length = 100)
 	private String actAuthorityRegistrationNumbers;
 
-	@Column(length = 100)
+	@Size(max = 100)
+	@Column(name = "remarks", length = 100)
 	private String remarks;
 
-	@Column(length = 16)
+	@Size(max = 16)
+	@Column(name = "location_code", length = 16)
 	private String locationCode;
 
-	@Column(length = 1)
+	@Size(max = 1)
+	@Column(name = "registration_status", length = 1)
 	private String registrationStatus;
 
-	@Column(length = 100)
+	@Size(max = 100)
+	@Column(name = "town_village", length = 100)
 	private String townVillage;
 
-	@Column(length = 100)
+	@Size(max = 100)
+	@Column(name = "taluka", length = 100)
 	private String taluka;
 
-	@Column(length = 100)
+	@Size(max = 100)
+	@Column(name = "district", length = 100)
 	private String district;
 
-	// (Rural / Urban)
-	@Column(length = 5)
+	@Size(max = 6)
+	@Column(name = "sector", length = 6)
 	private String sector;
 
-	@Column(length = 10)
+	@Size(max = 10)
+	@Column(name = "ward_number", length = 10)
 	private String wardNumber;
 
-	@Column(length = 200)
+	@Size(max = 200)
+	@Column(name = "authority_name", length = 200)
 	private String nameOfAuthority;
 
-	@Column(length = 200)
+	@Size(max = 200)
+	@Column(name = "act_name", length = 200)
 	private String nameOfAct;
 
-	@Column(length = 30)
+	@Column(name = "registration_date")
 	private LocalDate dateOfRegistration;
 
-	@Column(length = 30)
+	@Column(name = "deregistration_expiry_date")
 	private LocalDate dateOfDeregistrationExpiry;
 
-	@Column(length = 15)
+	@Size(max = 15)
+	@Column(name = "gst_number", length = 15)
 	private String gstNumber;
 
-	@Column(length = 10)
+	@Size(max = 10)
+	@Column(name = "hsn_code", length = 10)
 	private String hsnCode;
 
+	@Size(max = 20)
+	@Column(name = "record_status", length = 20)
 	private String recordStatus;
 
-	@Column(name = "brn_number", unique = true, nullable = false)
+	@NotNull
+	@Size(max = 50)
+	@Column(name = "brn_number", unique = true, nullable = false, length = 50)
 	private String brnNo;
-	
-	private Long regUserId;
 
+	@Column(name = "reg_user_id")
+	private Long regUserId;
 }

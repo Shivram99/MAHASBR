@@ -103,5 +103,11 @@ public class TalukaMasterServiceImpl implements TalukaMasterService {
         return cell.getStringCellValue().trim();
     }
 
+	@Override
+	public List<TalukaMaster> findByCensusDistrictCodeInAndIsActiveTrue(List<String> districtCode) {
+		// TODO Auto-generated method stub
+		return repository.findByCensusDistrictCodeInAndIsActiveTrue(districtCode);
+	}
+
 }
 
