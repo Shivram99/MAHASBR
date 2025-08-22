@@ -17,22 +17,22 @@ import com.mahasbr.service.CommonService;
 @RequestMapping("/user")
 public class TabController {
 
-	@Autowired
-	CommonService commonService;
-
-	@GetMapping("/getAllMenuByName/{roleId}")
-	public ResponseEntity<List<TopicModel>> getAllMenuByName(@PathVariable Long roleId) {
-		List<TopicModel> menuList = new ArrayList<>();
-		List<TopicModel> subMenuList = new ArrayList<>();
-		menuList = commonService.findMenuNameByRoleID(roleId);
-		return ResponseEntity.ok(menuList);
-	}
-	
-	@GetMapping("/getAllSubMenu/{roleId}")
-	public ResponseEntity<List<TopicModel>> getAllSubMenu(@PathVariable Long roleId) {
-		List<TopicModel> subMenuList = new ArrayList<>();
-		subMenuList = commonService.findSubMenuByRoleID(roleId);
-		return ResponseEntity.ok(subMenuList);
-	}
+//	@Autowired
+//	CommonService commonService;
+//
+//	@GetMapping("/getAllMenuByName/{roleId}")
+//	public ResponseEntity<List<TopicModel>> getAllMenuByName(@PathVariable Long roleId) {
+//		List<TopicModel> menuList = new ArrayList<>();
+//		List<TopicModel> subMenuList = new ArrayList<>();
+//		menuList = commonService.findMenuNameByRoleID(roleId);
+//		return ResponseEntity.ok(menuList);
+//	}
+//	
+//	@GetMapping("/getAllSubMenu/{roleId}")
+//	public ResponseEntity<List<TopicModel>> getAllSubMenu(@PathVariable Long roleId) {
+//		List<TopicModel> subMenuList = new ArrayList<>();
+//		subMenuList = commonService.findSubMenuByRoleID(roleId);
+//		return ResponseEntity.ok(subMenuList);
+//	}
 
 }

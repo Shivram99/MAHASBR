@@ -94,44 +94,44 @@ public class CommonServiceImpl implements CommonService{
 		return village;
 	}
 
-	@Override
-	public List<TopicModel> findMenuNameByRoleID(Long levelRoleVal) {
+//	@Override
+//	public List<TopicModel> findMenuNameByRoleID(Long levelRoleVal) {
+//
+//		List<Object[]> lstprop = commonHomeMethodsRepo.findMenuNameByRoleID(levelRoleVal);
+//		List<TopicModel> lstMenuObj = new ArrayList<>();
+//		if (!lstprop.isEmpty()) {
+//			for (Object[] objLst : lstprop) {
+//				TopicModel obj = new TopicModel();
+//				obj.setKey(StringHelperUtils.isNullInt(objLst[0]));
+//				obj.setMenuName(StringHelperUtils.isNullString(objLst[1]));
+//				// obj.setMenuName(StringHelperUtils.isNullString(objLst[2]));
+//				lstMenuObj.add(obj);
+//			}
+//		}
+//		return lstMenuObj;
+//	}
 
-		List<Object[]> lstprop = commonHomeMethodsRepo.findMenuNameByRoleID(levelRoleVal);
-		List<TopicModel> lstMenuObj = new ArrayList<>();
-		if (!lstprop.isEmpty()) {
-			for (Object[] objLst : lstprop) {
-				TopicModel obj = new TopicModel();
-				obj.setKey(StringHelperUtils.isNullInt(objLst[0]));
-				obj.setMenuName(StringHelperUtils.isNullString(objLst[1]));
-				// obj.setMenuName(StringHelperUtils.isNullString(objLst[2]));
-				lstMenuObj.add(obj);
-			}
-		}
-		return lstMenuObj;
-	}
-
-	@Override
-	public List<TopicModel> findSubMenuByRoleID(Long levelRoleVal) {
-		List<Object[]> lstprop = commonHomeMethodsRepo.findSubMenuByRoleID(levelRoleVal);
-		List<TopicModel> lstSubMenuObj = new ArrayList<>();
-		if (!lstprop.isEmpty()) {
-			for (Object[] objLst : lstprop) {
-				TopicModel obj = new TopicModel();
-				obj.setKey(StringHelperUtils.isNullInt(objLst[0]));
-				obj.setMenuKey(StringHelperUtils.isNullInt(objLst[1]));
-				obj.setRoleKey(StringHelperUtils.isNullInt(objLst[2]));
-				obj.setSubMenuName(StringHelperUtils.isNullString(objLst[3]));
-
-				obj.setControllerName(StringHelperUtils.isNullString(objLst[5]));
-				obj.setLinkName(StringHelperUtils.isNullString(objLst[6]));
-
-				lstSubMenuObj.add(obj);
-			}
-		}
-		return lstSubMenuObj;
-
-	}
+//	@Override
+//	public List<TopicModel> findSubMenuByRoleID(Long levelRoleVal) {
+//		List<Object[]> lstprop = commonHomeMethodsRepo.findSubMenuByRoleID(levelRoleVal);
+//		List<TopicModel> lstSubMenuObj = new ArrayList<>();
+//		if (!lstprop.isEmpty()) {
+//			for (Object[] objLst : lstprop) {
+//				TopicModel obj = new TopicModel();
+//				obj.setKey(StringHelperUtils.isNullInt(objLst[0]));
+//				obj.setMenuKey(StringHelperUtils.isNullInt(objLst[1]));
+//				obj.setRoleKey(StringHelperUtils.isNullInt(objLst[2]));
+//				obj.setSubMenuName(StringHelperUtils.isNullString(objLst[3]));
+//
+//				obj.setControllerName(StringHelperUtils.isNullString(objLst[5]));
+//				obj.setLinkName(StringHelperUtils.isNullString(objLst[6]));
+//
+//				lstSubMenuObj.add(obj);
+//			}
+//		}
+//		return lstSubMenuObj;
+//
+//	}
 
 	
 

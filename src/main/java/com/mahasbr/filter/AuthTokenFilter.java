@@ -1,6 +1,7 @@
 package com.mahasbr.filter;
 
 import java.io.IOException;
+import java.util.Enumeration;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +36,16 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
+		
+		 HttpServletRequest httpRequest = (HttpServletRequest) request;
+	        Enumeration<String> headerNames = httpRequest.getHeaderNames();
+	        String authHeader = request.getHeader("Authorization"); // case-insensitive
+//	        System.out.println("authHeader : "+authHeader);
+	        while (headerNames.hasMoreElements()) {
+	            String header = headerNames.nextElement();
+	            System.out.println(header + ": " + httpRequest.getHeader(header));
+	        }
+
 		try {
 			String jwt = parseJwt(request);
 			if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
@@ -58,10 +69,11 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 	private String parseJwt(HttpServletRequest request) {
 		String headerAuth = request.getHeader("Authorization");
 
-		if (StringUtils.hasText(headerAuth) && headerAuth.startsWith("Bearer ")) {
-			return headerAuth.substring(7, headerAuth.length());
-		}
-		return null;
+	    if (StringUtils.hasText(headerAuth) && headerAuth.startsWith("Bearer ")) {
+	        return headerAuth.substring(7);
+	    }
+
+	    return null;
 	}
 
 	

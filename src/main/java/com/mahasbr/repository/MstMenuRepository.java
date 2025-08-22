@@ -1,9 +1,9 @@
 package com.mahasbr.repository;
+
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
-import com.mahasbr.entity.MstMenu;
+import com.mahasbr.entity.MstMenuEntity;
 
-@Repository
-public interface MstMenuRepository extends JpaRepository<MstMenu, Long> {
+public interface MstMenuRepository extends JpaRepository<MstMenuEntity, Integer> {
+    boolean existsByMenuCode(Integer menuCode);
 }

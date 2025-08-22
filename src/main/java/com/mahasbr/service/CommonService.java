@@ -27,10 +27,10 @@ public interface CommonService {
 	public List<VillageMaster> getAllVillageTalukaCode(String censusTalukaCode);
 
 
-	public List<TopicModel> findMenuNameByRoleID(Long levelRoleVal);
+//	public List<TopicModel> findMenuNameByRoleID(Long levelRoleVal);
 
 
-	List<TopicModel> findSubMenuByRoleID(Long levelRoleVal);
+//	List<TopicModel> findSubMenuByRoleID(Long levelRoleVal);
 
 
 		
