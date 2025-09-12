@@ -3,8 +3,9 @@ package com.mahasbr.controller;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -14,32 +15,28 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.mahasbr.entity.ConcernRegistryDetailsPageEntity;
-import com.mahasbr.entity.District;
-import com.mahasbr.entity.DistrictMaster;
 import com.mahasbr.entity.DuplicateRegistryDetailsPageEntity;
 import com.mahasbr.entity.MstRegistryDetailsPageEntity;
-import com.mahasbr.entity.RegionEntity;
-import com.mahasbr.entity.User;
-import com.mahasbr.model.BRNGenerationRecordCount;
 import com.mahasbr.model.PostLoginDashboardRequestModel;
+import com.mahasbr.response.ExcelFileUpaloadResult;
 import com.mahasbr.service.ConcernRegistryDetailsPageService;
 import com.mahasbr.service.DuplicateRegistryDetailsPageService;
+import com.mahasbr.service.FileStorageService;
 import com.mahasbr.service.MstRegistryDetailsPageService;
-import com.mahasbr.util.CommonMethod;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -54,55 +51,79 @@ public class RegistryCSVUploadController {
 	@Autowired
 	DuplicateRegistryDetailsPageService duplicateRegistryDetailsPageService;
 
-//	@PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	@PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ResponseEntity<?> uploadExcelFile(@RequestPart("file") MultipartFile file) {
-		BRNGenerationRecordCount bRNGenerationRecordCount = null;
-		// Check if the file is empty
-		if (file.isEmpty()) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Please select a file to upload.");
-		}
+	private final FileStorageService service;
 
-		// Get the original filename
-		String originalFilename = file.getOriginalFilename();
-		if (originalFilename == null) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid file name.");
-		}
-
-		// Check file type
-		if (!(originalFilename.endsWith(".csv") || originalFilename.endsWith(".xlsx"))) {
-			return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
-					.body("Unsupported file type. Please upload a CSV or Excel (.xlsx) file.");
-		}
-
-		try {
-			// Process the file based on its type
-			if (originalFilename.endsWith(".xlsx")) {
-				bRNGenerationRecordCount = mstRegistryDetailsPageService.uploadRegiteryCSVFileForBRNGeneration(file);
-				System.out.println("bRNGenerationRecordCount :" + bRNGenerationRecordCount);
-			}
-
-		} catch (Exception e) {
-			// Log the error and return an error response
-			// logger.error("Error processing file: {}", e.getMessage(), e);
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-					.body("Failed to upload file: " + e.getMessage());
-		}
-
-		return ResponseEntity.ok().body(bRNGenerationRecordCount);
+	public RegistryCSVUploadController(FileStorageService service) {
+		this.service = service;
 	}
+
+//	@PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+//	@PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+//	public ResponseEntity<?> uploadExcelFile(@RequestPart("files") MultipartFile file) {
+//	    BRNGenerationRecordCount bRNGenerationRecordCount = null;
+//
+//	    // Check if file is empty
+//	    if (file.isEmpty()) {
+//	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Please select a file to upload.");
+//	    }
+//
+//	    // Get original filename
+//	    String originalFilename = file.getOriginalFilename();
+//	    if (originalFilename == null) {
+//	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid file name.");
+//	    }
+//
+//	    // Check allowed file type
+//	    if (!(originalFilename.endsWith(".csv") || originalFilename.endsWith(".xlsx"))) {
+//	        return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
+//	                .body("Unsupported file type. Please upload a CSV or Excel (.xlsx) file.");
+//	    }
+//
+//	    try {
+//	        if (originalFilename.endsWith(".csv")) {
+//	            // ✅ Handle CSV with proper charset
+//	            try (BufferedReader reader = new BufferedReader(
+//	                    new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8))) {
+//
+//	                // Example: parse CSV (you can pass reader to OpenCSV or your service)
+////	                bRNGenerationRecordCount = mstRegistryDetailsPageService.uploadRegistryCsvFile(file, reader);
+//	            }
+//	        } else if (originalFilename.endsWith(".xlsx")) {
+//	            // ✅ Handle Excel using Apache POI
+//	            try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
+////	                bRNGenerationRecordCount = mstRegistryDetailsPageService.uploadRegistryExcelFile(workbook);
+//	            }
+//	        }
+//	    } catch (Exception e) {
+//	        e.printStackTrace();
+//	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//	                .body("Failed to upload file: " + e.getMessage());
+//	    }
+//
+//	    return ResponseEntity.ok().body(bRNGenerationRecordCount);
+//	}
 
 	@GetMapping("/registoryData")
 	public ResponseEntity<Page<MstRegistryDetailsPageEntity>> getMasterRegistoryDetails(
-			@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size,
-			@RequestParam(defaultValue = "siNo") String sortBy) {
+			@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "12") int size,
+			@RequestParam(defaultValue = "siNo") String sortBy,
+			Authentication authentication){
+		
+		 // Get logged-in username
+	    String username = authentication.getName();
+
+	    // Get roles
+	    Collection<? extends GrantedAuthority> roles = authentication.getAuthorities();
+	    System.out.println("username" +username);
+	    for (GrantedAuthority role : roles) {
+	        System.out.println("Role: " + role.getAuthority());
+	    }
+	   
 		Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
 		Page<MstRegistryDetailsPageEntity> registryDetailsPage = mstRegistryDetailsPageService
 				.getAllRegistoryDetails(pageable);
 		return ResponseEntity.ok(registryDetailsPage);
 	}
-
-	
 
 	@GetMapping("/registoryDuplicateData")
 	public ResponseEntity<Page<DuplicateRegistryDetailsPageEntity>> getDuplicateRegistryDetails(
@@ -172,4 +193,72 @@ public class RegistryCSVUploadController {
 			throw new RuntimeException("Error occurred while downloading file " + fileName, e);
 		}
 	}
+
+	@PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public ResponseEntity<?> uploadFiles(@RequestParam("files") List<MultipartFile> files) {
+		if (files == null || files.isEmpty()) {
+			return ResponseEntity.badRequest().body(Map.of("error", "No files provided"));
+		}
+
+		List<ExcelFileUpaloadResult> results = new ArrayList<>();
+		for (MultipartFile file : files) {
+			try {
+				String saved = service.store(file);
+				results.add(ExcelFileUpaloadResult.success(file.getOriginalFilename(), saved));
+			} catch (Exception e) {
+				results.add(ExcelFileUpaloadResult.failure(file.getOriginalFilename(), e.getMessage()));
+			}
+		}
+		return ResponseEntity.ok(Map.of("files", results));
+	}
+//    public ResponseEntity<Map<String, Object>> uploadFiles(@RequestParam("files") MultipartFile[] files) {
+//        List<String> uploadedFileNames = new ArrayList<>();
+//        List<String> errors = new ArrayList<>();
+//
+//        try {
+//            for (MultipartFile file : files) {
+//                if (file.isEmpty()) {
+//                    errors.add("❌ Empty file uploaded.");
+//                    continue;
+//                }
+//
+//                // ✅ Validate extension
+//                String fileName = file.getOriginalFilename();
+//                String extension = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
+//                if (!ALLOWED_EXTENSIONS.contains(extension)) {
+//                    errors.add("❌ Invalid file type: " + fileName + ". Allowed: CSV, XLSX");
+//                    continue;
+//                }
+//
+//                // ✅ Validate size
+//                if (file.getSize() > MAX_FILE_SIZE) {
+//                    errors.add("❌ File too large: " + fileName + ". Max allowed size is 5MB.");
+//                    continue;
+//                }
+//
+//                // ✅ Save file locally
+//                Path path = Paths.get(UPLOAD_DIR + fileName);
+//                Files.createDirectories(path.getParent());
+//                Files.write(path, file.getBytes());
+//
+//                uploadedFileNames.add(fileName);
+//            }
+//
+//            Map<String, Object> response = new HashMap<>();
+//            if (!errors.isEmpty()) {
+//                response.put("message", "Some files failed validation.");
+//                response.put("errors", errors);
+//                response.put("uploaded", uploadedFileNames);
+//                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+//            }
+//
+//            response.put("message", "✅ Files uploaded successfully!");
+//            response.put("files", uploadedFileNames);
+//            return ResponseEntity.ok(response);
+//
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                    .body(Map.of("message", "❌ File upload failed: " + e.getMessage()));
+//        }
+//    }
 }

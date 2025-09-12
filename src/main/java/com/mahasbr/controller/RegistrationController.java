@@ -65,14 +65,14 @@ public class RegistrationController {
 	  		+ "")); }
 	 
     // Create new user's account
-    User user = new User(signUpRequest.getUsername(), encoder.encode(signUpRequest.getPassword()),signUpRequest.getEmail(),signUpRequest.getPhoneNo());
+    User user = new User(signUpRequest.getUsername(), encoder.encode(signUpRequest.getPassword()),signUpRequest.getEmail());
     
-    Optional<DepartmentMst>  departmentMst =departmentMstService.findDepartmentById(signUpRequest.getDepartmentId());
-    
-    if(departmentMst.isPresent()) {
-    	
-    	 user.setDepartment(departmentMst.get());
-    }
+//    Optional<DepartmentMst>  departmentMst =departmentMstService.findDepartmentById(signUpRequest.getDepartmentId());
+//    
+//    if(departmentMst.isPresent()) {
+//    	
+//    	 user.setDepartment(departmentMst.get());
+//    }
    
     String strRoles = signUpRequest.getRoles();
     Set<Role> roles = new HashSet<>();

@@ -107,7 +107,7 @@ public class MstRegistryDetailsPageServiceImpl implements MstRegistryDetailsPage
 		Optional<User>  user= userRepository.findByUsername(username);
 		
 		if(user.isPresent()) {
-			userId=user.get().getId();
+			userId=user.get().getRegistry();
 		}
 		return userId;
 	}
@@ -606,6 +606,7 @@ public class MstRegistryDetailsPageServiceImpl implements MstRegistryDetailsPage
 
 	@Override
 	public Page<MstRegistryDetailsPageEntity> getAllRegistoryDetails(Pageable pageable) {
+		
 		return mstRegistryDetailsPageRepository.findAllByRegUserId(getLoginUsernameId(),pageable);
 	}
 

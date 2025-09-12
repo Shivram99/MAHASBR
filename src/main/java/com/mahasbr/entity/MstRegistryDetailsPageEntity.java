@@ -2,6 +2,9 @@ package com.mahasbr.entity;
 
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -9,15 +12,16 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
-import lombok.Data;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 
-import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
-import lombok.*;
-import java.time.LocalDate;
-
+@JsonIgnoreProperties(value = { "hourOfDay" }, ignoreUnknown = true)
 @Entity
 @Table(name = "mst_reg_details")
 @Getter
@@ -105,17 +109,17 @@ public class MstRegistryDetailsPageEntity extends Auditable {
 	private String descriptionOfMajorActivity;
 
 	@Column(name = "nic2008_activity_code")
-	private Integer nic2008ActivityCode;
+	private String nic2008ActivityCode;
 
 	@Size(max = 5)
 	@Column(name = "nic2008_activity_code_description", length = 5)
 	private String nic2008ActivityCodeDescription;
 
 	@Column(name = "operation_start_year")
-	private Integer yearOfStartOfOperation;
+	private String yearOfStartOfOperation;
 
 	@Column(name = "ownership_code")
-	private Integer ownershipCode;
+	private String ownershipCode;
 
 	@Column(name = "total_persons_working")
 	private Integer totalNumberOfPersonsWorking;
@@ -125,7 +129,7 @@ public class MstRegistryDetailsPageEntity extends Auditable {
 	private String actAuthorityRegistrationNumbers;
 
 	@Size(max = 100)
-	@Column(name = "remarks", length = 100)
+	@Column(name = "remarks")
 	private String remarks;
 
 	@Size(max = 16)
@@ -133,7 +137,7 @@ public class MstRegistryDetailsPageEntity extends Auditable {
 	private String locationCode;
 
 	@Size(max = 1)
-	@Column(name = "registration_status", length = 1)
+	@Column(name = "registration_status", length = 10)
 	private String registrationStatus;
 
 	@Size(max = 100)
@@ -165,9 +169,11 @@ public class MstRegistryDetailsPageEntity extends Auditable {
 	private String nameOfAct;
 
 	@Column(name = "registration_date")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private LocalDate dateOfRegistration;
 
 	@Column(name = "deregistration_expiry_date")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private LocalDate dateOfDeregistrationExpiry;
 
 	@Size(max = 15)
@@ -184,7 +190,7 @@ public class MstRegistryDetailsPageEntity extends Auditable {
 
 	@NotNull
 	@Size(max = 50)
-	@Column(name = "brn_number", unique = true, nullable = false, length = 50)
+	@Column(name = "brn_number", nullable = true, length = 50)
 	private String brnNo;
 
 	@Column(name = "reg_user_id")

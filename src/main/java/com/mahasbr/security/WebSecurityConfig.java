@@ -22,11 +22,13 @@ import org.springframework.security.web.authentication.logout.HttpStatusReturnin
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.mahasbr.filter.AuthEntryPointJwt;
 import com.mahasbr.filter.AuthTokenFilter;
 import com.mahasbr.filter.XssFilter;
 import com.mahasbr.repository.PermissionRepository;
+import com.mahasbr.service.RefreshTokenService;
 import com.mahasbr.service.UserDetailsServiceImpl;
 
 @Configuration
@@ -44,17 +46,32 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
 
 	@Autowired
 	private PermissionRepository permissionRepository;
+	
+	@Autowired
+	private RefreshTokenService refreshTokenService;
+	
+	
+	@Autowired
+	 private ObjectMapper mapper;
 
 	// @Autowired
 	// private CustomAuthenticationFailureHandler authenticationFailureHandler;
 
-	@Bean
-	public ObjectMapper objectMapper() {
-		ObjectMapper objectMapper = new ObjectMapper();
-		objectMapper.registerModule(new JavaTimeModule());
-		return objectMapper;
-		// return new ObjectMapper();
-	}
+//	@Bean
+//	public ObjectMapper objectMapper() {
+//		ObjectMapper objectMapper = new ObjectMapper();
+//		objectMapper.registerModule(new JavaTimeModule());
+//		return objectMapper;
+//		// return new ObjectMapper();
+//	}
+	
+//	@Bean
+//    public ObjectMapper objectMapper() {
+//        ObjectMapper mapper = new ObjectMapper();
+//        mapper.registerModule(new JavaTimeModule());
+//        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+//        return mapper;
+//    }
 
 	@Bean
 	public AuthTokenFilter authenticationJwtTokenFilter() {
@@ -90,88 +107,55 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
 		return new HttpStatusReturningLogoutSuccessHandler();
 	}
 
-	/*
-	 * @Bean public SimpleUrlAuthenticationSuccessHandler loginSuccessHandler() {
-	 * return new SimpleUrlAuthenticationSuccessHandler(); }
-	 */
+	@Bean
+	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+		logger.info("Configuring HTTP Security...");
+		http.csrf(csrf -> csrf.disable()).cors(Customizer.withDefaults())
+				.exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
+				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+				// .failureHandler(authenticationFailureHandler)
+				.authorizeHttpRequests(auth -> auth.requestMatchers("/api/auth/signin", "/citizenSearch/**").permitAll()
+						.requestMatchers("/api/auth/signup").permitAll().requestMatchers("/api/test/**").permitAll()
+						.requestMatchers("/common/api**").permitAll()
+						.requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+						.requestMatchers(" /common/department**").permitAll().requestMatchers("/admin/**").permitAll()
+						.requestMatchers("/moderator/**").hasRole("MODERATOR").requestMatchers("/developer/**")
+						.hasRole("DEVELOPER").requestMatchers("/user/**").permitAll().anyRequest().authenticated())
+				.logout(logout -> logout.logoutUrl("/api/auth/logout").permitAll()
+						.logoutSuccessHandler(logoutSuccessHandler()));
 
-	  @Bean
-	  public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-		  logger.info("Configuring HTTP Security...");
-	    http.csrf(csrf -> csrf.disable())
-	    .cors(Customizer.withDefaults())
-	        .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
-	        .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-	       // .failureHandler(authenticationFailureHandler)
-	        .authorizeHttpRequests(auth -> 
-	          auth.requestMatchers("/api/auth/signin","/citizenSearch/**").permitAll()
-	              .requestMatchers("/api/auth/signup").permitAll()
-	              .requestMatchers("/api/test/**").permitAll()
-	              .requestMatchers("/common/api**").permitAll()
-	              .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-	              .requestMatchers(" /common/department**").permitAll()
-	              .requestMatchers("/admin/**").permitAll()
-	              .requestMatchers("/moderator/**").hasRole("MODERATOR")
-	              .requestMatchers("/developer/**").hasRole("DEVELOPER")
-	            .requestMatchers("/user/**").permitAll()
-	              .anyRequest().authenticated()
-	        ). logout().logoutUrl("/logout").permitAll().logoutSuccessHandler(logoutSuccessHandler);
-	 
-	    http.authenticationProvider(authenticationProvider());
-	    http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
-	   http.addFilterBefore(xssFilter(), UsernamePasswordAuthenticationFilter.class);
-	    return http.build();
-	  }
-
-//	@Bean
-//	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-//	    logger.info("Configuring HTTP Security...");
-//	    List<Permission> permissions = permissionRepository.findAll();
-//	    http.csrf(csrf -> csrf.disable())
-//	        .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
-//	        .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-//	        .authorizeHttpRequests(auth -> {
-//                // Public endpoints
-//                auth.requestMatchers("/api/auth/signin", "/api/auth/signup").permitAll();
-//                auth.requestMatchers("/common/api/**", "/common/department/**").permitAll();
-//                auth.requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll();
-//                auth.requestMatchers("/citizenSearch/**").permitAll();
-//                auth.requestMatchers("/api/test/**").permitAll();
-//                auth.requestMatchers("/api/menus/**").permitAll();
-//                auth.requestMatchers("/api/submenus/**").permitAll();
-//                auth.requestMatchers("/developer/**").permitAll();
-//
-//                // Load role-based access dynamically
-////                for (Permission p : permissions) {
-////                    auth.requestMatchers(p.getUrlPattern()).hasRole(p.getRole().getName().toString());
-////                }
-//
-//                // Default rule for all others
-//                auth.anyRequest().authenticated();
-//            })
-//	        // New way to configure logout
-//	        .logout(logout -> logout
-//	            .logoutRequestMatcher(new AntPathRequestMatcher("/logout", "POST"))
-//	            .permitAll()
-//	            .logoutSuccessHandler(logoutSuccessHandler)
-//	        );
-//
-//	    // Register JWT + XSS filters
-//	    http.authenticationProvider(authenticationProvider());
-//	    http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
-//	    http.addFilterBefore(xssFilter(), UsernamePasswordAuthenticationFilter.class);
-//
-//	    return http.build();
-//	}
+		http.authenticationProvider(authenticationProvider());
+		http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+		http.addFilterBefore(xssFilter(), UsernamePasswordAuthenticationFilter.class);
+		return http.build();
+	}
 
 	@Bean
 	public AuthenticationFailureHandler authenticationFailureHandler() {
-		return new CustomAuthenticationFailureHandler(objectMapper());
+		return new CustomAuthenticationFailureHandler(mapper);
 	}
 
 	@Bean
 	public AuthenticationSuccessHandler myAuthenticationSuccessHandler() {
 		return new CustomSimpleUrlAuthenticationSuccessHandler();
 	}
+
+//	@Bean
+//	public LogoutSuccessHandler logoutSuccessHandler() {
+//		return (request, response, authentication) -> {
+//			if (authentication != null) {
+//				// revoke refresh token for the logged-in user
+//				refreshTokenService.revoke(authentication.getName());
+//			}
+//
+//			// clear refresh token cookie
+//			ResponseCookie cookie = ResponseCookie.from("refresh", "").httpOnly(true).secure(true).sameSite("Strict")
+//					.path("/").maxAge(0).build();
+//
+//			response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+//			response.setStatus(HttpServletResponse.SC_OK);
+//			response.getWriter().write("{\"message\": \"Logout successful\"}");
+//		};
+//	}
 
 }

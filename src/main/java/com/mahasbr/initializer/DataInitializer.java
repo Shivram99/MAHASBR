@@ -31,18 +31,18 @@ public class DataInitializer implements CommandLineRunner {
 	// Create default admin user
 	@Override
 	public void run(String... args) throws Exception {
-		createUserIfNotExists("admin", "admin@example.com", "9999999990", "admin123", "ROLE_ADMIN");
-		createUserIfNotExists("moderator", "moderator@example.com", "9999999991", "mod123", "ROLE_MODERATOR");
-		createUserIfNotExists("developer", "developer@example.com", "9999999992", "dev123", "ROLE_DEVELOPER");
-		createUserIfNotExists("user", "user@example.com", "9999999993", "user123", "ROLE_USER");
-		createUserIfNotExists("des_state", "state@example.com", "9999999994", "state123", "ROLE_DES_STATE");
-		createUserIfNotExists("des_region", "region@example.com", "9999999995", "region123", "ROLE_DES_REGION");
-		createUserIfNotExists("des_district", "district@example.com", "9999999996", "district123", "ROLE_DES_DISTRICT");
-		createUserIfNotExists("auth_api", "api@example.com", "9999999997", "api123", "ROLE_REG_AUTH_API");
-		createUserIfNotExists("auth_csv", "csv@example.com", "9999999998", "csv123", "ROLE_REG_AUTH_CSV");
+		createUserIfNotExists("admin", "admin@example.com",  "admin123", "ROLE_ADMIN");
+		createUserIfNotExists("moderator", "moderator@example.com",  "mod123", "ROLE_MODERATOR");
+		createUserIfNotExists("developer", "developer@example.com",  "dev123", "ROLE_DEVELOPER");
+		createUserIfNotExists("user", "user@example.com",  "user123", "ROLE_USER");
+		createUserIfNotExists("des_state", "state@example.com",  "state123", "ROLE_DES_STATE");
+		createUserIfNotExists("des_region", "region@example.com", "region123", "ROLE_DES_REGION");
+		createUserIfNotExists("des_district", "district@example.com", "district123", "ROLE_DES_DISTRICT");
+		createUserIfNotExists("auth_api", "api@example.com", "api123", "ROLE_REG_AUTH_API");
+		createUserIfNotExists("auth_csv", "csv@example.com", "csv123", "ROLE_REG_AUTH_CSV");
 	}
 
-	private void createUserIfNotExists(String username, String email, String phone, String rawPassword, String roleName) {
+	private void createUserIfNotExists(String username, String email,  String rawPassword, String roleName) {
 	    if (!userRepository.existsByEmail(email)) {
 	        try {
 	            ERole roleEnum = ERole.valueOf(roleName); // Convert String to ERole
@@ -52,7 +52,6 @@ public class DataInitializer implements CommandLineRunner {
 	                User user = new User();
 	                user.setUsername(username);
 	                user.setEmail(email);
-	                user.setPhoneNo(phone);
 	                user.setPassword(passwordEncoder.encode(rawPassword));
 	                user.setRoles(Collections.singleton(roleOpt.get()));
 

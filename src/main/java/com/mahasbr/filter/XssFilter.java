@@ -23,6 +23,12 @@ public class XssFilter implements Filter {
             throws IOException, ServletException {
 
         if (request instanceof HttpServletRequest) {
+        	 String contentType = request.getContentType();
+        	 if (contentType != null && contentType.toLowerCase().startsWith("multipart/")) {
+        	        chain.doFilter(request, response);
+        	        return;
+        	    }
+
             chain.doFilter(new XssRequestWrapper((HttpServletRequest) request), response);
         } else {
             chain.doFilter(request, response);

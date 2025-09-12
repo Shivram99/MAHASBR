@@ -2,26 +2,20 @@ package com.mahasbr.entity;
 
 import java.util.Date;
 
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
+import com.mahasbr.config.AuditEntityListener;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 import lombok.Data;
-
-
-
-import jakarta.persistence.*;
-import lombok.Data;
-
-import java.util.Date;
 
 @Data
 @MappedSuperclass
+@EntityListeners(AuditEntityListener.class)
 public abstract class Auditable {
 
     @Column(name = "created_user_id", updatable = false)
@@ -37,17 +31,28 @@ public abstract class Auditable {
     @Column(name = "updated_date_time")
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedDateTime;
+ 
+    @Column(name = "created_ip", updatable = false)
+    private String createdIp;
 
+    @Column(name = "updated_ip")
+    private String updatedIp;
 
-    @PrePersist
-    protected void onCreate() {
-        this.createdDateTime = new Date();
-        this.updatedDateTime = new Date(); // optional: initialize both on creation
-    }
+    @Column(name = "created_user_agent", updatable = false)
+    private String createdUserAgent;
 
-    @PreUpdate
-    protected void onUpdate() {
-        this.updatedDateTime = new Date();
-    }
+    @Column(name = "updated_user_agent")
+    private String updatedUserAgent;
+    
+//    @PrePersist
+//    protected void onCreate() {
+//        this.createdDateTime = new Date();
+//        this.updatedDateTime = new Date(); // optional: initialize both on creation
+//    }
+//
+//    @PreUpdate
+//    protected void onUpdate() {
+//        this.updatedDateTime = new Date();
+//    }
 }
 

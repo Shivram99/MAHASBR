@@ -33,12 +33,12 @@ public class DashboardServiceImpl implements DashboardService {
 	            .filter(record -> record.getDistrict().equalsIgnoreCase(district))
 	            .filter(record -> {
 	                switch (operation) {
-	                    case "Total Registration (TR)":
-	                        return getFinancialQuarter(record.getDateOfRegistration()).equalsIgnoreCase(quarter);
-	                    case "Deregistration (DR)":
-	                        return getFinancialQuarter(record.getDateOfDeregistrationExpiry()).equalsIgnoreCase(quarter);
-	                    case "Count of New Registration (NR)":
-	                        return getFinancialQuarter(record.getDateOfRegistration()).equalsIgnoreCase(quarter);
+//	                    case "Total Registration (TR)":
+//	                        return getFinancialQuarter(record.getDateOfRegistration()).equalsIgnoreCase(quarter);
+//	                    case "Deregistration (DR)":
+//	                        return getFinancialQuarter(record.getDateOfDeregistrationExpiry()).equalsIgnoreCase(quarter);
+//	                    case "Count of New Registration (NR)":
+//	                        return getFinancialQuarter(record.getDateOfRegistration()).equalsIgnoreCase(quarter);
 	                    default:
 	                        return false;
 	                }
@@ -68,12 +68,12 @@ public class DashboardServiceImpl implements DashboardService {
 		            .filter(record -> record.getNameOfAct().equalsIgnoreCase(act))
 		            .filter(record -> {
 		                switch (operation) {
-		                    case "Total Registration (TR)":
-		                        return getYear(record.getDateOfRegistration()).equals(year);
-		                    case "Deregistration (DR)":
-		                        return getYear(record.getDateOfDeregistrationExpiry()).equals(year);
-		                    case "Count of New Registration (NR)":
-		                        return getYear(record.getDateOfRegistration()).equals(year);
+//		                    case "Total Registration (TR)":
+//		                        return getYear(record.getDateOfRegistration()).equals(year);
+//		                    case "Deregistration (DR)":
+//		                        return getYear(record.getDateOfDeregistrationExpiry()).equals(year);
+//		                    case "Count of New Registration (NR)":
+//		                        return getYear(record.getDateOfRegistration()).equals(year);
 		                    default:
 		                        return false;
 		                }
@@ -173,7 +173,7 @@ public class DashboardServiceImpl implements DashboardService {
         // Filter and group the data by NAME_OF_ESTATE_OWNER and financial quarter
         Map<String, Long> filteredData = allRecords.stream()
                 .filter(record -> record.getNameOfEstablishmentOrOwner().equalsIgnoreCase(estateOwner))
-                .filter(record -> getFinancialQuarter(record.getDateOfRegistration()).equalsIgnoreCase(quarter)) // Assuming the quarter is derived from registration date
+//                .filter(record -> getFinancialQuarter(record.getDateOfRegistration()).equalsIgnoreCase(quarter)) // Assuming the quarter is derived from registration date
                 .collect(Collectors.groupingBy(MstRegistryDetailsPageEntity::getNameOfEstablishmentOrOwner, 
                         Collectors.counting() 
                 ));

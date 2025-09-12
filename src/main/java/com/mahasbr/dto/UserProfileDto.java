@@ -1,0 +1,15 @@
+package com.mahasbr.dto;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class UserProfileDto {
+	private Long id;
+    private String fullName;
+    private String officeName;
+    private String officeAddress;
+    private String mobileNumber;
+}
