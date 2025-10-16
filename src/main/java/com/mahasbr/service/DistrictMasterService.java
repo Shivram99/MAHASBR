@@ -26,4 +26,6 @@ public interface DistrictMasterService {
 
 	Optional<DistrictMaster> findByCensusDistrictCode(String long1);
 
+	List<DistrictMaster> findByIsActiveTrueBasedOnlogin();
+
 }

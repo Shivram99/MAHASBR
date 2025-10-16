@@ -7,4 +7,5 @@ import com.mahasbr.entity.AuditLog;
 
 @Repository
 public interface AuditLogRepository extends JpaRepository<AuditLog, Long> {
+	
 }

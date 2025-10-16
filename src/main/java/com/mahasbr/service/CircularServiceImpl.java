@@ -1,24 +1,27 @@
 package com.mahasbr.service;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.FileNotFoundException;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
+import java.util.stream.Collectors;
 
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.text.PDFTextStripper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.mahasbr.dto.CircularRequestDTO;
+import com.mahasbr.dto.CircularResponseDTO;
 import com.mahasbr.entity.Circular;
 import com.mahasbr.repository.CircularRepository;
+import com.mahasbr.util.FileStorageUtil;
 
 @Service
 @PropertySource("application.properties")
@@ -29,130 +32,79 @@ public class CircularServiceImpl implements CircularService {
 	private Environment env;
 
 	@Autowired
-	CircularRepository circularRepository;
+	private CircularRepository circularRepository;
+	
 	@Autowired
-	CommonService commonService;
+	private FileStorageUtil fileStorageUtil;
 
 	@Override
-	public String processPDFFile(MultipartFile file) throws IOException {
+	public CircularResponseDTO createCircular(CircularRequestDTO dto) {
+		MultipartFile file = dto.getFile();
+		
+		String relativeFilePath = fileStorageUtil.saveFile(dto.getFile(), "circulars");
+		
+		Circular circular = new Circular();
+		circular.setSubject(dto.getSubject());
+		circular.setCircularDate(dto.getDate());
+		circular.setFilePath(relativeFilePath);
 
-		// Ensure the directory exists or create it if it doesn't
-		String fileUploadPath = null;
-		logger.info((System.getProperty("os.name")));
 
-		if (System.getProperty("os.name").contains("Windows")) {
+		circular = circularRepository.save(circular);
 
-			fileUploadPath = env.getProperty("mahasbrcircularfileupload.locationWindows");
-		} else {
-			fileUploadPath = env.getProperty("mahasbrcircularfileupload.locationLinux");
-		}
+		return mapToResponse(circular);
+	}
+	
+	@Override
+	public CircularResponseDTO updateCircular(CircularRequestDTO dto) {
+		Circular existing = circularRepository.findById(dto.getId())
+		        .orElseThrow(() -> new RuntimeException("Circular not found with id: " + dto.getId()));
+		MultipartFile file = dto.getFile();
+		
+		String relativeFilePath = fileStorageUtil.saveFile(dto.getFile(), "circulars");
 
-		Path uploadDir = Paths.get(fileUploadPath);
-		if (!Files.exists(uploadDir)) {
-			Files.createDirectories(uploadDir);
-		}
+		existing.setSubject(dto.getSubject());
+		existing.setCircularDate(dto.getDate());
+		existing.setFilePath(relativeFilePath);
 
-		// Generate a unique file name
-		List<Circular> lastPdfFiles = circularRepository.findAll();
-		long id = lastPdfFiles.stream().mapToLong(Circular::getId).max().orElse(0) + 1;
-		String baseFileName = "circular_" + id + ".pdf";
 
-		// Ensure the file name is unique by checking for existing files
-		String fileName = baseFileName;
-		Path filePath = uploadDir.resolve(fileName);
-		int counter = 1;
-		while (Files.exists(filePath)) {
-			fileName = "circular_" + counter + ".pdf";
-			filePath = uploadDir.resolve(fileName);
-			counter++;
-		}
+		Circular circular = circularRepository.save(existing);
 
-		// Save the file to the specified location
-		Files.copy(file.getInputStream(), filePath);
-
-		// Save the file in the database
-		Circular pdfFile = new Circular(fileName, filePath.toString());
-		circularRepository.save(pdfFile);
-
-		logger.info("PDF file saved successfully at: {}", filePath);
-		return filePath.toString();
+		return mapToResponse(circular);
 	}
 
 	@Override
-	public String deleteFile() {
-		circularRepository.deleteAll();
-		return "Data Delete sucessfully";
+	public List<CircularResponseDTO> getAllCirculars() {
+		return circularRepository.findAll().stream().map(this::mapToResponse).collect(Collectors.toList());
 	}
 
 	@Override
-	public boolean detectMaliciousJavaScript(String jsCode) {
-		if (jsCode.isEmpty()) {
-			return false;
-		}
-		String[] suspiciousPatterns = { "eval", // Use of eval function
-				"document.write", // Writing to document
-				"unescape", // Unescaping strings (often used in obfuscation)
-				"<script>", // Inline scripts
-				"</script>", // Closing script tags
-				"window.location", // Redirects
-				"XMLHttpRequest", // AJAX requests
-				"alert(", // Alerts
-				"confirm(", // Confirm dialogs
-				"prompt(", // Prompt dialogs
-				"setTimeout(", // Timers
-				"setInterval(", // Intervals
-				"document.location", // Document location
-				"location.href", // Location href
-				"document.cookie", // Accessing cookies
-				"document.domain" // Document domain
-		};
-
-		// Regular expressions for HTML tags
-		String[] htmlTags = { "<[^>]*>", // Any HTML tag
-				"</[^>]*>", // Closing HTML tag
-				"<script[^>]*>", // Opening script tag
-				"</script>", // Closing script tag
-				"<iframe[^>]*>", // Opening iframe tag
-				"</iframe>" // Closing iframe tag
-		};
-		for (String pattern : suspiciousPatterns) {
-			if (jsCode.contains(pattern)) {
-				return true;
-			}
-		}
-		// Check for HTML tags
-		for (String tag : htmlTags) {
-			if (jsCode.matches("(?s).*" + tag + ".*")) {
-				return true;
-			}
-		}
-
-		return false;
+	public CircularResponseDTO getCircularById(Long id) {
+		Circular circular = circularRepository.findById(id)
+				.orElseThrow(() -> new RuntimeException("Circular not found with id: " + id));
+		return mapToResponse(circular);
 	}
 
 	@Override
-	public String extractTextFromPDF(InputStream inputStream) {
-		StringBuilder textContent = new StringBuilder();
-		try (PDDocument document = PDDocument.load(inputStream)) {
-			// Extract text from PDF
-			PDFTextStripper pdfStripper = new PDFTextStripper();
-			textContent.append(pdfStripper.getText(document));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return textContent.toString();
+	public void deleteCircular(Long id) {
+		circularRepository.deleteById(id);
 	}
 
-	@Override
-	public boolean isValidPDF(InputStream inputStream) {
-		try {
-			// Check for PDF header
-			byte[] header = new byte[5];
-			inputStream.read(header, 0, 5);
-			return new String(header).equals("%PDF-");
-		} catch (IOException e) {
-			e.printStackTrace();
-			return false;
-		}
+	private CircularResponseDTO mapToResponse(Circular circular) {
+		return CircularResponseDTO.builder().id(circular.getId()).subject(circular.getSubject())
+				.date(circular.getCircularDate()).fileUrl(circular.getFilePath()).build();
 	}
+	  @Override
+	    public Resource getCircularFile(String relativePath) throws FileNotFoundException {
+	        Path filePath = fileStorageUtil.getAbsolutePath(relativePath);
+
+	        if (!Files.exists(filePath)) {
+	            throw new FileNotFoundException("File not found: " + relativePath);
+	        }
+
+	        try {
+	            return new UrlResource(filePath.toUri());
+	        } catch (MalformedURLException e) {
+	            throw new RuntimeException("Invalid file URL", e);
+	        }
+	    }
 }

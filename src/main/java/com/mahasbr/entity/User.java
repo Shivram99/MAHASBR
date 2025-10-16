@@ -61,11 +61,18 @@ public class User extends Auditable {
 	
 	@OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
 	private UserProfileEntity userProfile;
+    
+    private String divisionCode;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "registry_id")
+    private RegistryMasterEntity registry;
+ 
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "district_id")
+    private DistrictMaster district;
 
-    private Long registry;
-
-//	@OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-//	private DepartmentMst department;
 
 	
 	public User(String username, String password, String email) {

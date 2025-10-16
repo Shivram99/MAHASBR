@@ -14,17 +14,19 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-public class CustomSimpleUrlAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
+public class CustomSimpleUrlAuthenticationSuccessHandler 
+//implements AuthenticationSuccessHandler
+{
 
 	@Autowired
 	private AuditLogRepository auditLogRepository;
 
-	@Override
-	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-			Authentication authentication) throws IOException, ServletException {
-		String username = (authentication != null) ? authentication.getName() : "UNKNOWN";
-		String ipAddress = request.getRemoteAddr();
-		auditLogRepository.save(new AuditLog(username, "LOGIN_SUCCESS", LocalDateTime.now(), ipAddress));
-	}
+//	@Override
+//	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
+//			Authentication authentication) throws IOException, ServletException {
+//		String username = (authentication != null) ? authentication.getName() : "UNKNOWN";
+//		String ipAddress = request.getRemoteAddr();
+//		auditLogRepository.save(new AuditLog(username, "LOGIN_SUCCESS", LocalDateTime.now(), ipAddress));
+//	}
 
 }

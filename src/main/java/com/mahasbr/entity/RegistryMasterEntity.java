@@ -31,12 +31,16 @@ public class RegistryMasterEntity extends Auditable{
     @EqualsAndHashCode.Include
     private Long id;
 
-    @Column(name = "registry_name", nullable = false, length = 200)
+    @Column(name = "registry_name",  length = 200)
     private String registryName;
+    
+    @Column(name = "registry_name_en",  length = 200)
+    private String registryNameEn;   // English name
+
+    @Column(name = "registry_name_mr", length = 200)
+    private String registryNameMr;   // Marathi name
 
     @Column(name = "status", length = 20)
     private Boolean status = true;
 
-//    @OneToMany(mappedBy = "registry", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-//    private Set<User> users;
 }

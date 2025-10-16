@@ -25,7 +25,7 @@ public interface TalukaMasterRepository extends JpaRepository<TalukaMaster, Long
 
 
 	  @Query("SELECT t.talukaName FROM TalukaMaster t WHERE t.censusTalukaCode IN :censusTalukaCodes")
-      List<String> findTalukaNameByCensusTalukaCode(List<Long> censusTalukaCodes);
+      List<String> findTalukaNameByCensusTalukaCode(List<String> censusTalukaCodes);
 
 	List<TalukaMaster> findByCensusDistrictCodeInAndIsActiveTrue(List<String> districtCode);
 

@@ -29,11 +29,13 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.mahasbr.entity.ConcernRegistryDetailsPageEntity;
+import com.mahasbr.entity.DistrictMaster;
 import com.mahasbr.entity.DuplicateRegistryDetailsPageEntity;
 import com.mahasbr.entity.MstRegistryDetailsPageEntity;
 import com.mahasbr.model.PostLoginDashboardRequestModel;
 import com.mahasbr.response.ExcelFileUpaloadResult;
 import com.mahasbr.service.ConcernRegistryDetailsPageService;
+import com.mahasbr.service.DistrictMasterService;
 import com.mahasbr.service.DuplicateRegistryDetailsPageService;
 import com.mahasbr.service.FileStorageService;
 import com.mahasbr.service.MstRegistryDetailsPageService;
@@ -51,57 +53,15 @@ public class RegistryCSVUploadController {
 	@Autowired
 	DuplicateRegistryDetailsPageService duplicateRegistryDetailsPageService;
 
-	private final FileStorageService service;
+	@Autowired
+	private FileStorageService service;
+	
+	@Autowired
+	private DistrictMasterService districtservice;
 
 	public RegistryCSVUploadController(FileStorageService service) {
 		this.service = service;
 	}
-
-//	@PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-//	@PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-//	public ResponseEntity<?> uploadExcelFile(@RequestPart("files") MultipartFile file) {
-//	    BRNGenerationRecordCount bRNGenerationRecordCount = null;
-//
-//	    // Check if file is empty
-//	    if (file.isEmpty()) {
-//	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Please select a file to upload.");
-//	    }
-//
-//	    // Get original filename
-//	    String originalFilename = file.getOriginalFilename();
-//	    if (originalFilename == null) {
-//	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid file name.");
-//	    }
-//
-//	    // Check allowed file type
-//	    if (!(originalFilename.endsWith(".csv") || originalFilename.endsWith(".xlsx"))) {
-//	        return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
-//	                .body("Unsupported file type. Please upload a CSV or Excel (.xlsx) file.");
-//	    }
-//
-//	    try {
-//	        if (originalFilename.endsWith(".csv")) {
-//	            // ✅ Handle CSV with proper charset
-//	            try (BufferedReader reader = new BufferedReader(
-//	                    new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8))) {
-//
-//	                // Example: parse CSV (you can pass reader to OpenCSV or your service)
-////	                bRNGenerationRecordCount = mstRegistryDetailsPageService.uploadRegistryCsvFile(file, reader);
-//	            }
-//	        } else if (originalFilename.endsWith(".xlsx")) {
-//	            // ✅ Handle Excel using Apache POI
-//	            try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
-////	                bRNGenerationRecordCount = mstRegistryDetailsPageService.uploadRegistryExcelFile(workbook);
-//	            }
-//	        }
-//	    } catch (Exception e) {
-//	        e.printStackTrace();
-//	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-//	                .body("Failed to upload file: " + e.getMessage());
-//	    }
-//
-//	    return ResponseEntity.ok().body(bRNGenerationRecordCount);
-//	}
 
 	@GetMapping("/registoryData")
 	public ResponseEntity<Page<MstRegistryDetailsPageEntity>> getMasterRegistoryDetails(
@@ -112,7 +72,7 @@ public class RegistryCSVUploadController {
 		 // Get logged-in username
 	    String username = authentication.getName();
 
-	    // Get roles
+//	    // Get roles
 	    Collection<? extends GrantedAuthority> roles = authentication.getAuthorities();
 	    System.out.println("username" +username);
 	    for (GrantedAuthority role : roles) {
@@ -151,6 +111,10 @@ public class RegistryCSVUploadController {
 	public ResponseEntity<Page<MstRegistryDetailsPageEntity>> getBRNDetails(@PathVariable String brn) {
 		Pageable pageable = PageRequest.of(0, 10, Sort.by("siNo"));
 		Page<MstRegistryDetailsPageEntity> details = mstRegistryDetailsPageService.getBRNData(brn, pageable);
+		details.getContent().forEach(entity -> {
+		    System.out.println("SI.No: " + entity.getSiNo());
+		    // print other fields...
+		});
 		return ResponseEntity.ok(details);
 	}
 
@@ -203,62 +167,18 @@ public class RegistryCSVUploadController {
 		List<ExcelFileUpaloadResult> results = new ArrayList<>();
 		for (MultipartFile file : files) {
 			try {
-				String saved = service.store(file);
-				results.add(ExcelFileUpaloadResult.success(file.getOriginalFilename(), saved));
+				mstRegistryDetailsPageService.uploadRegiteryCSVFileForBRNGeneration(file);
 			} catch (Exception e) {
 				results.add(ExcelFileUpaloadResult.failure(file.getOriginalFilename(), e.getMessage()));
 			}
 		}
 		return ResponseEntity.ok(Map.of("files", results));
 	}
-//    public ResponseEntity<Map<String, Object>> uploadFiles(@RequestParam("files") MultipartFile[] files) {
-//        List<String> uploadedFileNames = new ArrayList<>();
-//        List<String> errors = new ArrayList<>();
-//
-//        try {
-//            for (MultipartFile file : files) {
-//                if (file.isEmpty()) {
-//                    errors.add("❌ Empty file uploaded.");
-//                    continue;
-//                }
-//
-//                // ✅ Validate extension
-//                String fileName = file.getOriginalFilename();
-//                String extension = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
-//                if (!ALLOWED_EXTENSIONS.contains(extension)) {
-//                    errors.add("❌ Invalid file type: " + fileName + ". Allowed: CSV, XLSX");
-//                    continue;
-//                }
-//
-//                // ✅ Validate size
-//                if (file.getSize() > MAX_FILE_SIZE) {
-//                    errors.add("❌ File too large: " + fileName + ". Max allowed size is 5MB.");
-//                    continue;
-//                }
-//
-//                // ✅ Save file locally
-//                Path path = Paths.get(UPLOAD_DIR + fileName);
-//                Files.createDirectories(path.getParent());
-//                Files.write(path, file.getBytes());
-//
-//                uploadedFileNames.add(fileName);
-//            }
-//
-//            Map<String, Object> response = new HashMap<>();
-//            if (!errors.isEmpty()) {
-//                response.put("message", "Some files failed validation.");
-//                response.put("errors", errors);
-//                response.put("uploaded", uploadedFileNames);
-//                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-//            }
-//
-//            response.put("message", "✅ Files uploaded successfully!");
-//            response.put("files", uploadedFileNames);
-//            return ResponseEntity.ok(response);
-//
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                    .body(Map.of("message", "❌ File upload failed: " + e.getMessage()));
-//        }
-//    }
+
+	
+	@GetMapping("/districts")
+	public ResponseEntity<List<DistrictMaster>> getAll() {
+//		return ResponseEntity.ok(districtservice.findByIsActiveTrue());
+		return ResponseEntity.ok(districtservice.findByIsActiveTrueBasedOnlogin());
+	}
 }

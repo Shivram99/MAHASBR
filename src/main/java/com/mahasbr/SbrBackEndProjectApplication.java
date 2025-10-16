@@ -14,9 +14,9 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 //@Profile("local")
 //@PropertySource("classpath:application.properties")
 //@ActiveProfiles("uat")
-@EnableRetry
-@EnableAsync
-@EnableScheduling
+//@EnableRetry
+//@EnableAsync
+//@EnableScheduling
 public class SbrBackEndProjectApplication {
 
 	public static void main(String[] args) {

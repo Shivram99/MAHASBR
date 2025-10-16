@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.mahasbr.entity.DistrictMaster;
 import com.mahasbr.entity.MstRegistryDetailsPageEntity;
-import com.mahasbr.entity.RegionEntity;
 import com.mahasbr.service.MstRegistryDetailsPageService;
 import com.mahasbr.service.RegionWiseDataService;
 

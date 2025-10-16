@@ -1,24 +1,26 @@
 package com.mahasbr.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import java.time.LocalDate;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import jakarta.validation.constraints.Email;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-
 @Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class MstRegistryDetailsPagesDTO {
-
-    private Long siNo;
+	private String srNo;
     private String nameOfEstablishmentOrOwner;
     private String houseNo;
     private String streetName;
     private String locality;
     private Integer pinCode;
     private Long telephoneMobNumber;
+
+    @Email
     private String emailAddress;
+
     private String panNumber;
     private String tanNumber;
     private String headOfficeHouseNo;
@@ -26,7 +28,10 @@ public class MstRegistryDetailsPagesDTO {
     private String headOfficeLocality;
     private Integer headOfficePinCode;
     private Long headOfficeTelephoneMobNumber;
+
+    @Email
     private String headOfficeEmailAddress;
+
     private String headOfficePanNumber;
     private String headOfficeTanNumber;
     private String descriptionOfMajorActivity;
@@ -37,7 +42,8 @@ public class MstRegistryDetailsPagesDTO {
     private Integer totalNumberOfPersonsWorking;
     private String actAuthorityRegistrationNumbers;
     private String remarks;
-    private String locationCode;
+
+    private String locationCode; // optional, can be generated if missing
     private String registrationStatus;
     private String townVillage;
     private String taluka;
@@ -47,14 +53,15 @@ public class MstRegistryDetailsPagesDTO {
     private String nameOfAuthority;
     private String nameOfAct;
 
-    // Always return dates as String formatted properly
-    private String dateOfRegistration;
-    private String dateOfDeregistrationExpiry;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    private LocalDate dateOfRegistration;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    private LocalDate dateOfDeregistrationExpiry;
 
     private String gstNumber;
     private String hsnCode;
     private String recordStatus;
-    private String brnNo;
-    private Long regUserId;
-}
 
+    private String brnNo; // optional, can be generated internally
+}

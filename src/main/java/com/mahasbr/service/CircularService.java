@@ -1,22 +1,23 @@
 package com.mahasbr.service;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.FileNotFoundException;
+import java.util.List;
 
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.core.io.Resource;
 
+import com.mahasbr.dto.CircularRequestDTO;
+import com.mahasbr.dto.CircularResponseDTO;
 
 public interface CircularService {
+	CircularResponseDTO createCircular(CircularRequestDTO dto);
+	
+	CircularResponseDTO updateCircular(CircularRequestDTO dto);
 
-String processPDFFile(MultipartFile file) throws IOException;
+	List<CircularResponseDTO> getAllCirculars();
 
-String deleteFile();
+	CircularResponseDTO getCircularById(Long id);
 
-boolean detectMaliciousJavaScript(String jsCode);
-
-String extractTextFromPDF(InputStream inputStream);
-
-boolean isValidPDF(InputStream inputStream);
-
+	void deleteCircular(Long id);
+	
+	Resource getCircularFile(String relativePath) throws FileNotFoundException;
 }

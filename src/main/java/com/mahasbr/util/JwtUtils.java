@@ -4,6 +4,7 @@ import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Component;
 
 import com.mahasbr.service.UserDetailsImpl;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
@@ -22,73 +24,106 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+
 @Component
 public class JwtUtils {
 
-	 private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
+	private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
 
-	    @Value("${com.mahait.gov.in.jwtSecret}")
-	    private String jwtSecret;
+	@Value("${com.mahait.gov.in.jwtSecret}")
+	private String jwtSecret;
 
-	    @Value("${com.mahait.gov.in.jwtExpirationMs}") // e.g., 30000 (30 sec)
-	    private int jwtExpirationMs;
+	@Value("${com.mahait.gov.in.jwtExpirationMs}") // e.g., 30000 (30 sec)
+	private int jwtExpirationMs;
 
-	    // refresh token validity (max 30 minutes)
-	    private static final long REFRESH_TOKEN_VALIDITY = 30 * 60 * 1000; // 30 min in ms
+	
+	private static final long REFRESH_TOKEN_VALIDITY_MS = 30 * 60 * 1000; // 30 min
 
-	    private Key key() {
-	        return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
-	    }
+	// Key for signing JWT (HS256)
+	private Key getSigningKey() {
+		return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
+	}
 
-	    // 🔹 Generate Access Token
-	    public String generateJwtToken(Authentication authentication) {
-	        UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
-	        Map<String, Object> claims = new HashMap<>();
-	        claims.put("roles", userPrincipal.getAuthorities().stream()
-	                .map(GrantedAuthority::getAuthority)
-	                .collect(Collectors.toList()));
-	        return Jwts.builder()
-	        		.setClaims(claims)
-	                .setSubject(userPrincipal.getUsername())
-	                .setIssuedAt(new Date())
-	                .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
-	                .signWith(key(), SignatureAlgorithm.HS256)
-	                .compact();
-	    }
+	// 🔹 Generate Access Token (with username, roles, userId)
+	public String generateJwtToken(Authentication authentication) {
+		UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
+		String jti = UUID.randomUUID().toString();
 
-	    // 🔹 Generate Refresh Token (valid max 30 min)
-	    public String generateRefreshToken(String username) {
-	    	logger.info("token refresh");
-	        return Jwts.builder()
-	                .setSubject(username)
-	                .setIssuedAt(new Date())
-	                .setExpiration(new Date((new Date()).getTime() + REFRESH_TOKEN_VALIDITY))
-	                .signWith(key(), SignatureAlgorithm.HS256)
-	                .compact();
-	    }
+		Map<String, Object> claims = new HashMap<>();
+		claims.put("roles", userPrincipal.getAuthorities().stream().map(GrantedAuthority::getAuthority)
+				.collect(Collectors.toList()));
+		claims.put("userId", userPrincipal.getId()); // add userId for audit/filter
+		claims.put("jti", jti);
 
-	    // 🔹 Extract Username from Token
-	    public String getUserNameFromJwtToken(String token) {
-	        return Jwts.parserBuilder().setSigningKey(key()).build()
+		return Jwts.builder().setClaims(claims).setSubject(userPrincipal.getUsername()).setIssuedAt(new Date())
+				.setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
+				.signWith(getSigningKey(), SignatureAlgorithm.HS256).compact();
+	}
+
+	// 🔹 Generate Refresh Token (valid 30 min)
+	public String generateRefreshToken(String username) {
+		logger.info("Generating refresh token for {}", username);
+
+		return Jwts.builder().setSubject(username).setIssuedAt(new Date())
+				.setExpiration(new Date(System.currentTimeMillis() + REFRESH_TOKEN_VALIDITY_MS))
+				.signWith(getSigningKey(), SignatureAlgorithm.HS256).compact();
+	}
+
+	// 🔹 Extract Username
+	public String getUserNameFromJwtToken(String token) {
+		return Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parseClaimsJws(token).getBody().getSubject();
+	}
+
+	// 🔹 Extract User ID
+	public Long getUserIdFromJwtToken(String token) {
+		Claims claims = Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parseClaimsJws(token).getBody();
+
+		Object userIdClaim = claims.get("userId");
+		if (userIdClaim instanceof Integer) {
+			return ((Integer) userIdClaim).longValue();
+		} else if (userIdClaim instanceof Long) {
+			return (Long) userIdClaim;
+		} else if (userIdClaim instanceof String) {
+			return Long.parseLong((String) userIdClaim);
+		}
+		return null;
+	}
+
+	// 🔹 Get token expiration date
+	public Date getExpirationDateFromJwtToken(String token) {
+		return Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parseClaimsJws(token).getBody()
+				.getExpiration();
+	}
+
+	// 🔹 Validate token
+	public boolean validateJwtToken(String token) {
+		try {
+			Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parseClaimsJws(token);
+			return true;
+		} catch (SecurityException | MalformedJwtException e) {
+			logger.error("Invalid JWT signature: {}", e.getMessage());
+		} catch (ExpiredJwtException e) {
+			logger.warn("JWT token is expired: {}", e.getMessage());
+		} catch (UnsupportedJwtException e) {
+			logger.error("JWT token is unsupported: {}", e.getMessage());
+		} catch (IllegalArgumentException e) {
+			logger.error("JWT claims string is empty: {}", e.getMessage());
+		}
+		return false;
+	}
+	
+	public String getJtiFromJwtToken(String token) {
+	    try {
+	        Claims claims = Jwts.parserBuilder()
+	                .setSigningKey(getSigningKey())
+	                .build()
 	                .parseClaimsJws(token)
-	                .getBody().getSubject();
-	    }
+	                .getBody();
 
-	    // 🔹 Validate Token
-	    public boolean validateJwtToken(String authToken) {
-	        try {
-	            Jwts.parserBuilder().setSigningKey(key()).build().parse(authToken);
-	            return true;
-	        } catch (MalformedJwtException e) {
-	            logger.error("Invalid JWT token: {}", e.getMessage());
-	        } catch (ExpiredJwtException e) {
-	            logger.error("JWT token is expired: {}", e.getMessage());
-	        } catch (UnsupportedJwtException e) {
-	            logger.error("JWT token is unsupported: {}", e.getMessage());
-	        } catch (IllegalArgumentException e) {
-	            logger.error("JWT claims string is empty: {}", e.getMessage());
-	        }
-
-	        return false;
+	        Object jti = claims.get("jti");
+	        return jti != null ? jti.toString() : null;
+	    } catch (Exception e) {
+	        return null;
 	    }
+	}
 }

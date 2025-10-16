@@ -8,4 +8,6 @@ import com.mahasbr.entity.DivisionMaster;
 
 public interface DivisionRepository extends JpaRepository<DivisionMaster, Long> {
 	Optional<DivisionMaster> findByDivisionCode(String divisionCode);
+
+	boolean existsByDivisionCode(String divisionCode);
 }

@@ -29,14 +29,6 @@ public interface MstRegistryDetailsPageRepository extends JpaRepository<MstRegis
 			@Param("emailAddress") String emailAddress, @Param("gstNumber") String gstNumber,
 			@Param("nic2008ActivityCode") Integer nic2008ActivityCode);
 
-	// @Query("SELECT e FROM MstRegistryDetailsPageEntity e WHERE
-	// e.nameOfEstablishmentOrOwner = :nameOfEstablishmentOrOwner AND
-	// e.telephoneMobNumber = :telephoneMobNumber AND e.emailAddress = :emailAddress
-	// AND e.panNumber = :panNumber AND e.tanNumber = :tanNumber AND
-	// e.nic2008ActivityCode = :nic2008ActivityCode AND e.gstNumber = :gstNumber AND
-	// e.houseNo = :houseNo AND e.streetName = :streetName AND e.locality =
-	// :locality AND e.townVillage = :townVillage AND e.taluka = :taluka AND
-	// e.district = :district AND e.pinCode = :pinCode AND e.sector = :sector")
 	@Query("SELECT e FROM MstRegistryDetailsPageEntity e WHERE "
 			+ "(:nameOfEstablishmentOrOwner IS NULL OR e.nameOfEstablishmentOrOwner = :nameOfEstablishmentOrOwner) AND "
 			+ "(:telephoneMobNumber IS NULL OR e.telephoneMobNumber = :telephoneMobNumber) AND "
@@ -60,68 +52,44 @@ public interface MstRegistryDetailsPageRepository extends JpaRepository<MstRegis
 			@Param("locality") String locality, @Param("townVillage") String townVillage,
 			@Param("taluka") String taluka, @Param("district") String district, @Param("pinCode") Integer pinCode,
 			@Param("sector") String sector);
-	
-	//search brnNo or nameOfEstablishmentOrOwner form the district
-	 @Query("SELECT m FROM MstRegistryDetailsPageEntity m WHERE m.district = :district AND " +
-	           "(m.brnNo = :brnNo OR m.nameOfEstablishmentOrOwner = :nameOfEstablishmentOrOwner)")
-	    List<MstRegistryDetailsPageEntity> findByDistrictAndBrnNoOrNameOfEstablishmentOrOwner(
-	        @Param("district") String district,
-	        @Param("brnNo") String brnNo,
-	        @Param("nameOfEstablishmentOrOwner") String nameOfEstablishmentOrOwner);
+
+	// search brnNo or nameOfEstablishmentOrOwner form the district
+	@Query("SELECT m FROM MstRegistryDetailsPageEntity m WHERE LOWER(m.district) = LOWER(:district) AND "
+			+ "(m.brnNo = :brnNo OR LOWER(m.nameOfEstablishmentOrOwner) = LOWER(:nameOfEstablishmentOrOwner))")
+	List<MstRegistryDetailsPageEntity> findByDistrictAndBrnNoOrNameOfEstablishmentOrOwner(
+			@Param("district") String district, @Param("brnNo") String brnNo,
+			@Param("nameOfEstablishmentOrOwner") String nameOfEstablishmentOrOwner);
 
 	Optional<MstRegistryDetailsPageEntity> findByBrnNo(String brnno);
-	
+
 	@Query("SELECT m FROM MstRegistryDetailsPageEntity m WHERE m.taluka IN :talukas AND m.district IN :district")
-	Page<MstRegistryDetailsPageEntity> findByTalukaInAndDistrictIn(
-	        @Param("talukas") List<String> talukas,
-	        @Param("district") List<String> district,
-	        Pageable pageable);
-	
-//	@Query("SELECT m FROM MstRegistryDetailsPageEntity m WHERE m.taluka IN :talukas AND m.district IN :district AND m.regUserId = :regUserId")
-//	Page<MstRegistryDetailsPageEntity> findByTalukaInAndDistrictInAndRegUserId(
-//	        @Param("talukas") List<String> talukas,
-//	        @Param("district") List<String> district,
-//	        @Param("regUserId") Long regUserId,
-//	        Pageable pageable);
+	Page<MstRegistryDetailsPageEntity> findByTalukaInAndDistrictIn(@Param("talukas") List<String> talukas,
+			@Param("district") List<String> district, Pageable pageable);
 
-
-
-  //   Custom query to get paginated data based on a list of talukas and a list of districts
-//    @Query("SELECT m FROM MstRegistryDetailsPageEntity m WHERE m.taluka IN :talukas AND m.district IN :districts")
-//    Page<MstRegistryDetailsPageEntity> findByTalukasAndDistricts(@Param("talukas") List<String> talukas, 
-//                                                                 @Param("districts") List<String> districts, 
-//                                                                 Pageable pageable);
-    
-	
 	@Query("SELECT m FROM MstRegistryDetailsPageEntity m WHERE m.taluka IN :talukas AND m.district IN :districts AND m.regUserId = :regUserId")
-	Page<MstRegistryDetailsPageEntity> findByTalukasAndDistrictsAndRegUserId(
-	        @Param("talukas") List<String> talukas,
-	        @Param("districts") List<String> districts,
-	        @Param("regUserId") Long regUserId,
-	        Pageable pageable);
+	Page<MstRegistryDetailsPageEntity> findByTalukasAndDistrictsAndRegUserId(@Param("talukas") List<String> talukas,
+			@Param("districts") List<String> districts, @Param("regUserId") Long regUserId, Pageable pageable);
 
-//	
-//    @Query("SELECT m FROM MstRegistryDetailsPageEntity m WHERE m.district IN (:districts)")
-//    Page<MstRegistryDetailsPageEntity> findByDistricts(@Param("districts") List<String> districts, Pageable pageable);
-//    
-	@Query("SELECT m FROM MstRegistryDetailsPageEntity m WHERE m.district IN (:districts) AND m.regUserId = :regUserId")
-	Page<MstRegistryDetailsPageEntity> findByDistrictsAndRegUserId(
-	        @Param("districts") List<String> districts,
-	        @Param("regUserId") Long regUserId,
-	        Pageable pageable);
+	@Query("SELECT m FROM MstRegistryDetailsPageEntity m WHERE LOWER(m.district) IN :districtsLower AND m.regUserId = :regUserId")
+	Page<MstRegistryDetailsPageEntity> findByDistrictsAndRegUserId(@Param("districtsLower") List<String> districts,
+			@Param("regUserId") Long regUserId, Pageable pageable);
 
-	
-    @Query("SELECT m FROM MstRegistryDetailsPageEntity m WHERE m.brnNo = :brnNo AND m.regUserId = :regUserId")
-   // @Query("SELECT m FROM MstRegistryDetailsPageEntity m WHERE m.brnNo = :brn")
-    Page<MstRegistryDetailsPageEntity> findAllByBrnNoAndRegUserId(@Param("brnNo") String brn,  @Param("regUserId") Long regUserId,Pageable pageable);
-    
-    @Query("SELECT m FROM MstRegistryDetailsPageEntity m WHERE m.regUserId = :regUserId")
-    Page<MstRegistryDetailsPageEntity> findAllByRegUserId(@Param("regUserId") Long regUserId, Pageable pageable);
+	@Query("SELECT m FROM MstRegistryDetailsPageEntity m WHERE m.brnNo = :brnNo ")
+	// @Query("SELECT m FROM MstRegistryDetailsPageEntity m WHERE m.brnNo = :brn")
+	Page<MstRegistryDetailsPageEntity> findAllByBrnNoAndRegUserId(@Param("brnNo") String brn,
+			 Pageable pageable);
 
-    @Query("SELECT m FROM MstRegistryDetailsPageEntity m WHERE m.district IN :matchingDistricts ")
-	Page<MstRegistryDetailsPageEntity> findByDistrictName( @Param("matchingDistricts") List<String> matchingDistricts , Pageable pageable);
+	@Query("SELECT m FROM MstRegistryDetailsPageEntity m WHERE m.regUserId = :regUserId")
+	Page<MstRegistryDetailsPageEntity> findAllByRegUserId(@Param("regUserId") Long regUserId, Pageable pageable);
 
-    @Query("SELECT m FROM MstRegistryDetailsPageEntity m WHERE m.district IN :districtName ")
-	Page<MstRegistryDetailsPageEntity> findByDistrictName( @Param("districtName")String districtName, Pageable pageable);
-     
+	@Query("SELECT m FROM MstRegistryDetailsPageEntity m WHERE LOWER(m.district) IN :districts")
+	Page<MstRegistryDetailsPageEntity> findByDistricts(@Param("districts") List<String> districts, Pageable pageable);
+
+	@Query("SELECT m FROM MstRegistryDetailsPageEntity m WHERE LOWER(m.district) = LOWER(:districtName)")
+	Page<MstRegistryDetailsPageEntity> findByDistrictName(@Param("districtName") String districtName, Pageable pageable);
+
+	@Query("SELECT m FROM MstRegistryDetailsPageEntity m WHERE LOWER(m.taluka) IN :talukas AND LOWER(m.district) IN :districts ")
+	Page<MstRegistryDetailsPageEntity> findByTalukasAndDistricts(@Param("talukas") List<String> talukas,
+			@Param("districts") List<String> districts, Pageable pageable);
+
 }

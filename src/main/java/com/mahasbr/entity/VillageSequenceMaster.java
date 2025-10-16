@@ -34,10 +34,4 @@ public class VillageSequenceMaster {
 	@NotBlank
 	private String censusVillageCode;
 	
-	
-	
-	
-	
-
-
 }

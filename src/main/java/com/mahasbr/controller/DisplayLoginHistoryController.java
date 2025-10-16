@@ -24,14 +24,9 @@ public class DisplayLoginHistoryController {
 	public ResponseEntity<List<AuditLog>> getAllAuditLogs() {
 		List<AuditLog> auditLogs = auditLogRepository.findAll();
 
-		return ResponseEntity.ok(auditLogs.stream().map(this::convertToDto).collect(Collectors.toList()));
+		return ResponseEntity.ok(auditLogs);
 	}
 
-	private AuditLog convertToDto(AuditLog auditLog) {
-
-		return new AuditLog(auditLog.getId(), auditLog.getUsername(), auditLog.getAction(),
-				auditLog.getTimestamp().format(DateTimeFormatter.ofPattern("dd-MM-yy h:mm:ss.SSSSSSSSS a")),
-				auditLog.getIpAddress(), auditLog.getStatus());
-	}
+		
 
 }

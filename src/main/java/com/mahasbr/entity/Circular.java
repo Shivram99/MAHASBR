@@ -1,12 +1,14 @@
 package com.mahasbr.entity;
 
+import java.time.LocalDate;
+
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -15,21 +17,18 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Table(name = "circular")
 public class Circular extends Auditable {
-
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "circulars_seq_generator")
 	@SequenceGenerator(name = "circulars_seq_generator", sequenceName = "circulars_seq", allocationSize = 1)
 	private Long id;
 
-	@NotBlank
-	private String fileName;
+	@Column(nullable = false)
+	private String subject;
 
-	@NotBlank
-	private String filePath;
+	@Column(name = "circular_date",nullable = false)
+	private LocalDate circularDate;
 
-	public Circular(String fileName, String filePath) {
-		this.fileName = fileName;
-		this.filePath = filePath;
-	}
+	@Column(name = "file_path", nullable = false)
+	private String filePath; // store uploaded PDF path
 
 }

@@ -15,7 +15,6 @@ public class DivisionMaster extends Auditable {
     @SequenceGenerator(name = "division_seq_gen", sequenceName = "division_seq", allocationSize = 1)
     private Long divisionId;
 
-	
     @Column(nullable = false)
     private String divisionName;
 

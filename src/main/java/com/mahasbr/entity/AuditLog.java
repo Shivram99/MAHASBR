@@ -19,43 +19,50 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class AuditLog {
 
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "audit_seq_generator")
 	@SequenceGenerator(name = "audit_seq_generator", sequenceName = "audit_seq", allocationSize = 1)
 	private Long id;
 
-	@Column(nullable = false)
-	private String username;
+    private String username;
+    
+    private String ipAddress;
 
-	@Column(nullable = false)
-	private String action;
+    private String jwtId;
+    
+    private String url;
 
-	@Column(nullable = false)
-	private LocalDateTime timestamp;
+    private String httpMethod;
 
-	@Column(nullable = false)
-	private String ipAddress;
+    private String referrer;
+    
+    private String userAgent;
+    
+    private boolean success;
+    
+    private String message;
 
-	@Column(nullable = false)
-	private String status;
+    private LocalDateTime timestamp;
+    
+    private String country;
+    
+    private Integer responseStatus;
 
-	@Transient
-	private String format;
+    private String processId;
 
-	public AuditLog(String username, String action, LocalDateTime timestamp, String ipAddress) {
-		this.username = username;
-		this.action = action;
-		this.timestamp = timestamp;
-		this.ipAddress = ipAddress;
-		this.status = action;
-	}
+    private String requestHash;
+    
+    private String responseHash;
+    
 
-	public AuditLog(Long id2, String username2, String action2, String format, String ipAddress2, String status2) {
-		this.id = id2;
-		this.username = username2;
-		this.action = action2;
-		this.format = format;
-		this.ipAddress = ipAddress2;
-		this.status = status2;
-	}
+    public void AuditLogDto(Long id, String username, String message, LocalDateTime timestamp, String ipAddress, Boolean success) {
+        this.id = id;
+        this.username = username;
+        this.message = message;
+        this.timestamp = timestamp;
+        this.ipAddress = ipAddress;
+        this.success = success;
+    }
+
 }

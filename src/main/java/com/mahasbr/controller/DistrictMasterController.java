@@ -53,7 +53,7 @@ public class DistrictMasterController {
 
     @GetMapping
     public ResponseEntity<List<DistrictMaster>> getAll() {
-        return ResponseEntity.ok(service.getAll());
+        return ResponseEntity.ok(service.findByIsActiveTrue());
     }
     
     @PostMapping("/upload")

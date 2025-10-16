@@ -4,14 +4,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
-import com.mahasbr.entity.RegionEntity;
-import com.mahasbr.repository.RegionRepository;
+
 
 @Component
 public class RegionDataInitializer implements CommandLineRunner {
 
-    @Autowired
-    private RegionRepository regionRepository;
+//    @Autowired
+//    private RegionRepository regionRepository;
 
     @Override
     public void run(String... args) throws Exception {

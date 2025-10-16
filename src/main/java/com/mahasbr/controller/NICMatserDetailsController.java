@@ -27,7 +27,7 @@ public class NICMatserDetailsController {
 	
 	@GetMapping("/nic")
 	public List<MasterNicDetails> readExcelData() throws IOException {
-		String filePath = "D:\\Download\\NIC_2008_MST.xlsx";
+		String filePath = "C:\\Users\\jitendra.ghasle\\Downloads\\NIC_2008_MST (2).xlsx";
 		StringUtils stringUtils = new StringUtils();
 	        List<MasterNicDetails> nicDetailsList = new ArrayList<>();
 	        FileInputStream fileInputStream = new FileInputStream(filePath);

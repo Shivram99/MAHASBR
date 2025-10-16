@@ -7,11 +7,9 @@ import org.springframework.data.domain.Pageable;
 
 import com.mahasbr.entity.DistrictMaster;
 import com.mahasbr.entity.MstRegistryDetailsPageEntity;
-import com.mahasbr.entity.RegionEntity;
-
 public interface RegionWiseDataService {
 
-	List<RegionEntity> getAllRegions();
+//	List<RegionEntity> getAllRegions();
 
 	List<DistrictMaster> getAllDistrict();
 

@@ -18,18 +18,17 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.mahasbr.filter.AuthEntryPointJwt;
 import com.mahasbr.filter.AuthTokenFilter;
 import com.mahasbr.filter.XssFilter;
 import com.mahasbr.repository.PermissionRepository;
 import com.mahasbr.service.RefreshTokenService;
 import com.mahasbr.service.UserDetailsServiceImpl;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 @Configuration
 @EnableMethodSecurity(prePostEnabled = true)
@@ -46,13 +45,12 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
 
 	@Autowired
 	private PermissionRepository permissionRepository;
-	
+
 	@Autowired
 	private RefreshTokenService refreshTokenService;
-	
-	
+
 	@Autowired
-	 private ObjectMapper mapper;
+	private ObjectMapper mapper;
 
 	// @Autowired
 	// private CustomAuthenticationFailureHandler authenticationFailureHandler;
@@ -64,7 +62,7 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
 //		return objectMapper;
 //		// return new ObjectMapper();
 //	}
-	
+
 //	@Bean
 //    public ObjectMapper objectMapper() {
 //        ObjectMapper mapper = new ObjectMapper();
@@ -102,9 +100,33 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
 		return new XssFilter();
 	}
 
+//	@Bean
+//	public LogoutSuccessHandler logoutSuccessHandler() {
+//		return new HttpStatusReturningLogoutSuccessHandler();
+//	}
+
 	@Bean
 	public LogoutSuccessHandler logoutSuccessHandler() {
-		return new HttpStatusReturningLogoutSuccessHandler();
+		return (request, response, authentication) -> {
+			response.setStatus(HttpServletResponse.SC_OK);
+			response.setContentType("application/json");
+			response.setCharacterEncoding("UTF-8");
+
+			String message;
+			if (authentication == null || !authentication.isAuthenticated()
+					|| "anonymousUser".equals(authentication.getPrincipal())) {
+				// No active session/user found
+				message = "{\"message\": \"No active session found\"}";
+				System.out.println(message);
+			} else {
+				// Successful logout
+				message = "{\"message\": \"User logged out successfully\"}";
+				System.out.println(message);
+			}
+
+			response.getWriter().write(message);
+			response.getWriter().flush();
+		};
 	}
 
 	@Bean
@@ -120,9 +142,9 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
 						.requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
 						.requestMatchers(" /common/department**").permitAll().requestMatchers("/admin/**").permitAll()
 						.requestMatchers("/moderator/**").hasRole("MODERATOR").requestMatchers("/developer/**")
-						.hasRole("DEVELOPER").requestMatchers("/user/**").permitAll().anyRequest().authenticated())
-				.logout(logout -> logout.logoutUrl("/api/auth/logout").permitAll()
-						.logoutSuccessHandler(logoutSuccessHandler()));
+						.hasRole("DEVELOPER").requestMatchers("/user/**").permitAll().anyRequest().authenticated());
+//				.logout(logout -> logout.logoutUrl("/api/auth/logout").permitAll()
+//						.logoutSuccessHandler(logoutSuccessHandler()));
 
 		http.authenticationProvider(authenticationProvider());
 		http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
@@ -135,10 +157,10 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
 		return new CustomAuthenticationFailureHandler(mapper);
 	}
 
-	@Bean
-	public AuthenticationSuccessHandler myAuthenticationSuccessHandler() {
-		return new CustomSimpleUrlAuthenticationSuccessHandler();
-	}
+//	@Bean
+//	public AuthenticationSuccessHandler myAuthenticationSuccessHandler() {
+//		return new CustomSimpleUrlAuthenticationSuccessHandler();
+//	}
 
 //	@Bean
 //	public LogoutSuccessHandler logoutSuccessHandler() {

@@ -1,6 +1,7 @@
 package com.mahasbr.entity;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -169,11 +170,11 @@ public class MstRegistryDetailsPageEntity extends Auditable {
 	private String nameOfAct;
 
 	@Column(name = "registration_date")
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 	private LocalDate dateOfRegistration;
 
 	@Column(name = "deregistration_expiry_date")
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 	private LocalDate dateOfDeregistrationExpiry;
 
 	@Size(max = 15)
@@ -194,5 +195,5 @@ public class MstRegistryDetailsPageEntity extends Auditable {
 	private String brnNo;
 
 	@Column(name = "reg_user_id")
-	private Long regUserId;
+	private Integer regUserId;
 }
