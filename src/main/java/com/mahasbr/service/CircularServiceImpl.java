@@ -24,12 +24,12 @@ import com.mahasbr.repository.CircularRepository;
 import com.mahasbr.util.FileStorageUtil;
 
 @Service
-@PropertySource("application.properties")
+//@PropertySource("application.properties")
 public class CircularServiceImpl implements CircularService {
 	private static final Logger logger = LoggerFactory.getLogger(CircularServiceImpl.class);
 
-	@Autowired
-	private Environment env;
+//	@Autowired
+//	private Environment env;
 
 	@Autowired
 	private CircularRepository circularRepository;
