@@ -31,15 +31,7 @@ public class DataInitializer implements CommandLineRunner {
 	// Create default admin user
 	@Override
 	public void run(String... args) throws Exception {
-		createUserIfNotExists("admin", "admin@example.com",  "admin123", "ROLE_ADMIN");
-		createUserIfNotExists("moderator", "moderator@example.com",  "mod123", "ROLE_MODERATOR");
-		createUserIfNotExists("developer", "developer@example.com",  "dev123", "ROLE_DEVELOPER");
-		createUserIfNotExists("user", "user@example.com",  "user123", "ROLE_USER");
-		createUserIfNotExists("des_state", "state@example.com",  "state123", "ROLE_DES_STATE");
-		createUserIfNotExists("des_region", "region@example.com", "region123", "ROLE_DES_REGION");
-		createUserIfNotExists("des_district", "district@example.com", "district123", "ROLE_DES_DISTRICT");
-		createUserIfNotExists("auth_api", "api@example.com", "api123", "ROLE_REG_AUTH_API");
-		createUserIfNotExists("auth_csv", "csv@example.com", "csv123", "ROLE_REG_AUTH_CSV");
+		createUserIfNotExists("SUPER_ADMIN", "superadmin@gmail.com",  "Pass@123", "ROLE_ADMIN");
 	}
 
 	private void createUserIfNotExists(String username, String email,  String rawPassword, String roleName) {

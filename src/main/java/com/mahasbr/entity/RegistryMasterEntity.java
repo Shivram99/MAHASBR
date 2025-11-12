@@ -35,12 +35,24 @@ public class RegistryMasterEntity extends Auditable{
     private String registryName;
     
     @Column(name = "registry_name_en",  length = 200)
-    private String registryNameEn;   // English name
+    private String registryNameEn;   
 
     @Column(name = "registry_name_mr", length = 200)
-    private String registryNameMr;   // Marathi name
+    private String registryNameMr;  
 
     @Column(name = "status", length = 20)
     private Boolean status = true;
-
+    
+    @Column(name = "auth_url")
+    private String auth_url;
+    
+    @Column(name = "username")
+    private String username;
+    
+    @Column(name = "password")
+    private String password;
+    
+    @Column(name = "apiUrl")
+    private String apiUrl;
+        
 }

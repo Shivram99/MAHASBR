@@ -66,7 +66,7 @@ public interface MstRegistryDetailsPageRepository extends JpaRepository<MstRegis
 	Page<MstRegistryDetailsPageEntity> findByTalukaInAndDistrictIn(@Param("talukas") List<String> talukas,
 			@Param("district") List<String> district, Pageable pageable);
 
-	@Query("SELECT m FROM MstRegistryDetailsPageEntity m WHERE m.taluka IN :talukas AND m.district IN :districts AND m.regUserId = :regUserId")
+	@Query("SELECT m FROM MstRegistryDetailsPageEntity m WHERE LOWER(m.taluka ) IN :talukas AND LOWER(m.district) IN :districts AND m.regUserId = :regUserId")
 	Page<MstRegistryDetailsPageEntity> findByTalukasAndDistrictsAndRegUserId(@Param("talukas") List<String> talukas,
 			@Param("districts") List<String> districts, @Param("regUserId") Long regUserId, Pageable pageable);
 

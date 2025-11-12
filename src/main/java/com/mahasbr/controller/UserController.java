@@ -22,54 +22,6 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
 public class UserController {
-//	@Autowired
-//	CommonService commonService;
-//
-//	@Autowired
-//	MstRegistryDetailsPageService mstRegistryDetailsPageService;
-//
-//	@GetMapping("/getDistrictData")
-//	public ResponseEntity<?> getDistrictDetails() {
-//		List<DistrictMaster> district = commonService.getAllDistrict();
-//		return ResponseEntity.ok(new MessageResponse(" District List", district));
-//	}
-//
-//	@GetMapping("/getDistrictByCode/{CensusDistrictCode}")
-//	public ResponseEntity<?> getDistrictDetailByDistrictCode(@PathVariable String CensusDistrictCode) throws Exception {
-//		DistrictMaster district = commonService.getAllDistrictDistrictCode(CensusDistrictCode);
-//		return ResponseEntity.ok(new MessageResponse(" District List by District Code ", district));
-//	}
-//
-//	@GetMapping("/getTalukaByCode/{CensusDistrictCode}")
-//	public ResponseEntity<?> getTalukaDetailByDistrictCode(@PathVariable String CensusDistrictCode) throws Exception {
-//		List<TalukaMaster> taluka = commonService.getAllTalukaByDistrictCode(CensusDistrictCode);
-//		return ResponseEntity.ok(new MessageResponse(" Taluka List by District Code ", taluka));
-//	}
-//
-//	@GetMapping("/getVillagetByCode/{censusTalukaCode}")
-//	public ResponseEntity<?> getVillageDetailByTalukaCode(@PathVariable String censusTalukaCode) throws Exception {
-//		List<VillageMaster> village = commonService.getAllVillageTalukaCode(censusTalukaCode);
-//		return ResponseEntity.ok(new MessageResponse(" village List by taluka Code ", village));
-//	}
-//
-//	@PostMapping("/searchBRN")
-//	public ResponseEntity<List<MstRegistryDetailsPageEntity>> getSearchBRN(@RequestBody SearchBrnDto searchBrnDto)
-//			throws Exception {
-//		// List<VillageMaster> village =
-//		// commonService.getAllVillageTalukaCode(censusTalukaCode);
-//		List<MstRegistryDetailsPageEntity> searchBRNAndEstablishmentDetails = new ArrayList<>();
-//		StringUtils stringUtils = new StringUtils();
-//		if (!searchBrnDto.getDistrict().isEmpty()) {
-//			DistrictMaster district = commonService
-//					.getAllDistrictDistrictCode(Long.parseLong(searchBrnDto.getDistrict()));
-//			searchBRNAndEstablishmentDetails = mstRegistryDetailsPageService.getsearchBRNAndEstablishmentDetails(
-//					stringUtils.safeUpperCase(district.getDistrictName()),
-//					stringUtils.safeUpperCase(searchBrnDto.getBrnNo()),
-//					stringUtils.safeUpperCase(searchBrnDto.getNameOfEstablishmentOrOwner()));
-//		}
-//
-//		return new ResponseEntity<>(searchBRNAndEstablishmentDetails, HttpStatus.OK);
-//	}
 
 	private final UserService userService;
 

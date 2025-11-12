@@ -69,6 +69,7 @@ public class RegistryApiService {
             Map.entry(29, "GSTN")
         );
     
+   
 	@Async
 	@Retryable(value = { RuntimeException.class }, maxAttempts = 3, backoff = @Backoff(delay = 2000))
 	public CompletableFuture<Void> fetchAndSave(ApiAuthConfig config, String apiName, String url,String registrory) {

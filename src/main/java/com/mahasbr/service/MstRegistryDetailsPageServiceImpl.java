@@ -695,9 +695,8 @@ public class MstRegistryDetailsPageServiceImpl implements MstRegistryDetailsPage
 	public Page<MstRegistryDetailsPageEntity> getPostLoginDashboardData(Pageable pageable,
 			List<Long> selectedDistrictIds, List<Long> selectedTalukaIds, String registerDateFrom,
 			String registerDateTo) {
-		  List<String> formattedCodes = selectedTalukaIds.stream()
-		            .map(code -> String.format("%05d", code))
-		            .collect(Collectors.toList());
+		List<String> formattedCodes = selectedTalukaIds.stream().map(code -> String.format("%05d", code))
+				.collect(Collectors.toList());
 
 		List<String> talukaName = talukaMasterRepository.findTalukaNameByCensusTalukaCode(formattedCodes);
 		List<String> districtName = districtMasterRepository
@@ -723,16 +722,21 @@ public class MstRegistryDetailsPageServiceImpl implements MstRegistryDetailsPage
 			if (!talukaName.isEmpty())
 				return mstRegistryDetailsPageRepository.findByTalukasAndDistrictsAndRegUserId(talukaNameLower,
 						districtsLower, getLoginUsernameId(), pageable);
-			else
+			else if (!districtName.isEmpty())
 				return mstRegistryDetailsPageRepository.findByDistrictsAndRegUserId(districtsLower,
 						getLoginUsernameId(), pageable);
+			else
+				return mstRegistryDetailsPageRepository.findAllByRegUserId(getLoginUsernameId(), pageable);
+
 		case "ROLE_REG_AUTH_CSV":
 			if (!talukaName.isEmpty())
 				return mstRegistryDetailsPageRepository.findByTalukasAndDistrictsAndRegUserId(talukaNameLower,
 						districtsLower, getLoginUsernameId(), pageable);
-			else
+			else if (!districtName.isEmpty())
 				return mstRegistryDetailsPageRepository.findByDistrictsAndRegUserId(districtsLower,
 						getLoginUsernameId(), pageable);
+			else
+				return mstRegistryDetailsPageRepository.findAllByRegUserId(getLoginUsernameId(), pageable);
 
 		case "ROLE_DES_DISTRICT":
 			return getDistrictWiseRegistryDetails(pageable);
@@ -791,14 +795,14 @@ public class MstRegistryDetailsPageServiceImpl implements MstRegistryDetailsPage
 
 		String username = SecurityContextHolder.getContext().getAuthentication().getName();
 		Optional<User> user = userRepository.findByUsername(username);
-		List<String> formattedCodes = selectedTalukaIds.stream()
-	            .map(code -> String.format("%05d", code))
-	            .collect(Collectors.toList());
+		List<String> formattedCodes = selectedTalukaIds.stream().map(code -> String.format("%05d", code))
+				.collect(Collectors.toList());
 
-	List<String> talukaName = talukaMasterRepository.findTalukaNameByCensusTalukaCode(formattedCodes);
-		
-		List<String> districtName = districtMasterRepository.findDistrictNamesByCensusDistrictCodes(selectedDistrictIds);
-		
+		List<String> talukaName = talukaMasterRepository.findTalukaNameByCensusTalukaCode(formattedCodes);
+
+		List<String> districtName = districtMasterRepository
+				.findDistrictNamesByCensusDistrictCodes(selectedDistrictIds);
+
 		List<String> districtsLower = districtName.stream().map(String::toLowerCase).collect(Collectors.toList());
 
 		List<String> talukaNameLower = talukaName.stream().map(String::toLowerCase).collect(Collectors.toList());
@@ -815,35 +819,35 @@ public class MstRegistryDetailsPageServiceImpl implements MstRegistryDetailsPage
 		return mstRegistryDetailsPageRepository.findByDistricts(lowercaseDistricts, pageable);
 
 	}
-	
+
 	private Page<MstRegistryDetailsPageEntity> getStateDetailsBasedOnfilter(List<Long> selectedDistrictIds,
 			List<Long> selectedTalukaIds, String registerDateFrom, String registerDateTo, Pageable pageable) {
 
 //		String username = SecurityContextHolder.getContext().getAuthentication().getName();
 //		Optional<User> user = userRepository.findByUsername(username);
 
-		List<String> formattedCodes = selectedTalukaIds.stream()
-	            .map(code -> String.format("%05d", code))
-	            .collect(Collectors.toList());
+		List<String> formattedCodes = selectedTalukaIds.stream().map(code -> String.format("%05d", code))
+				.collect(Collectors.toList());
 
-	List<String> talukaName = talukaMasterRepository.findTalukaNameByCensusTalukaCode(formattedCodes);
-		
-		List<String> districtName = districtMasterRepository.findDistrictNamesByCensusDistrictCodes(selectedDistrictIds);
-		
+		List<String> talukaName = talukaMasterRepository.findTalukaNameByCensusTalukaCode(formattedCodes);
+
+		List<String> districtName = districtMasterRepository
+				.findDistrictNamesByCensusDistrictCodes(selectedDistrictIds);
+
 		List<String> districtsLower = districtName.stream().map(String::toLowerCase).collect(Collectors.toList());
 
 		List<String> talukaNameLower = talukaName.stream().map(String::toLowerCase).collect(Collectors.toList());
 
 		List<String> lowercaseDistricts = districtName.stream().map(String::toLowerCase).collect(Collectors.toList());
 
-		if (!talukaName.isEmpty()) {
+		if (!talukaName.isEmpty() && !districtName.isEmpty()) {
 			return mstRegistryDetailsPageRepository.findByTalukasAndDistricts(talukaNameLower, districtsLower,
 					pageable);
+		} else if (!districtName.isEmpty()) {
+			return mstRegistryDetailsPageRepository.findByDistricts(lowercaseDistricts, pageable);
+		} else {
+			return mstRegistryDetailsPageRepository.findAll(pageable);
 		}
-		if (districtName.isEmpty()) {
-			return Page.empty(pageable);
-		}
-		return mstRegistryDetailsPageRepository.findByDistricts(lowercaseDistricts, pageable);
 
 	}
 }

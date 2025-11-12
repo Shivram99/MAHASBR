@@ -39,7 +39,9 @@ public class UserDto {
     private Long registryId;  // maps to registry1.id
 
     private Long districtId;  // maps to district.id
-
+    
+    private Long censusDistrictCode; 
+    
     @Valid
     @NotNull(message = "User profile is required")
     private UserProfileDto userProfile;
