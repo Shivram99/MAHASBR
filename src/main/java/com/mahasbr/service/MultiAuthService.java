@@ -1,14 +1,19 @@
 package com.mahasbr.service;
 
-import java.nio.charset.StandardCharsets;
 import java.time.Instant;
-import java.util.Base64;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -78,47 +83,36 @@ public class MultiAuthService {
      * @return A fresh JWT token.
      */
     private String authenticate(ApiAuthConfig config) {
+        RestTemplate restTemplate = new RestTemplate();
+
+        // Prepare request body
         Map<String, String> body = Map.of(
                 "Username", config.getUsername(),
                 "Password", config.getPassword()
         );
 
-        // Execute login call
-        String token = webClient.post()
-                .uri(config.getLoginUrl())
-                .bodyValue(body)
-                .retrieve()
-                .bodyToMono(String.class)
-                .block();
+        // Set headers
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
 
-        if (token == null) {
-            log.error("❌ Authentication failed for API: {}", config.name());
-            throw new RuntimeException("Authentication failed for API: " + config.name());
+        HttpEntity<Map<String, String>> entity = new HttpEntity<>(body, headers);
+
+        // Call API
+        ResponseEntity<String> response = restTemplate.exchange(
+                config.getLoginUrl(),
+                HttpMethod.POST,
+                entity,
+                String.class
+        );
+
+        if (response.getStatusCode() != HttpStatus.OK || response.getBody() == null) {
+            throw new RuntimeException("❌ Authentication failed for API: " + config.name());
         }
 
-        token = token.replace("\"", ""); // Clean JSON string response
+        String token = response.getBody().replace("\"", "");
 
-        try {
-            // Parse JWT and extract expiry claim
-            String[] parts = token.split("\\.");
-            if (parts.length > 1) {
-                String payloadJson = new String(Base64.getUrlDecoder().decode(parts[1]), StandardCharsets.UTF_8);
-                Map<String, Object> claims = mapper.readValue(payloadJson, Map.class);
-                Number exp = (Number) claims.get("exp");
-
-                expiryCache.put(
-                        config,
-                        exp != null ? Instant.ofEpochSecond(exp.longValue()) : Instant.now().plusSeconds(3000)
-                );
-            } else {
-                expiryCache.put(config, Instant.now().plusSeconds(3000));
-            }
-        } catch (Exception e) {
-            log.warn("⚠️ Failed to parse token expiry for API: {}. Using fallback expiry.", config.name(), e);
-            expiryCache.put(config, Instant.now().plusSeconds(3000));
-        }
-
-        log.info("🔑 Token refreshed for API: {}", config.name());
+        log.info("🔑 Token received for API: {}", config.name());
         return token;
     }
+
 }

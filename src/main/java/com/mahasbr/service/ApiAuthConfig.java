@@ -6,7 +6,7 @@ import lombok.Getter;
 public enum ApiAuthConfig {
 
     CHARITY("https://sbrlmsapi.mahaitgov.in/api/Login", "axe2Zf3HlSBr5L6", "7FVaTuMIarLMAso"),
-    DISH("https://sbrlmsapi.mahaitgov.in/api/Login", "axe2Zf3HlSBr5L6", "7FVaTuMIarLMAso"),
+    DISH("https://sbrlmsapi.mahaonline.gov.in/api/Login", "ate1Yf3HlPIb9V9", "6FBnPzMTrmLNPig"),
     LABOUR("https://sbrlmsapi.mahaitgov.in/api/Login", "axe2Zf3HlSBr5L6", "7FVaTuMIarLMAso"),
     COOP("https://sbrlmsapi.mahaitgov.in/api/Login", "coopUser123", "coopPass123"),
     KVIB("https://sbrlmsapi.mahaitgov.in/api/Login", "kvibUser123", "kvibPass123"),

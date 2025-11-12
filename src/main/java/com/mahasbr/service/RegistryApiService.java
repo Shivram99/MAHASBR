@@ -8,12 +8,18 @@ import java.util.concurrent.CompletableFuture;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -70,53 +76,72 @@ public class RegistryApiService {
         );
     
    
-	@Async
-	@Retryable(value = { RuntimeException.class }, maxAttempts = 3, backoff = @Backoff(delay = 2000))
-	public CompletableFuture<Void> fetchAndSave(ApiAuthConfig config, String apiName, String url,String registrory) {
-		try {
-			// 1. Get token
-			String token = authService.getToken(config);
+    @Async
+    @Retryable(value = { RuntimeException.class }, maxAttempts = 3, backoff = @Backoff(delay = 2000))
+    public CompletableFuture<Void> fetchAndSave(ApiAuthConfig config, String apiName, String url, String registrory) {
+        try {
+            // 1️⃣ Get token using your existing auth service
+            String token = authService.getToken(config);
 
-			// 2. Fetch API response
-			String response = webClient.post().uri(url).header("Authorization", "Bearer " + token).retrieve()
-					.bodyToMono(String.class).block();
+            // 2️⃣ Prepare RestTemplate and headers
+            RestTemplate restTemplate = new RestTemplate();
 
-			if (response == null || response.isEmpty()) {
-				apiLogService.log(apiName, url, "FAILURE", "No data received");
-				return CompletableFuture.completedFuture(null);
-			}
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.setBearerAuth(token);
 
-			// 3. Parse response into DTOs (never directly into Entity!)
-			// 3. Parse response into DTOs (never directly into Entity!)
-			List<MstRegistryDetailsPagesDTO> dtos = objectMapper.readValue(
-			        response,
-			        new TypeReference<List<MstRegistryDetailsPagesDTO>>() {}
-			);
+            HttpEntity<String> entity = new HttpEntity<>(null, headers);
 
-			int successCount = 0;
-			int failedCount = 0;
+            // 3️⃣ Execute API call
+            ResponseEntity<String> responseEntity = restTemplate.exchange(
+                    url,
+                    HttpMethod.POST,
+                    entity,
+                    String.class
+            );
 
-			// 4. Process each record individually
-			for (MstRegistryDetailsPagesDTO dto : dtos) {
-				try {
-					processSingleRecord(dto, response,apiName,url,registrory);
-					successCount++;
-				} catch (Exception ex) {
-					failedCount++;
-					saveFailedRecord(dto, response, ex.getMessage(),apiName,url);
-				}
-			}
+            String response = responseEntity.getBody();
 
-			apiLogService.log(apiName, url, "SUCCESS",
-					"Processed " + dtos.size() + " records. Saved=" + successCount + ", Failed=" + failedCount);
+            if (response == null || response.isEmpty()) {
+                apiLogService.log(apiName, url, "FAILURE", "No data received");
+                return CompletableFuture.completedFuture(null);
+            }
 
-		} catch (Exception e) {
-			apiLogService.log(apiName, url, "FAILURE", e.getMessage());
-			throw new RuntimeException(e);
-		}
+            // 4️⃣ Parse JSON into DTOs
+            List<MstRegistryDetailsPagesDTO> dtos = objectMapper.readValue(
+                    response,
+                    new TypeReference<List<MstRegistryDetailsPagesDTO>>() {}
+            );
 
-		return CompletableFuture.completedFuture(null);
-	}
+            int successCount = 0;
+            int failedCount = 0;
+
+            // 5️⃣ Process each record individually
+            for (MstRegistryDetailsPagesDTO dto : dtos) {
+                try {
+                    processSingleRecord(dto, response, apiName, url, registrory);
+                    successCount++;
+                } catch (Exception ex) {
+                    failedCount++;
+                    saveFailedRecord(dto, response, ex.getMessage(), apiName, url);
+                }
+            }
+
+            // 6️⃣ Log overall success
+            apiLogService.log(
+                    apiName,
+                    url,
+                    "SUCCESS",
+                    String.format("Processed %d records. Saved=%d, Failed=%d", dtos.size(), successCount, failedCount)
+            );
+
+        } catch (Exception e) {
+            apiLogService.log(apiName, url, "FAILURE", e.getMessage());
+            throw new RuntimeException("Error in fetchAndSave for API: " + apiName, e);
+        }
+
+        return CompletableFuture.completedFuture(null);
+    }
 
 	// Convenience methods
 	public CompletableFuture<Void> fetchCharity() {

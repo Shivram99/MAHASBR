@@ -28,12 +28,12 @@ public class ApiSchedulerService {
 //                apiClientService.fetchCharity(),
                 apiClientService.fetchDish()
 //                apiClientService.fetchLabour()
-////                apiClientService.fetchCoop(),
-////                apiClientService.fetchKvib(),
-////                apiClientService.fetchMcgm(),
-////                apiClientService.fetchMsme(),
-////                apiClientService.fetchMca(),
-////                apiClientService.fetchGstn()
+//                apiClientService.fetchCoop(),
+//                apiClientService.fetchKvib(),
+//                apiClientService.fetchMcgm(),
+//                apiClientService.fetchMsme(),
+//                apiClientService.fetchMca(),
+//                apiClientService.fetchGstn()
         ).join();
 
         System.out.println("🎯 Scheduler finished.");
