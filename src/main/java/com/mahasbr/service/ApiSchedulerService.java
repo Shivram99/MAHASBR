@@ -26,8 +26,8 @@ public class ApiSchedulerService {
 
         CompletableFuture.allOf(
 //                apiClientService.fetchCharity(),
-                apiClientService.fetchDish()
-//                apiClientService.fetchLabour()
+//                apiClientService.fetchDish()
+                apiClientService.fetchLabour()
 //                apiClientService.fetchCoop(),
 //                apiClientService.fetchKvib(),
 //                apiClientService.fetchMcgm(),
