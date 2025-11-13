@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mahasbr.dto.CircularResponseDTO;
+import com.mahasbr.dto.DivisionDto;
+import com.mahasbr.dto.RegistryMasterResponse;
 import com.mahasbr.entity.DistrictMaster;
 import com.mahasbr.entity.MstRegistryDetailsPageEntity;
 import com.mahasbr.entity.TalukaMaster;
@@ -27,7 +29,9 @@ import com.mahasbr.model.SearchBrnDto;
 import com.mahasbr.service.CircularService;
 import com.mahasbr.service.CommonService;
 import com.mahasbr.service.DistrictMasterService;
+import com.mahasbr.service.DivisionService;
 import com.mahasbr.service.MstRegistryDetailsPageService;
+import com.mahasbr.service.RegistryMasterService;
 import com.mahasbr.service.TalukaMasterService;
 import com.mahasbr.util.BrnGeneratorFactory;
 
@@ -52,7 +56,11 @@ public class SearchBRNController {
 	private final BrnGeneratorFactory generatorFactory;
 	
     private final CircularService circularService;
+    
+    private final RegistryMasterService registryMasterService;
 
+    private final DivisionService divisionService;
+    
 	@GetMapping("/districts")
 	public ResponseEntity<List<DistrictMaster>> getAll() {
 		return ResponseEntity.ok(districtservice.findByIsActiveTrue());
@@ -105,5 +113,14 @@ public class SearchBRNController {
 	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
 	                .body(null);
 	    }
+	}
+	
+	@GetMapping("/registry")
+    public ResponseEntity<List<RegistryMasterResponse>> getRegistringAutherity() {
+        return ResponseEntity.ok(registryMasterService.getAllRegistries());
+    }
+	@GetMapping("/division")
+	public ResponseEntity<List<DivisionDto>> findDivisionService() {
+		return ResponseEntity.ok(divisionService.getAllDivisions());
 	}
 }
