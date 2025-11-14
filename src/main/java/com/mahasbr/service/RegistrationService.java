@@ -1,5 +1,6 @@
 package com.mahasbr.service;
 
+import com.mahasbr.dto.CitizenDashboardData;
 import com.mahasbr.dto.RegistrationStatsDTO;
 import com.mahasbr.repository.RegistrationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,19 +12,30 @@ import java.util.stream.Collectors;
 @Service
 public class RegistrationService {
 
-    @Autowired
-    private RegistrationRepository repository;
+	@Autowired
+	private RegistrationRepository repository;
 
-    public List<RegistrationStatsDTO> getRegistrationStats() {
-        List<Object[]> results = repository.getRegistrationStatsRaw();
+	public List<RegistrationStatsDTO> getRegistrationStats() {
+		List<Object[]> results = repository.getRegistrationStatsRaw();
 
-        return results.stream()
-                .map(r -> new RegistrationStatsDTO(
-                        (String) r[0],
-                        ((Number) r[1]).intValue(),
-                        (String) r[2],
-                        ((Number) r[3]).longValue()
-                ))
-                .collect(Collectors.toList());
-    }
+		return results.stream().map(r -> new RegistrationStatsDTO((String) r[0], ((Number) r[1]).intValue(),
+				(String) r[2], ((Number) r[3]).longValue())).collect(Collectors.toList());
+	}
+
+	public List<CitizenDashboardData> citizenDashboardDataNR() {
+		List<CitizenDashboardData> citizenDashboardData = repository.citizenDashboardDataNR();
+
+		return citizenDashboardData;
+	}
+	
+	public List<CitizenDashboardData> citizenDashboardDataTR() {
+		List<CitizenDashboardData> citizenDashboardData = repository.citizenDashboardDataTR();
+		return citizenDashboardData;
+	}
+	
+	public List<CitizenDashboardData> citizenDashboardDataDR() {
+		List<CitizenDashboardData> citizenDashboardData = repository.citizenDashboardDataDR();
+
+		return citizenDashboardData;
+	}
 }
