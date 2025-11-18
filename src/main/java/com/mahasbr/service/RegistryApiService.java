@@ -1,8 +1,10 @@
 package com.mahasbr.service;
 
 import java.security.SecureRandom;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -72,9 +74,34 @@ public class RegistryApiService {
 	@Retryable(value = { RuntimeException.class }, maxAttempts = 3, backoff = @Backoff(delay = 2000))
 	public CompletableFuture<Void> fetchAndSave(ApiAuthConfig config, String apiName, String url, String registrory) {
 		try {
+			Map<String, String> dateMap = new LinkedHashMap<>();
 
-			String fromDate = "2025-01-22";
-			String toDate = "2025-02-22";
+			// Start date
+			LocalDate startDate = LocalDate.parse("2020-01-01");
+			// End date (can be dynamic or fixed)
+			LocalDate endDate = LocalDate.now();
+
+			// Current interval start
+			LocalDate currentStart = startDate;
+
+			while (!currentStart.isAfter(endDate)) {
+				// Interval end is 3 months from start minus 1 day
+				LocalDate currentEnd = currentStart.plusMonths(3).minusDays(1);
+				// If interval end is after final end date, adjust it
+				if (currentEnd.isAfter(endDate)) {
+					currentEnd = endDate;
+				}
+
+				// Put in map
+				dateMap.put(currentStart.toString(), currentEnd.toString());
+
+				// Move start to next interval
+				currentStart = currentEnd.plusDays(1);
+			}
+
+			// Print intervals
+			dateMap.forEach((start, end) -> System.out.println(start + " -> " + end));
+
 			// 1️⃣ Get token
 			String token = authService.getToken(config);
 
@@ -83,46 +110,51 @@ public class RegistryApiService {
 			headers.setContentType(MediaType.APPLICATION_JSON);
 			headers.setBearerAuth(token);
 
-			// 3️⃣ Prepare request body
-			Map<String, String> requestBody = new HashMap<>();
-			requestBody.put("FromDate", fromDate);
-			requestBody.put("ToDate", toDate);
+			// 3️⃣ Iterate over each month
+			for (Map.Entry<String, String> entry : dateMap.entrySet()) {
+				String fromDate = entry.getKey();
+				String toDate = entry.getValue();
 
-			String jsonBody = objectMapper.writeValueAsString(requestBody);
+				// 4️⃣ Prepare request body
+				Map<String, String> requestBody = new HashMap<>();
+				requestBody.put("FromDate", fromDate);
+				requestBody.put("ToDate", toDate);
 
-			HttpEntity<String> entity = new HttpEntity<>(jsonBody, headers);
+				String jsonBody = objectMapper.writeValueAsString(requestBody);
+				HttpEntity<String> entity = new HttpEntity<>(jsonBody, headers);
 
-			// 4️⃣ Execute API call
-			ResponseEntity<String> responseEntity = new RestTemplate().exchange(url, HttpMethod.POST, entity,
-					String.class);
+				// 5️⃣ Execute API call
+				ResponseEntity<String> responseEntity = new RestTemplate().exchange(url, HttpMethod.POST, entity,
+						String.class);
+				String response = responseEntity.getBody();
 
-			String response = responseEntity.getBody();
-
-			if (response == null || response.isEmpty()) {
-				apiLogService.log(apiName, url, "FAILURE", "No data received");
-				return CompletableFuture.completedFuture(null);
-			}
-
-			// 5️⃣ Parse JSON into DTOs
-			List<MstRegistryDetailsPagesDTO> dtos = objectMapper.readValue(response,
-					new TypeReference<List<MstRegistryDetailsPagesDTO>>() {
-					});
-
-			int successCount = 0;
-			int failedCount = 0;
-
-			for (MstRegistryDetailsPagesDTO dto : dtos) {
-				try {
-					processSingleRecord(dto, response, apiName, url, registrory);
-					successCount++;
-				} catch (Exception ex) {
-					failedCount++;
-					saveFailedRecord(dto, response, ex.getMessage(), apiName, url);
+				if (response == null || response.isEmpty()) {
+					apiLogService.log(apiName, url, "FAILURE", "No data received for " + fromDate + " to " + toDate);
+					continue;
 				}
-			}
 
-			apiLogService.log(apiName, url, "SUCCESS",
-					String.format("Processed %d records. Saved=%d, Failed=%d", dtos.size(), successCount, failedCount));
+				// 6️⃣ Parse JSON into DTOs
+				List<MstRegistryDetailsPagesDTO> dtos = objectMapper.readValue(response,
+						new TypeReference<List<MstRegistryDetailsPagesDTO>>() {
+						});
+
+				int successCount = 0;
+				int failedCount = 0;
+
+				for (MstRegistryDetailsPagesDTO dto : dtos) {
+					try {
+						processSingleRecord(dto, response, apiName, url, registrory);
+						successCount++;
+					} catch (Exception ex) {
+						failedCount++;
+						saveFailedRecord(dto, response, ex.getMessage(), apiName, url);
+					}
+				}
+
+				apiLogService.log(apiName, url, "SUCCESS",
+						String.format("Processed %d records for %s to %s. Saved=%d, Failed=%d", dtos.size(), fromDate,
+								toDate, successCount, failedCount));
+			}
 
 		} catch (Exception e) {
 			apiLogService.log(apiName, url, "FAILURE", e.getMessage());
@@ -221,7 +253,7 @@ public class RegistryApiService {
 			String apiUrl) {
 		try {
 			MstRegistryFailedEntity failed = new MstRegistryFailedEntity();
-			failed.setRawData(rawData);
+			//failed.setRawData(rawData);
 			failed.setErrorMessage(reason);
 			failed.setApiName(apiName);
 			failed.setApiUrl(apiUrl);
