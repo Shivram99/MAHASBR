@@ -59,7 +59,7 @@ public class MstRegistryDetailsPageEntity extends Auditable {
 	private Integer pinCode;
 
 	@Column(name = "telephone_mob_number")
-	private Long telephoneMobNumber;
+	private String telephoneMobNumber;
 
 	@Email
 	@Size(max = 320)
@@ -90,7 +90,7 @@ public class MstRegistryDetailsPageEntity extends Auditable {
 	private Integer headOfficePinCode;
 
 	@Column(name = "head_office_telephone_mob_number")
-	private Long headOfficeTelephoneMobNumber;
+	private String headOfficeTelephoneMobNumber;
 
 	@Email
 	@Size(max = 320)
