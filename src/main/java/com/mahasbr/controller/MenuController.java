@@ -1,7 +1,9 @@
 package com.mahasbr.controller;
+
 import java.util.List;
 
-import org.springframework.http.HttpStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,43 +14,82 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.mahasbr.dto.MenuRequestDto;
-import com.mahasbr.dto.MenuResponseDto;
+import com.mahasbr.dto.AssignMenuToRoleDTO;
+import com.mahasbr.dto.MenuCreateDTO;
+import com.mahasbr.dto.MenuDTO;
+import com.mahasbr.model.ERole;
 import com.mahasbr.service.MenuService;
+import com.mahasbr.util.ApiResponse;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/menus1")
+@RequestMapping("/citizenSearch/menus")
 @RequiredArgsConstructor
 public class MenuController {
 
- private final MenuService menuService;
+	private static final Logger logger = LoggerFactory.getLogger(MenuController.class);
+    private final MenuService menuService;
 
- @PostMapping
- public ResponseEntity<MenuResponseDto> createMenu(@Valid @RequestBody MenuRequestDto dto) {
-     return ResponseEntity.status(HttpStatus.CREATED).body(menuService.createMenu(dto));
- }
+    /* =============================
+          MENU CRUD API
+       ============================= */
 
- @PutMapping("/{id}")
- public ResponseEntity<MenuResponseDto> updateMenu(@PathVariable Integer id,
-                                                   @Valid @RequestBody MenuRequestDto dto) {
-     return ResponseEntity.ok(menuService.updateMenu(id, dto));
- }
+    @GetMapping
+    public ResponseEntity<ApiResponse<List<MenuDTO>>> getAllMenus() {
+        List<MenuDTO> menus = menuService.getAllMenus();
+        return ResponseEntity.ok(new ApiResponse<>(true, "Menus fetched successfully", menus));
+    }
 
- @GetMapping("/{id}")
- public ResponseEntity<MenuResponseDto> getMenuById(@PathVariable Integer id) {
-     return ResponseEntity.ok(menuService.getMenuById(id));
- }
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<MenuDTO>> getMenuById(@PathVariable Long id) {
+        MenuDTO menu = menuService.getMenuById(id);
+        return ResponseEntity.ok(new ApiResponse<>(true, "Menu fetched successfully", menu));
+    }
 
- @GetMapping
- public ResponseEntity<List<MenuResponseDto>> getAllMenus() {
-     return ResponseEntity.ok(menuService.getAllMenus());
- }
- @DeleteMapping("/{id}")
- public ResponseEntity<Void> deleteMenu(@PathVariable Integer id) {
-     menuService.deleteMenu(id);
-     return ResponseEntity.noContent().build();
- }
+    @PostMapping
+    public ResponseEntity<ApiResponse<MenuDTO>> createMenu(@RequestBody MenuCreateDTO dto) {
+    	
+        MenuDTO created = menuService.createMenu(dto);
+        return ResponseEntity.ok(new ApiResponse<>(true, "Menu created successfully", created));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<MenuDTO>> updateMenu(
+            @PathVariable Long id,
+            @RequestBody MenuCreateDTO dto) {
+
+        MenuDTO updated = menuService.updateMenu(id, dto);
+        return ResponseEntity.ok(new ApiResponse<>(true, "Menu updated successfully", updated));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<Void>> deleteMenu(@PathVariable Long id) {
+        menuService.deleteMenu(id);
+        return ResponseEntity.ok(new ApiResponse<>(true, "Menu deleted successfully", null));
+    }
+
+    /* =============================
+          ROLE-BASED MENU
+       ============================= */
+    @GetMapping("/role/{role}")
+    public ResponseEntity<ApiResponse<List<MenuDTO>>> getMenusByRole(@PathVariable ERole role) {
+        List<MenuDTO> menus = menuService.getMenusForRole(role);
+        return ResponseEntity.ok(new ApiResponse<>(true, "Menus fetched for role " + role, menus));
+    }
+
+    /* =============================
+          ASSIGN MENU TO ROLE
+       ============================= */
+    @PostMapping("/assign")
+    public ResponseEntity<ApiResponse<Void>> assignMenuToRole(@RequestBody AssignMenuToRoleDTO dto) {
+        menuService.assignMenuToRole(dto.getMenuId(), dto.getRoleId());
+        return ResponseEntity.ok(new ApiResponse<>(true, "Menu assigned to role successfully", null));
+    }
+
+    @PostMapping("/remove")
+    public ResponseEntity<ApiResponse<Void>> removeMenuFromRole(@RequestBody AssignMenuToRoleDTO dto) {
+        menuService.removeMenuFromRole(dto.getMenuId(), dto.getRoleId());
+        return ResponseEntity.ok(new ApiResponse<>(true, "Menu removed from role successfully", null));
+    }
 }

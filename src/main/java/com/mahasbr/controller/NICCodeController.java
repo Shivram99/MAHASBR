@@ -28,31 +28,31 @@ public class NICCodeController {
     @GetMapping
     public ResponseEntity<ApiResponse<List<NICCodeEntity>>> getAllCodes() {
         List<NICCodeEntity> codes = nicCodeService.getAllCodes();
-        return new ResponseEntity<>(new ApiResponse<>("Codes fetched successfully", codes), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse<>(true,"Codes fetched successfully", codes), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<NICCodeEntity>> getCodeById(@PathVariable Long id) {
         NICCodeEntity code = nicCodeService.getCodeById(id);
-        return new ResponseEntity<>(new ApiResponse<>("Code fetched successfully", code), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse<>(true,"Code fetched successfully", code), HttpStatus.OK);
     }
 
     @PostMapping
     public ResponseEntity<ApiResponse<NICCodeEntity>> createCode(@RequestBody NICCodeEntity nicCodeEntity) {
         NICCodeEntity createdCode = nicCodeService.createCode(nicCodeEntity);
-        return new ResponseEntity<>(new ApiResponse<>("Code created successfully", createdCode), HttpStatus.CREATED);
+        return new ResponseEntity<>(new ApiResponse<>(true,"Code created successfully", createdCode), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<NICCodeEntity>> updateCode(@PathVariable Long id, @RequestBody NICCodeEntity nicCodeEntity) {
         NICCodeEntity updatedCode = nicCodeService.updateCode(id, nicCodeEntity);
-        return new ResponseEntity<>(new ApiResponse<>("Code updated successfully", updatedCode), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse<>(true,"Code updated successfully", updatedCode), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteCode(@PathVariable Long id) {
         nicCodeService.deleteCode(id);
-        return new ResponseEntity<>(new ApiResponse<>("Code deleted successfully", null), HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(new ApiResponse<>(true,"Code deleted successfully", null), HttpStatus.NO_CONTENT);
     }
 }
 

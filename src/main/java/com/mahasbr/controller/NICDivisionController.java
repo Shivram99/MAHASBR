@@ -28,30 +28,30 @@ public class NICDivisionController {
     @GetMapping
     public ResponseEntity<ApiResponse<List<NICDivisionEntity>>> getAllDivisions() {
         List<NICDivisionEntity> divisions = nicDivisionService.getAllDivisions();
-        return new ResponseEntity<>(new ApiResponse<>("Divisions fetched successfully", divisions), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse<>(true,"Divisions fetched successfully", divisions), HttpStatus.OK);
     }
 
     @GetMapping("/{divisionCode}")
     public ResponseEntity<ApiResponse<NICDivisionEntity>> getDivisionByCode(@PathVariable String divisionCode) {
         NICDivisionEntity division = nicDivisionService.getDivisionByCode(divisionCode);
-        return new ResponseEntity<>(new ApiResponse<>("Division fetched successfully", division), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse<>(true,"Division fetched successfully", division), HttpStatus.OK);
     }
 
     @PostMapping
     public ResponseEntity<ApiResponse<NICDivisionEntity>> createDivision(@RequestBody NICDivisionEntity nicDivisionEntity) {
         NICDivisionEntity createdDivision = nicDivisionService.createDivision(nicDivisionEntity);
-        return new ResponseEntity<>(new ApiResponse<>("Division created successfully", createdDivision), HttpStatus.CREATED);
+        return new ResponseEntity<>(new ApiResponse<>(true,"Division created successfully", createdDivision), HttpStatus.CREATED);
     }
 
     @PutMapping("/{divisionCode}")
     public ResponseEntity<ApiResponse<NICDivisionEntity>> updateDivision(@PathVariable String divisionCode, @RequestBody NICDivisionEntity nicDivisionEntity) {
         NICDivisionEntity updatedDivision = nicDivisionService.updateDivision(divisionCode, nicDivisionEntity);
-        return new ResponseEntity<>(new ApiResponse<>("Division updated successfully", updatedDivision), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse<>(true,"Division updated successfully", updatedDivision), HttpStatus.OK);
     }
 
     @DeleteMapping("/{divisionCode}")
     public ResponseEntity<ApiResponse<Void>> deleteDivision(@PathVariable String divisionCode) {
         nicDivisionService.deleteDivision(divisionCode);
-        return new ResponseEntity<>(new ApiResponse<>("Division deleted successfully", null), HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(new ApiResponse<>(true,"Division deleted successfully", null), HttpStatus.NO_CONTENT);
     }
 }

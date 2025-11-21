@@ -28,30 +28,30 @@ public class NICCategoryController {
     @GetMapping
     public ResponseEntity<ApiResponse<List<NICCategoryEntity>>> getAllCategories() {
         List<NICCategoryEntity> categories = nicCategoryService.getAllCategories();
-        return new ResponseEntity<>(new ApiResponse<>("Categories fetched successfully", categories), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse<>(true,"Categories fetched successfully", categories), HttpStatus.OK);
     }
 
     @GetMapping("/{categoryCode}")
     public ResponseEntity<ApiResponse<NICCategoryEntity>> getCategoryByCode(@PathVariable String categoryCode) {
         NICCategoryEntity category = nicCategoryService.getCategoryByCode(categoryCode);
-        return new ResponseEntity<>(new ApiResponse<>("Category fetched successfully", category), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse<>(true,"Category fetched successfully", category), HttpStatus.OK);
     }
 
     @PostMapping
     public ResponseEntity<ApiResponse<NICCategoryEntity>> createCategory(@RequestBody NICCategoryEntity nicCategoryEntity) {
         NICCategoryEntity createdCategory = nicCategoryService.createCategory(nicCategoryEntity);
-        return new ResponseEntity<>(new ApiResponse<>("Category created successfully", createdCategory), HttpStatus.CREATED);
+        return new ResponseEntity<>(new ApiResponse<>(true,"Category created successfully", createdCategory), HttpStatus.CREATED);
     }
 
     @PutMapping("/{categoryCode}")
     public ResponseEntity<ApiResponse<NICCategoryEntity>> updateCategory(@PathVariable String categoryCode, @RequestBody NICCategoryEntity nicCategoryEntity) {
         NICCategoryEntity updatedCategory = nicCategoryService.updateCategory(categoryCode, nicCategoryEntity);
-        return new ResponseEntity<>(new ApiResponse<>("Category updated successfully", updatedCategory), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse<>(true,"Category updated successfully", updatedCategory), HttpStatus.OK);
     }
 
     @DeleteMapping("/{categoryCode}")
     public ResponseEntity<ApiResponse<Void>> deleteCategory(@PathVariable String categoryCode) {
         nicCategoryService.deleteCategory(categoryCode);
-        return new ResponseEntity<>(new ApiResponse<>("Category deleted successfully", null), HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(new ApiResponse<>(true,"Category deleted successfully", null), HttpStatus.NO_CONTENT);
     }
 }

@@ -1,8 +1,10 @@
 package com.mahasbr.service;
 
 import java.security.SecureRandom;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -78,15 +80,27 @@ public class RegistryApiService {
 			// 1️⃣ Get token
 			String token = authService.getToken(config);
 
+			LocalDate from = LocalDate.parse(fromDate);
+		    LocalDate to   = LocalDate.parse(toDate);
+
+		    // Generate all 3-month ranges
+		    Map<LocalDate, LocalDate> ranges = generateDateRanges(from, to);
+		    
 			// 2️⃣ Prepare headers
 			HttpHeaders headers = new HttpHeaders();
 			headers.setContentType(MediaType.APPLICATION_JSON);
 			headers.setBearerAuth(token);
+			for (Map.Entry<LocalDate, LocalDate> entry : ranges.entrySet()) {
 
+		        LocalDate start = entry.getKey();
+		        LocalDate end   = entry.getValue();
+
+		        String startStr = start.toString();
+		        String endStr   = end.toString();
 			// 3️⃣ Prepare request body
 			Map<String, String> requestBody = new HashMap<>();
-			requestBody.put("FromDate", fromDate);
-			requestBody.put("ToDate", toDate);
+			requestBody.put("FromDate", startStr);
+			requestBody.put("ToDate", endStr);
 
 			String jsonBody = objectMapper.writeValueAsString(requestBody);
 
@@ -123,7 +137,7 @@ public class RegistryApiService {
 
 			apiLogService.log(apiName, url, "SUCCESS",
 					String.format("Processed %d records. Saved=%d, Failed=%d", dtos.size(), successCount, failedCount));
-
+			}
 		} catch (Exception e) {
 			apiLogService.log(apiName, url, "FAILURE", e.getMessage());
 			throw new RuntimeException("Error in fetchAndSave for API: " + apiName, e);
@@ -221,7 +235,7 @@ public class RegistryApiService {
 			String apiUrl) {
 		try {
 			MstRegistryFailedEntity failed = new MstRegistryFailedEntity();
-			failed.setRawData(rawData);
+//			failed.setRawData(rawData);
 			failed.setErrorMessage(reason);
 			failed.setApiName(apiName);
 			failed.setApiUrl(apiUrl);
@@ -266,4 +280,23 @@ public class RegistryApiService {
 																											// insensitive
 				.map(Map.Entry::getKey).findFirst().orElse(null); // return null if not found
 	}
+	
+	public Map<LocalDate, LocalDate> generateDateRanges(LocalDate finalFrom, LocalDate finalTo) {
+
+	    Map<LocalDate, LocalDate> map = new LinkedHashMap<>();
+
+	    LocalDate start = LocalDate.of(2020, 1, 1);
+
+	    while (start.isBefore(finalFrom)) {
+	        LocalDate end = start.plusMonths(3).minusDays(1);
+	        map.put(start, end);
+	        start = start.plusMonths(3);
+	    }
+
+	    // Add final custom range
+	    map.put(finalFrom, finalTo);
+
+	    return map;
+	}
+
 }

@@ -21,53 +21,42 @@ import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "menu")
-@Getter
-@Setter
-@NoArgsConstructor
+@Table(name = "menus")
+@Getter @Setter
+@Data
 @AllArgsConstructor
-@Builder
+@NoArgsConstructor
 public class Menu {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "menu_id")
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
     private Menu parent;
-    
-    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @OrderBy("menuOrder ASC")
-    private List<Menu> children = new ArrayList<>();
 
-    @Column(name = "menu_name_en", nullable = false)
+    @Column(nullable = false)
     private String nameEn;
+
+    @Column(nullable = false)
+    private String nameMr;
+
+    private String route;
+    private String icon;
+    private Integer sequence;
+
+    private Boolean active = true;
     
-    @Column(name = "menu_name_mh", nullable = false)
-    private String nameMh;
+    private String menuType;
 
-    @Column(name = "menu_url")
-    private String url;
-
-    @Column(name = "menu_order")
-    private Integer menuOrder;
-    
- // NEW: Many-to-Many with Role
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-        name = "role_menu",
-        joinColumns = @JoinColumn(name = "menu_id"),
-        inverseJoinColumns = @JoinColumn(name = "role_id")
-    )
-    private Set<Role> roles = new HashSet<>();
-
-    @Column(name = "is_active")
-    private Boolean active;
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
+    @OrderBy("sequence ASC")
+    private List<Menu> children = new ArrayList<>();
 }
+

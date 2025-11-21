@@ -9,10 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import com.mahasbr.dto.MstMenuModel;
-import com.mahasbr.dto.MstMenuRoleMappingModel;
-import com.mahasbr.dto.MstRoleModel;
-import com.mahasbr.dto.MstSubMenuModel;
 import com.mahasbr.dto.TopicModel;
 import com.mahasbr.entity.Role;
 import com.mahasbr.repository.CommonHomeMethodsRepo;
@@ -81,94 +77,7 @@ public class CommonHomeMethodsServiceImpl implements CommonHomeMethodsService {
 
 	}
 
-	@Override
-	public List<MstMenuModel> findAllMenu(String language) {
-
-		List<Object[]> lstprop = commonHomeMethodsRepo.findAllMenu();
-		List<MstMenuModel> lstObj = new ArrayList<>();
-		if (!lstprop.isEmpty()) {
-			for (Object[] objLst : lstprop) {
-				MstMenuModel obj = new MstMenuModel();
-				obj.setMenuId(StringHelperUtils.isNullInt(objLst[0]));
-				obj.setMenuCode(StringHelperUtils.isNullInt(objLst[0]));
-				obj.setMenuNameEnglish(StringHelperUtils.isNullString(objLst[2]));
-				obj.setMenuNameMarathi(StringHelperUtils.isNullString(objLst[3]));
-				obj.setIsActive(StringHelperUtils.isNullInt(Integer.parseInt(String.valueOf(objLst[4]))));
-				obj.setIcon(StringHelperUtils.isNullString(objLst[5]));
-				lstObj.add(obj);
-			}
-		}
-		return lstObj;
-	}
-
-	@Override
-	public List<MstRoleModel> findAllRole(String language) {
-
-		List<Object[]> lstprop = commonHomeMethodsRepo.findAllRole();
-		List<MstRoleModel> lstObj = new ArrayList<>();
-		if (!lstprop.isEmpty()) {
-			for (Object[] objLst : lstprop) {
-				MstRoleModel obj = new MstRoleModel();
-				obj.setKey(StringHelperUtils.isNullInt(objLst[0]));
-				obj.setRoleId(StringHelperUtils.isNullInt(objLst[1]));
-				obj.setRoleName(StringHelperUtils.isNullString(objLst[2]));
-				obj.setRoleDesc(StringHelperUtils.isNullString(objLst[3]));
-				obj.setIsActive(StringHelperUtils.isNullInt(Integer.parseInt(String.valueOf(objLst[4]))));
-				lstObj.add(obj);
-			}
-		}
-		return lstObj;
-	}
-
-	@Override
-	public List<MstSubMenuModel> findAllSubMenu(String language) {
-
-		List<Object[]> lstprop = commonHomeMethodsRepo.findAllSubMenu();
-		List<MstSubMenuModel> lstObj = new ArrayList<>();
-		if (!lstprop.isEmpty()) {
-			for (Object[] objLst : lstprop) {
-				MstSubMenuModel obj = new MstSubMenuModel();
-				obj.setSubMenuCode(StringHelperUtils.isNullInt(objLst[0]));
-				obj.setSubMenuId(StringHelperUtils.isNullInt(objLst[0])); // key for edit sub menu
-				obj.setRoleName(StringHelperUtils.isNullString(objLst[1]));
-				obj.setMenuName(StringHelperUtils.isNullString(objLst[2]));
-				obj.setSubMenuEnglish(StringHelperUtils.isNullString(objLst[3]));
-				obj.setSubMenuMarathi(StringHelperUtils.isNullString(objLst[4]));
-				obj.setControllerName(StringHelperUtils.isNullString(objLst[5]));
-				obj.setLinkName(StringHelperUtils.isNullString(objLst[6]));
-				obj.setIsActive(StringHelperUtils.isNullInt(Integer.parseInt(String.valueOf(objLst[7]))));
-				obj.setMenuCode(StringHelperUtils.isNullInt(objLst[8]));
-				obj.setRoleId(StringHelperUtils.isNullInt(objLst[9]));
-				obj.setIcon(StringHelperUtils.isNullString(objLst[10]));
-				lstObj.add(obj);
-			}
-		}
-		return lstObj;
-	}
-
-	@Override
-	public List<MstMenuRoleMappingModel> findAllMenuRoleMapping(String language) {
-
-		List<Object[]> lstprop = commonHomeMethodsRepo.findAllMenuRoleMapping();
-		List<MstMenuRoleMappingModel> lstObj = new ArrayList<>();
-		if (!lstprop.isEmpty()) {
-			for (Object[] objLst : lstprop) {
-				MstMenuRoleMappingModel obj = new MstMenuRoleMappingModel();
-				obj.setMenuMapId(StringHelperUtils.isNullInt(objLst[0]));
-				if (language.equals("en")) {
-					obj.setMenuName(StringHelperUtils.isNullString(objLst[1]));
-				} else {
-					obj.setMenuName(StringHelperUtils.isNullString(objLst[2]));
-				}
-				obj.setRoleName(StringHelperUtils.isNullString(objLst[3]));
-				obj.setIsActive(StringHelperUtils.isNullInt(Integer.parseInt(String.valueOf(objLst[4]))));
-				obj.setMenuCode(StringHelperUtils.isNullInt(objLst[5]));
-				obj.setRoleId(StringHelperUtils.isNullInt(objLst[6]));
-				lstObj.add(obj);
-			}
-		}
-		return lstObj;
-	}
+	
 
 //	@Override
 //	public List<MstRoleEntity> findAllRole() {

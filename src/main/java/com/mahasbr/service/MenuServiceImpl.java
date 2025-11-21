@@ -1,89 +1,220 @@
 package com.mahasbr.service;
-import java.util.List;
-import java.util.stream.Collectors;
 
+import java.util.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import com.mahasbr.dto.MenuRequestDto;
-import com.mahasbr.dto.MenuResponseDto;
-import com.mahasbr.entity.MstMenuEntity;
-import com.mahasbr.repository.MstMenuRepository;
-
-import jakarta.persistence.EntityNotFoundException;
-import lombok.RequiredArgsConstructor;
+import com.mahasbr.dto.MenuCreateDTO;
+import com.mahasbr.dto.MenuDTO;
+import com.mahasbr.entity.Menu;
+import com.mahasbr.entity.Role;
+import com.mahasbr.entity.RoleMenu;
+import com.mahasbr.mapper.MenuMapper;
+import com.mahasbr.model.ERole;
+import com.mahasbr.repository.MenuRepository;
+import com.mahasbr.repository.RoleMenuRepository;
+import com.mahasbr.repository.RoleRepository;
 
 @Service
-@RequiredArgsConstructor
+@Transactional
 public class MenuServiceImpl implements MenuService {
 
- private final MstMenuRepository menuRepository;
+    private final MenuRepository menuRepository;
+    private final RoleRepository roleRepository;
+    private final RoleMenuRepository roleMenuRepository;
+    private final MenuMapper mapper;
 
- @Override
- public MenuResponseDto createMenu(MenuRequestDto dto) {
-     if (menuRepository.existsByMenuCode(dto.getMenuCode())) {
-         throw new IllegalArgumentException("Menu code already exists");
-     }
-     MstMenuEntity entity = mapToEntity(dto);
-     MstMenuEntity saved = menuRepository.save(entity);
-     return mapToResponse(saved);
- }
+    public MenuServiceImpl(MenuRepository menuRepository,
+                           RoleRepository roleRepository,
+                           RoleMenuRepository roleMenuRepository,
+                           MenuMapper mapper) {
+        this.menuRepository = menuRepository;
+        this.roleRepository = roleRepository;
+        this.roleMenuRepository = roleMenuRepository;
+        this.mapper = mapper;
+    }
 
- @Override
- public MenuResponseDto updateMenu(Integer id, MenuRequestDto dto) {
-     MstMenuEntity entity = menuRepository.findById(id)
-             .orElseThrow(() -> new EntityNotFoundException("Menu not found with id " + id));
+    /* =====================================================
+       GET ALL MENUS – FULL TREE
+       ===================================================== */
+    @Override
+    public List<MenuDTO> getAllMenus() {
+        List<Menu> rootMenus = menuRepository.findByParentIsNullAndActiveTrueOrderBySequenceAsc();
+        return rootMenus.stream()
+                .map(this::convertRecursive)
+                .toList();
+    }
 
-     entity.setMenuCode(dto.getMenuCode());
-     entity.setMenu_name_english(dto.getMenuNameEnglish());
-     entity.setMenu_name_marathi(dto.getMenuNameMarathi());
-     entity.setIs_active(dto.getIsActive());
-     entity.setIcon(dto.getIcon());
+    private MenuDTO convertRecursive(Menu menu) {
+        MenuDTO dto = mapper.toDto(menu);
 
-     return mapToResponse(menuRepository.save(entity));
- }
+        menu.getChildren().stream()
+                .filter(Menu::getActive)
+                .sorted(Comparator.comparing(Menu::getSequence))
+                .forEach(child -> dto.getChildren().add(convertRecursive(child)));
 
- @Override
- public MenuResponseDto getMenuById(Integer id) {
-     MstMenuEntity entity = menuRepository.findById(id)
-             .orElseThrow(() -> new EntityNotFoundException("Menu not found with id " + id));
-     return mapToResponse(entity);
- }
+        return dto;
+    }
 
- @Override
- public List<MenuResponseDto> getAllMenus() {
-     return menuRepository.findAll()
-             .stream()
-             .map(this::mapToResponse)
-             .collect(Collectors.toList());
- }
+    @Override
+    public MenuDTO getMenuById(Long id) {
+        return mapper.toDto(
+                menuRepository.findById(id)
+                        .orElseThrow(() -> new NoSuchElementException("Menu not found"))
+        );
+    }
 
+    /* =====================================================
+       CREATE MENU
+       ===================================================== */
+    @Override
+    public MenuDTO createMenu(MenuCreateDTO dto) {
 
- @Override
- public void deleteMenu(Integer id) {
-     if (!menuRepository.existsById(id)) {
-         throw new EntityNotFoundException("Menu not found with id " + id);
-     }
-     menuRepository.deleteById(id);
- }
+        Menu menu = new Menu();
 
- private MstMenuEntity mapToEntity(MenuRequestDto dto) {
-     MstMenuEntity entity = new MstMenuEntity();
-     entity.setMenuCode(dto.getMenuCode());
-     entity.setMenu_name_english(dto.getMenuNameEnglish());
-     entity.setMenu_name_marathi(dto.getMenuNameMarathi());
-     entity.setIs_active(dto.getIsActive());
-     entity.setIcon(dto.getIcon());
-     return entity;
- }
+        // Parent handling
+        if (dto.getParentId() != null) {
+            Menu parent = menuRepository.findById(dto.getParentId())
+                    .orElseThrow(() -> new NoSuchElementException("Parent menu not found"));
+            menu.setParent(parent);
+        } else {
+            menu.setParent(null);
+        }
 
- private MenuResponseDto mapToResponse(MstMenuEntity entity) {
-     return new MenuResponseDto(
-             entity.getMenuId(),
-             entity.getMenuCode(),
-             entity.getMenu_name_english(),
-             entity.getMenu_name_marathi(),
-             entity.getIs_active(),
-             entity.getIcon()
-     );
- }
+        menu.setNameEn(dto.getNameEn());
+        menu.setNameMr(dto.getNameMr());
+        menu.setRoute(dto.getRoute());
+        menu.setIcon(dto.getIcon());
+        menu.setMenuType(dto.getMenuType());
+        menu.setSequence(dto.getSequence());
+        menu.setActive(dto.getActive() != null ? dto.getActive() : true);
+
+        return mapper.toDto(menuRepository.save(menu));
+    }
+
+    /* =====================================================
+       UPDATE MENU
+       ===================================================== */
+    @Override
+    public MenuDTO updateMenu(Long id, MenuCreateDTO dto) {
+
+        Menu menu = menuRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Menu not found"));
+
+        /* -----------------------------------------------
+           HANDLE PARENT CHANGE (remove / update / validate)
+           ----------------------------------------------- */
+        if (dto.getParentId() == null) {
+            // Remove parent
+            menu.setParent(null);
+
+        } else {
+
+            if (Objects.equals(dto.getParentId(), id)) {
+                throw new IllegalArgumentException("A menu cannot be its own parent");
+            }
+
+            // Prevent cycle: don't allow a descendant to be assigned as parent
+            if (isDescendant(id, dto.getParentId())) {
+                throw new IllegalArgumentException("Cannot assign a descendant as parent (cyclic hierarchy)");
+            }
+
+            Menu parent = menuRepository.findById(dto.getParentId())
+                    .orElseThrow(() -> new NoSuchElementException("Parent menu not found"));
+
+            menu.setParent(parent);
+        }
+
+        // Update normal fields
+        menu.setNameEn(dto.getNameEn());
+        menu.setNameMr(dto.getNameMr());
+        menu.setRoute(dto.getRoute());
+        menu.setIcon(dto.getIcon());
+        menu.setSequence(dto.getSequence());
+        menu.setActive(dto.getActive());
+
+        return mapper.toDto(menuRepository.save(menu));
+    }
+
+    /* =====================================================
+       HELPER – CHECK CYCLIC ASSIGNMENT
+       ===================================================== */
+    private boolean isDescendant(Long menuId, Long supposedParentId) {
+
+        List<Menu> children = menuRepository.findChildren(menuId);
+
+        for (Menu child : children) {
+            if (Objects.equals(child.getId(), supposedParentId)) {
+                return true; // cycle found
+            }
+            if (isDescendant(child.getId(), supposedParentId)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /* =====================================================
+       DELETE MENU
+       ===================================================== */
+    @Override
+    public void deleteMenu(Long id) {
+        if (!menuRepository.existsById(id)) {
+            throw new NoSuchElementException("Menu not found");
+        }
+        menuRepository.deleteById(id);
+    }
+
+    /* =====================================================
+       ROLE → MENU MAPPING
+       ===================================================== */
+    @Override
+    public List<MenuDTO> getMenusForRole(ERole role) {
+        List<Menu> flatMenus = menuRepository.findMenusByRole(role);
+        return buildTree(flatMenus);
+    }
+
+    private List<MenuDTO> buildTree(List<Menu> flat) {
+
+        Map<Long, MenuDTO> map = new HashMap<>();
+        List<MenuDTO> roots = new ArrayList<>();
+
+        flat.forEach(m -> map.put(m.getId(), mapper.toDto(m)));
+
+        for (Menu menu : flat) {
+            if (menu.getParent() == null) {
+                roots.add(map.get(menu.getId()));
+            } else {
+                MenuDTO parent = map.get(menu.getParent().getId());
+                parent.getChildren().add(map.get(menu.getId()));
+            }
+        }
+
+        roots.sort(Comparator.comparing(MenuDTO::getSequence));
+        return roots;
+    }
+
+    /* =====================================================
+       ROLE MENU ASSIGNMENT
+       ===================================================== */
+    @Override
+    public void assignMenuToRole(Long menuId, Long roleId) {
+
+        Role role = roleRepository.findById(roleId)
+                .orElseThrow(() -> new NoSuchElementException("Role not found"));
+
+        Menu menu = menuRepository.findById(menuId)
+                .orElseThrow(() -> new NoSuchElementException("Menu not found"));
+
+        RoleMenu rm = new RoleMenu();
+        rm.setRole(role);
+        rm.setMenu(menu);
+
+        roleMenuRepository.save(rm);
+    }
+
+    @Override
+    public void removeMenuFromRole(Long menuId, Long roleId) {
+//        roleMenuRepository.deleteByRole_IdAndMenu_IdIn(roleId, menuId);
+    }
 }

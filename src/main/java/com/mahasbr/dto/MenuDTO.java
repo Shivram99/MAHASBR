@@ -1,26 +1,23 @@
 package com.mahasbr.dto;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 public class MenuDTO {
 	private Long id;
 	private String nameEn;
-	private String nameMh;
-	private String url;
-	private Integer menuOrder;
+	private String nameMr;
+	private String route;
+	private String icon;
+	private Integer sequence;
 	private Boolean active;
-	private Long parentId;
-	private List<Long> roleIds; // NEW FIELD
-	private List<MenuDTO> children;
+	private Long parentId;    
+	private List<MenuDTO> children = new ArrayList<>();
 }

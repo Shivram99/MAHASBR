@@ -2,6 +2,7 @@ package com.mahasbr.exception;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,57 +18,73 @@ import jakarta.persistence.EntityNotFoundException;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-	/*
-	 * @ExceptionHandler(IllegalArgumentException.class) public
-	 * ResponseEntity<String> handleIllegalArgument(IllegalArgumentException ex) {
-	 * return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage()); }
-	 */
+    /* ================================
+          RESOURCE NOT FOUND (404)
+       ================================ */
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ApiResponse<Void>> handleResourceNotFound(ResourceNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new ApiResponse<>(false, ex.getMessage(), null));
+    }
 
-	@ExceptionHandler(ResourceNotFoundException.class)
-	public ResponseEntity<ApiResponse<Void>> handleResourceNotFoundException(ResourceNotFoundException ex) {
-		ApiResponse<Void> response = new ApiResponse<>(ex.getMessage(), null);
-		return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-	}
+    @ExceptionHandler(NoSuchElementException.class)
+    public ResponseEntity<ApiResponse<Void>> handleNoSuchElement(NoSuchElementException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new ApiResponse<>(false, ex.getMessage(), null));
+    }
 
-	@ExceptionHandler(ResourceAlreadyExistsException.class)
-	public ResponseEntity<ApiResponse<Void>> handleResourceAlreadyExistsException(ResourceAlreadyExistsException ex) {
-		ApiResponse<Void> response = new ApiResponse<>(ex.getMessage(), null);
-		return new ResponseEntity<>(response, HttpStatus.CONFLICT);
-	}
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<ApiResponse<Void>> handleEntityNotFound(EntityNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new ApiResponse<>(false, ex.getMessage(), null));
+    }
 
-	@ExceptionHandler(Exception.class)
-	public ResponseEntity<ApiResponse<Void>> handleGlobalException(Exception ex) {
-		ApiResponse<Void> response = new ApiResponse<>("An unexpected error occurred", null);
-		return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-	}
 
-	@ExceptionHandler(EntityNotFoundException.class)
-	public ResponseEntity<Map<String, String>> handleEntityNotFound(EntityNotFoundException ex) {
-		Map<String, String> error = new HashMap<>();
-		error.put("error", ex.getMessage());
-		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
-	}
+    /* ================================
+          RESOURCE ALREADY EXISTS (409)
+       ================================ */
+    @ExceptionHandler(ResourceAlreadyExistsException.class)
+    public ResponseEntity<ApiResponse<Void>> handleAlreadyExists(ResourceAlreadyExistsException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(new ApiResponse<>(false, ex.getMessage(), null));
+    }
 
-//    @ExceptionHandler(MethodArgumentNotValidException.class)
-//    public ResponseEntity<Map<String, String>> handleValidationErrors(MethodArgumentNotValidException ex) {
-//        Map<String, String> errors = new HashMap<>();
-//        ex.getBindingResult().getFieldErrors().forEach(err -> errors.put(err.getField(), err.getDefaultMessage()));
-//        return ResponseEntity.badRequest().body(errors);
-//    }
 
-	@ExceptionHandler(IllegalArgumentException.class)
-	public ResponseEntity<Map<String, String>> handleIllegalArgument(IllegalArgumentException ex) {
-		Map<String, String> error = new HashMap<>();
-		error.put("error", ex.getMessage());
-		return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
-	}
-	@ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<?> handleValidationErrors(MethodArgumentNotValidException ex) {
+    /* ================================
+          BAD REQUEST (400)
+       ================================ */
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ApiResponse<Void>> handleIllegalArgument(IllegalArgumentException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ApiResponse<>(false, ex.getMessage(), null));
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ApiResponse<Map<String, String>>> handleValidationErrors(MethodArgumentNotValidException ex) {
+
         Map<String, String> errors = new HashMap<>();
-        ex.getBindingResult().getFieldErrors().forEach(err ->
-            errors.put(err.getField(), err.getDefaultMessage())
-        );
-        return new ResponseEntity<>(Map.of("validationErrors", errors), HttpStatus.BAD_REQUEST);
+        ex.getBindingResult()
+                .getFieldErrors()
+                .forEach(err -> errors.put(err.getField(), err.getDefaultMessage()));
+
+        ApiResponse<Map<String, String>> response =
+                new ApiResponse<>(false, "Validation failed", errors);
+
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+
+    /* ================================
+              INTERNAL SERVER ERROR (500)
+       ================================ */
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiResponse<Void>> handleGlobal(Exception ex) {
+
+        ex.printStackTrace(); // for debugging/logging only
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ApiResponse<>(false, "An unexpected error occurred", null));
     }
 }
+
 

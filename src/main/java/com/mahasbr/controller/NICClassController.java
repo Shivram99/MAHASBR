@@ -28,30 +28,30 @@ public class NICClassController {
     @GetMapping
     public ResponseEntity<ApiResponse<List<NICClassEntity>>> getAllClasses() {
         List<NICClassEntity> classes = nicClassService.getAllClasses();
-        return new ResponseEntity<>(new ApiResponse<>("Classes fetched successfully", classes), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse<>(true,"Classes fetched successfully", classes), HttpStatus.OK);
     }
 
     @GetMapping("/{classCode}")
     public ResponseEntity<ApiResponse<NICClassEntity>> getClassByCode(@PathVariable String classCode) {
         NICClassEntity nicClass = nicClassService.getClassByCode(classCode);
-        return new ResponseEntity<>(new ApiResponse<>("Class fetched successfully", nicClass), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse<>(true,"Class fetched successfully", nicClass), HttpStatus.OK);
     }
 
     @PostMapping
     public ResponseEntity<ApiResponse<NICClassEntity>> createClass(@RequestBody NICClassEntity nicClassEntity) {
         NICClassEntity createdClass = nicClassService.createClass(nicClassEntity);
-        return new ResponseEntity<>(new ApiResponse<>("Class created successfully", createdClass), HttpStatus.CREATED);
+        return new ResponseEntity<>(new ApiResponse<>(true,"Class created successfully", createdClass), HttpStatus.CREATED);
     }
 
     @PutMapping("/{classCode}")
     public ResponseEntity<ApiResponse<NICClassEntity>> updateClass(@PathVariable String classCode, @RequestBody NICClassEntity nicClassEntity) {
         NICClassEntity updatedClass = nicClassService.updateClass(classCode, nicClassEntity);
-        return new ResponseEntity<>(new ApiResponse<>("Class updated successfully", updatedClass), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse<>(true,"Class updated successfully", updatedClass), HttpStatus.OK);
     }
 
     @DeleteMapping("/{classCode}")
     public ResponseEntity<ApiResponse<Void>> deleteClass(@PathVariable String classCode) {
         nicClassService.deleteClass(classCode);
-        return new ResponseEntity<>(new ApiResponse<>("Class deleted successfully", null), HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(new ApiResponse<>(true,"Class deleted successfully", null), HttpStatus.NO_CONTENT);
     }
 }

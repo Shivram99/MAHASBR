@@ -4,6 +4,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.mahasbr.entity.MstSubMenuEntity;
 
-public interface MstSubMenuRepository extends JpaRepository<MstSubMenuEntity, Integer> {
- boolean existsBySubMenuCode(Integer subMenuCode); // To prevent duplicates
+public interface MstSubMenuRepository  {
+// boolean existsBySubMenuCode(Integer subMenuCode); // To prevent duplicates
 }

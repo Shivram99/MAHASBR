@@ -28,30 +28,30 @@ public class NICGroupController {
     @GetMapping
     public ResponseEntity<ApiResponse<List<NICGroupEntity>>> getAllGroups() {
         List<NICGroupEntity> groups = nicGroupService.getAllGroups();
-        return new ResponseEntity<>(new ApiResponse<>("Groups fetched successfully", groups), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse<>(true,"Groups fetched successfully", groups), HttpStatus.OK);
     }
 
     @GetMapping("/{groupCode}")
     public ResponseEntity<ApiResponse<NICGroupEntity>> getGroupByCode(@PathVariable String groupCode) {
         NICGroupEntity group = nicGroupService.getGroupByCode(groupCode);
-        return new ResponseEntity<>(new ApiResponse<>("Group fetched successfully", group), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse<>(true,"Group fetched successfully", group), HttpStatus.OK);
     }
 
     @PostMapping
     public ResponseEntity<ApiResponse<NICGroupEntity>> createGroup(@RequestBody NICGroupEntity nicGroupEntity) {
         NICGroupEntity createdGroup = nicGroupService.createGroup(nicGroupEntity);
-        return new ResponseEntity<>(new ApiResponse<>("Group created successfully", createdGroup), HttpStatus.CREATED);
+        return new ResponseEntity<>(new ApiResponse<>(true,"Group created successfully", createdGroup), HttpStatus.CREATED);
     }
 
     @PutMapping("/{groupCode}")
     public ResponseEntity<ApiResponse<NICGroupEntity>> updateGroup(@PathVariable String groupCode, @RequestBody NICGroupEntity nicGroupEntity) {
         NICGroupEntity updatedGroup = nicGroupService.updateGroup(groupCode, nicGroupEntity);
-        return new ResponseEntity<>(new ApiResponse<>("Group updated successfully", updatedGroup), HttpStatus.OK);
+        return new ResponseEntity<>(new ApiResponse<>(true,"Group updated successfully", updatedGroup), HttpStatus.OK);
     }
 
     @DeleteMapping("/{groupCode}")
     public ResponseEntity<ApiResponse<Void>> deleteGroup(@PathVariable String groupCode) {
         nicGroupService.deleteGroup(groupCode);
-        return new ResponseEntity<>(new ApiResponse<>("Group deleted successfully", null), HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(new ApiResponse<>(true,"Group deleted successfully", null), HttpStatus.NO_CONTENT);
     }
 }

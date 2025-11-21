@@ -10,7 +10,16 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString
 public class ApiResponse<T> {
-    private String message;
-    private T data;
+	private boolean success;
+	private String message;
+	private T data;
+	
+	public static <T> ApiResponse<T> ok(T data, String message) {
+		return new ApiResponse<>(true, message, data);
+	}
+
+	public static <T> ApiResponse<T> fail(String message) {
+		return new ApiResponse<>(false, message, null);
+	}
 
 }
