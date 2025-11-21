@@ -105,34 +105,15 @@ public class RegistryApiService {
 			// 1️⃣ Get token
 			String token = authService.getToken(config);
 
-			LocalDate from = LocalDate.parse(fromDate);
-		    LocalDate to   = LocalDate.parse(toDate);
-
-		    // Generate all 3-month ranges
-		    Map<LocalDate, LocalDate> ranges = generateDateRanges(from, to);
-		    
 			// 2️⃣ Prepare headers
 			HttpHeaders headers = new HttpHeaders();
 			headers.setContentType(MediaType.APPLICATION_JSON);
 			headers.setBearerAuth(token);
-			for (Map.Entry<LocalDate, LocalDate> entry : ranges.entrySet()) {
 
-<<<<<<< HEAD
-		        LocalDate start = entry.getKey();
-		        LocalDate end   = entry.getValue();
-
-		        String startStr = start.toString();
-		        String endStr   = end.toString();
-			// 3️⃣ Prepare request body
-			Map<String, String> requestBody = new HashMap<>();
-			requestBody.put("FromDate", startStr);
-			requestBody.put("ToDate", endStr);
-=======
 			// 3️⃣ Iterate over each month
 			for (Map.Entry<String, String> entry : dateMap.entrySet()) {
 				String fromDate = entry.getKey();
 				String toDate = entry.getValue();
->>>>>>> 0818d6c7ae9c5755ca54d22e21567c36c6deba23
 
 				// 4️⃣ Prepare request body
 				Map<String, String> requestBody = new HashMap<>();
@@ -152,11 +133,6 @@ public class RegistryApiService {
 					continue;
 				}
 
-<<<<<<< HEAD
-			apiLogService.log(apiName, url, "SUCCESS",
-					String.format("Processed %d records. Saved=%d, Failed=%d", dtos.size(), successCount, failedCount));
-			}
-=======
 				// 6️⃣ Parse JSON into DTOs
 				List<MstRegistryDetailsPagesDTO> dtos = objectMapper.readValue(response,
 						new TypeReference<List<MstRegistryDetailsPagesDTO>>() {
@@ -180,7 +156,6 @@ public class RegistryApiService {
 								toDate, successCount, failedCount));
 			}
 
->>>>>>> 0818d6c7ae9c5755ca54d22e21567c36c6deba23
 		} catch (Exception e) {
 			apiLogService.log(apiName, url, "FAILURE", e.getMessage());
 			throw new RuntimeException("Error in fetchAndSave for API: " + apiName, e);
@@ -278,11 +253,7 @@ public class RegistryApiService {
 			String apiUrl) {
 		try {
 			MstRegistryFailedEntity failed = new MstRegistryFailedEntity();
-<<<<<<< HEAD
-//			failed.setRawData(rawData);
-=======
 			//failed.setRawData(rawData);
->>>>>>> 0818d6c7ae9c5755ca54d22e21567c36c6deba23
 			failed.setErrorMessage(reason);
 			failed.setApiName(apiName);
 			failed.setApiUrl(apiUrl);
@@ -327,23 +298,4 @@ public class RegistryApiService {
 																											// insensitive
 				.map(Map.Entry::getKey).findFirst().orElse(null); // return null if not found
 	}
-	
-	public Map<LocalDate, LocalDate> generateDateRanges(LocalDate finalFrom, LocalDate finalTo) {
-
-	    Map<LocalDate, LocalDate> map = new LinkedHashMap<>();
-
-	    LocalDate start = LocalDate.of(2020, 1, 1);
-
-	    while (start.isBefore(finalFrom)) {
-	        LocalDate end = start.plusMonths(3).minusDays(1);
-	        map.put(start, end);
-	        start = start.plusMonths(3);
-	    }
-
-	    // Add final custom range
-	    map.put(finalFrom, finalTo);
-
-	    return map;
-	}
-
 }

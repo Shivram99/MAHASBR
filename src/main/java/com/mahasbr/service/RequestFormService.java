@@ -1,6 +1,7 @@
 package com.mahasbr.service;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.mahasbr.dto.RequestFormDTO;
 import com.mahasbr.entity.RequestFormEntity;
+import com.mahasbr.mapper.RequestFormMapper;
 import com.mahasbr.repository.RequestFormRepository;
 
 @Service
@@ -15,6 +17,9 @@ public class RequestFormService {
 	
 	@Autowired
 	RequestFormRepository requestFormRepository;
+	
+	@Autowired
+	RequestFormMapper requestFormMapper;
 	
 	public String saveRequest(RequestFormDTO request) {
 
@@ -25,6 +30,7 @@ public class RequestFormService {
 	            .name(request.getName())
 	            .email(request.getEmail())
 	            .mobile(request.getMobile())
+	            .district(request.getDistrict())
 	            .message(request.getMessage())
 	            .build();
 
@@ -37,6 +43,10 @@ public class RequestFormService {
 	        String date = LocalDate.now().toString().replace("-", "");
 	        String random = UUID.randomUUID().toString().substring(0, 6).toUpperCase();
 	        return "REQ-" + date + "-" + random;
+	    }
+
+	 public List<RequestFormDTO> getAllRequests() {
+	        return requestFormMapper.toDTOList(requestFormRepository.findAll());
 	    }
 
 }

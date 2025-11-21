@@ -31,6 +31,8 @@ public class RequestFormEntity {
     private String name;
     private String email;
     private String mobile;
+    
+    private String district;
 
     @Column(length = 5000)
     private String message;

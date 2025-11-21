@@ -34,5 +34,7 @@ public class RequestFormDTO {
 	    @NotBlank(message = "Message is required")
 	    @Size(max = 5000, message = "Message must be under 5000 characters")
 	    private String message;
+	    
+	    private String requestId;
 
 }

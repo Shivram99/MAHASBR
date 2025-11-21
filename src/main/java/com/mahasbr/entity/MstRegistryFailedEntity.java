@@ -23,13 +23,6 @@ public class MstRegistryFailedEntity extends Auditable {
     @Column(name = "id", nullable = false, updatable = false)
     private Long id;
 
-<<<<<<< HEAD
-//    @Lob
-//    @Column(name = "raw_data", columnDefinition = "CLOB")
-//    private String rawData;  // Full API JSON
-
-=======
->>>>>>> 0818d6c7ae9c5755ca54d22e21567c36c6deba23
     @Column(name = "error_message" )
     private String errorMessage;  // Reason for failure
 
