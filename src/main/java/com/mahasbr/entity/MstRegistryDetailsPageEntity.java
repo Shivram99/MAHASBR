@@ -39,8 +39,7 @@ public class MstRegistryDetailsPageEntity extends Auditable {
 	@EqualsAndHashCode.Include
 	private Long siNo;
 
-	@Size(max = 100)
-	@Column(name = "establishment_or_owner_name", length = 100)
+	@Column(name = "establishment_or_owner_name")
 	private String nameOfEstablishmentOrOwner;
 
 	@Size(max = 500)

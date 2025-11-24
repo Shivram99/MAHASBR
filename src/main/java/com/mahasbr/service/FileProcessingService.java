@@ -8,7 +8,9 @@ import org.springframework.web.multipart.MultipartFile;
 import com.mahasbr.dto.RegistryRowDTO;
 
 public interface FileProcessingService {
-  List<RegistryRowDTO> parseForPreview(MultipartFile file) throws Exception;
-  void processAndSave(MultipartFile file, String fileId) throws Exception;
-  void saveRows(List<Map<String,String>> rows) throws Exception;
+	List<RegistryRowDTO> parseForPreview(MultipartFile file) throws Exception;
+
+	void saveRows(List<Map<String, String>> rows) throws Exception;
+
+	void processAndSave(byte[] bytes, String fileId, String originalFilename);
 }

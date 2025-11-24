@@ -139,7 +139,7 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
 				.authorizeHttpRequests(auth -> auth.requestMatchers("/api/auth/signin", "/citizenSearch/**").permitAll()
 						.requestMatchers("/api/auth/signup").permitAll().requestMatchers("/api/test/**").permitAll()
 						.requestMatchers("/common/api**").permitAll()
-						.requestMatchers("/api/progress/**").permitAll() 
+						.requestMatchers("/api/auth/progress/**").permitAll() 
 						.requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
 						.requestMatchers(" /common/department**").permitAll().requestMatchers("/admin/**").permitAll()
 						.requestMatchers("/moderator/**").hasRole("MODERATOR").requestMatchers("/developer/**")

@@ -12,7 +12,7 @@ import com.mahasbr.util.UploadProgressStore;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/progress")
+@RequestMapping("/api/auth/progress")
 @RequiredArgsConstructor
 public class ProgressSseController {
 
