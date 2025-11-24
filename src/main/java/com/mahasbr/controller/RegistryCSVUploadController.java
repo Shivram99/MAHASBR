@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -28,6 +30,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.mahasbr.dto.PreviewResponse;
+import com.mahasbr.dto.RegistryRowDTO;
 import com.mahasbr.entity.ConcernRegistryDetailsPageEntity;
 import com.mahasbr.entity.DistrictMaster;
 import com.mahasbr.entity.DuplicateRegistryDetailsPageEntity;
@@ -37,8 +41,10 @@ import com.mahasbr.response.ExcelFileUpaloadResult;
 import com.mahasbr.service.ConcernRegistryDetailsPageService;
 import com.mahasbr.service.DistrictMasterService;
 import com.mahasbr.service.DuplicateRegistryDetailsPageService;
+import com.mahasbr.service.FileProcessingService;
 import com.mahasbr.service.FileStorageService;
 import com.mahasbr.service.MstRegistryDetailsPageService;
+import com.mahasbr.util.UploadProgressStore;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -59,9 +65,6 @@ public class RegistryCSVUploadController {
 	@Autowired
 	private DistrictMasterService districtservice;
 
-	public RegistryCSVUploadController(FileStorageService service) {
-		this.service = service;
-	}
 
 	@GetMapping("/registoryData")
 	public ResponseEntity<Page<MstRegistryDetailsPageEntity>> getMasterRegistoryDetails(
@@ -158,7 +161,7 @@ public class RegistryCSVUploadController {
 		}
 	}
 
-	@PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	@PostMapping(value = "/upload1", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<?> uploadFiles(@RequestParam("files") List<MultipartFile> files) {
 		if (files == null || files.isEmpty()) {
 			return ResponseEntity.badRequest().body(Map.of("error", "No files provided"));
@@ -181,4 +184,39 @@ public class RegistryCSVUploadController {
 //		return ResponseEntity.ok(districtservice.findByIsActiveTrue());
 		return ResponseEntity.ok(districtservice.findByIsActiveTrueBasedOnlogin());
 	}
+	
+	@Autowired
+	 private  FileProcessingService service1;
+	
+	@Autowired
+	private UploadProgressStore progressStore;
+
+	  @PostMapping(value="/preview", consumes=MediaType.MULTIPART_FORM_DATA_VALUE)
+	  public ResponseEntity<PreviewResponse> preview(@RequestParam("file") MultipartFile file) throws Exception {
+	    List<RegistryRowDTO> rows = service1.parseForPreview(file);
+	    PreviewResponse resp = PreviewResponse.builder()
+	            .fileId(UUID.randomUUID().toString())
+	            .fileName(Optional.ofNullable(file.getOriginalFilename()).orElse("unknown"))
+	            .rows(rows)
+	            .build();
+	    return ResponseEntity.ok(resp);
+	  }
+
+	  @PostMapping(value="/upload", consumes=MediaType.MULTIPART_FORM_DATA_VALUE)
+	  public ResponseEntity<?> upload(@RequestParam("files") List<MultipartFile> files) throws Exception {
+	    List<Map<String,String>> out = new ArrayList<>();
+	    for (MultipartFile f : files) {
+	      String fileId = UUID.randomUUID().toString();
+	      progressStore.set(fileId, 0);
+	      service1.processAndSave(f, fileId); // async
+	      out.add(Map.of("fileId", fileId, "fileName", Optional.ofNullable(f.getOriginalFilename()).orElse("file")));
+	    }
+	    return ResponseEntity.ok(Map.of("files", out));
+	  }
+
+	  @PostMapping("/save")
+	  public ResponseEntity<?> save(@RequestBody List<Map<String,String>> rows) throws Exception {
+		  service1.saveRows(rows);
+	    return ResponseEntity.ok(Map.of("message","saved"));
+	  }
 }
