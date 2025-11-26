@@ -12,8 +12,8 @@ public class MultipartConfiguration {
     @Bean
     public jakarta.servlet.MultipartConfigElement multipartConfigElement() {
         MultipartConfigFactory factory = new MultipartConfigFactory();
-        factory.setMaxFileSize(DataSize.ofMegabytes(10)); // 10MB
-        factory.setMaxRequestSize(DataSize.ofMegabytes(10)); // 10MB
+        factory.setMaxFileSize(DataSize.ofMegabytes(10000)); // 10MB
+        factory.setMaxRequestSize(DataSize.ofMegabytes(10000)); // 10MB
         return factory.createMultipartConfig();
     }
     

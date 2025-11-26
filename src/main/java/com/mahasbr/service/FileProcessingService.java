@@ -3,6 +3,7 @@ package com.mahasbr.service;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.security.core.Authentication;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.mahasbr.dto.RegistryRowDTO;
@@ -12,5 +13,5 @@ public interface FileProcessingService {
 
 	void saveRows(List<Map<String, String>> rows) throws Exception;
 
-	void processAndSave(byte[] bytes, String fileId, String originalFilename);
+	void processAndSave(byte[] bytes, String fileId, String originalFilename,Authentication authentication   );
 }

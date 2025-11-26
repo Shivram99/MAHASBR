@@ -4,29 +4,43 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.mahasbr.dto.RegistryRowDTO;
+import com.mahasbr.dto.UploadResultRecordes;
+import com.mahasbr.entity.CensusEntity;
 import com.mahasbr.entity.MstRegistryDetailsPageEntity;
+import com.mahasbr.entity.TalukaMaster;
+import com.mahasbr.entity.User;
+import com.mahasbr.entity.VillageMaster;
 import com.mahasbr.mapper.RegistryMapper;
+import com.mahasbr.repository.CensusEntityRepository;
+import com.mahasbr.repository.DistrictMasterRepository;
 import com.mahasbr.repository.MstRegistryDetailsPageRepository;
+import com.mahasbr.repository.TalukaMasterRepository;
+import com.mahasbr.repository.UserRepository;
+import com.mahasbr.repository.VillageMasterRepository;
 import com.mahasbr.util.RowValidator;
 import com.mahasbr.util.UploadProgressStore;
 import com.opencsv.CSVReader;
@@ -37,13 +51,45 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class FileProcessingServiceImpl implements FileProcessingService {
 
+	private static final Logger logger = LoggerFactory.getLogger(FileProcessingServiceImpl.class);
 	private final UploadProgressStore progressStore;
 	private final MstRegistryDetailsPageRepository repository;
 	private final RegistryMapper mapper;
 	private final RowValidator validator;
-	
+	private final UploadResultRecordes uploadResultRecordes;
+
 	@Autowired
 	private MstRegistryDetailsPageServiceImpl mstRegistryDetailsPageServiceImpl;
+
+	@Autowired
+	UserRepository userRepository;
+
+	@Autowired
+	BrnGeneratorService brnGeneratorService;
+
+	@Autowired
+	CensusEntityRepository censusEntityRepository;
+
+	@Autowired
+	DistrictMasterRepository districtMasterRepository;
+
+	@Autowired
+	TalukaMasterRepository talukaMasterRepository;
+
+	@Autowired
+	VillageMasterRepository villageMasterRepository;
+
+	Long userId = 0L;
+
+	public Long getLoginUsernameId() {
+		String username = SecurityContextHolder.getContext().getAuthentication().getName();
+		Optional<User> user = userRepository.findByUsername(username);
+
+		if (user.isPresent()) {
+			userId = user.get().getRegistry().getId();
+		}
+		return userId;
+	}
 
 	@Override
 	public List<RegistryRowDTO> parseForPreview(MultipartFile file) throws Exception {
@@ -55,71 +101,139 @@ public class FileProcessingServiceImpl implements FileProcessingService {
 		}
 	}
 
+//	@Async
+//	public void processAndSave(byte[] fileBytes, String fileId, String fileName, Authentication authentication) {
+//		try {
+//			// Initialize progress
+//			progressStore.set(fileId, 0);
+//
+//			InputStream is = new ByteArrayInputStream(fileBytes);
+//			SecurityContext context = SecurityContextHolder.createEmptyContext();
+//			context.setAuthentication(authentication);
+//			SecurityContextHolder.setContext(context);
+//
+//			// Parse file into row DTOs
+//			List<RegistryRowDTO> rows = fileName.toLowerCase().endsWith(".csv") ? parseCsv(is) : parseExcel(is);
+//
+//			int total = Math.max(1, rows.size());
+//			int processed = 0;
+//
+//			List<MstRegistryDetailsPageEntity> toSave = new ArrayList<>();
+//			List<RegistryRowDTO> savedRows = new ArrayList<>(); // <-- STORE only valid rows for UI
+//
+//			// Loop through parsed rows
+//			for (RegistryRowDTO r : rows) {
+//				processed++;
+//
+//				// Update upload progress %
+//				progressStore.set(fileId, (processed * 100) / total);
+//
+//				// Only process valid rows
+////	            if (r.isValid()) {
+//				try {
+//					// Convert row into DB entity
+//					MstRegistryDetailsPageEntity ent = mapper.toEntity(r.getRowData());
+//
+//					// Auto-generate BRN if missing
+//					if (ent.getBrnNo() == null || ent.getBrnNo().isBlank()) {
+//						ent.setBrnNo(brnGeneratorService.generateBrn("27"));
+//						ent.setLocationCode(getLocationCode(ent.getDistrict(),ent.getTaluka(),ent.getTownVillage()));
+//						ent.setRegUserId(Integer.parseInt(getLoginUsernameId().toString()));
+//					}
+//
+//					toSave.add(ent);
+//					savedRows.add(r); // <-- Add to UI return list
+//
+//				} catch (Exception ex) {
+//					ex.printStackTrace();
+//				}
+//			}
+////	        }
+//
+//			// Save all valid rows into DB
+//			if (!toSave.isEmpty()) {
+//				repository.saveAll(toSave);
+//			}
+//
+//			// Save result for frontend to fetch later
+//			uploadResultRecordes.set(fileId, savedRows);
+//
+//			// Mark upload complete
+//			progressStore.set(fileId, 100);
+//
+//		} catch (Exception ex) {
+//			// Mark as failed
+//			progressStore.set(fileId, -1);
+//			ex.printStackTrace();
+//		}
+//	}
+	
 	@Async
-	public void processAndSave(byte[] fileBytes, String fileId, String fileName) {
-		try {
-			progressStore.set(fileId, 0);
+	public void processAndSave(byte[] fileBytes, String fileId, String fileName, Authentication authentication) {
+	    try {
+	        // Initialize progress
+	        progressStore.set(fileId, 0);
 
-			InputStream is = new ByteArrayInputStream(fileBytes);
+	        InputStream is = new ByteArrayInputStream(fileBytes);
+	        SecurityContext context = SecurityContextHolder.createEmptyContext();
+	        context.setAuthentication(authentication);
+	        SecurityContextHolder.setContext(context);
 
-			List<RegistryRowDTO> rows;
+	        // Parse file rows
+	        List<RegistryRowDTO> rows = fileName.toLowerCase().endsWith(".csv") 
+	                ? parseCsv(is) 
+	                : parseExcel(is);
 
-			if (fileName.toLowerCase().endsWith(".csv")) {
-				rows = parseCsv(is); // no more multipart needed
-			} else {
-				rows = parseExcel(is); // reads directly from memory
-			}
+	        int total = Math.max(1, rows.size());
+	        int processed = 0;
 
-			int total = Math.max(1, rows.size());
-			int processed = 0;
+	        List<RegistryRowDTO> savedRows = new ArrayList<>();
 
-			List<MstRegistryDetailsPageEntity> toSave = new ArrayList<>();
+	        // PROCESS RECORDS ONE BY ONE
+	        for (RegistryRowDTO r : rows) {
+	            processed++;
 
-			for (RegistryRowDTO r : rows) {
-				processed++;
-				progressStore.set(fileId, (processed * 100) / total);
+	            try {
+	                // Convert row into entity
+	                MstRegistryDetailsPageEntity ent = mapper.toEntity(r.getRowData());
 
-				if (r.isValid()) {
-					try {
-						MstRegistryDetailsPageEntity ent = mapper.toEntity(r.getRowData());
-						if (ent.getBrnNo() == null || ent.getBrnNo().isBlank()) {
-							ent.setBrnNo(generateBrn());
-						}
-						toSave.add(ent);
-					} catch (Exception ex) {
-						ex.printStackTrace();
-					}
-				}
-			}
+	                // Auto-generate BRN if needed
+	                if (ent.getBrnNo() == null || ent.getBrnNo().isBlank()) {
+	                    ent.setBrnNo(brnGeneratorService.generateBrn("27"));
+	                    ent.setLocationCode(getLocationCode(
+	                            ent.getDistrict(), 
+	                            ent.getTaluka(), 
+	                            ent.getTownVillage()
+	                    ));
+	                    ent.setRegUserId(Integer.parseInt(getLoginUsernameId().toString()));
+	                }
 
-			// audit fix here (same as you added)
-			for (MstRegistryDetailsPageEntity ent : toSave) {
-				if (ent.getCreatedDateTime() == null)
-					ent.setCreatedDateTime(new Date());
-				ent.setUpdatedDateTime(new Date());
-				if (ent.getCreatedUserId() == null)
-					ent.setCreatedUserId(0L);
-				ent.setUpdatedUserId(0L);
-				ent.setCreatedIp("localhost");
-				ent.setUpdatedIp("localhost");
-				ent.setCreatedUserAgent("async-upload");
-				ent.setUpdatedUserAgent("async-upload");
-				ent.setBrnNo(generateBrn());
-				ent.setRegUserId(Integer.parseInt(mstRegistryDetailsPageServiceImpl.getLoginUsernameId().toString()));
-//				ent.setLocationCode(locationCode);
-			}
+	                // SAVE SINGLE RECORD IN DB
+	                repository.save(ent);
 
-			if (!toSave.isEmpty()) {
-				repository.saveAll(toSave);
-			}
+	                // Add to UI list
+	                savedRows.add(r);
 
-			progressStore.set(fileId, 100);
+	            } catch (Exception ex) {
+	                ex.printStackTrace();
+	            }
 
-		} catch (Exception ex) {
-			progressStore.set(fileId, -1);
-			ex.printStackTrace();
-		}
+	            // Update progress % after each record
+	            progressStore.set(fileId, (processed * 100) / total);
+	        }
+
+	        // Store result for frontend request
+	        uploadResultRecordes.set(fileId, savedRows);
+
+	        // Mark complete
+	        progressStore.set(fileId, 100);
+
+	    } catch (Exception ex) {
+	        progressStore.set(fileId, -1);
+	        ex.printStackTrace();
+	    }
 	}
+
 
 	@Override
 	public void saveRows(List<Map<String, String>> rows) throws Exception {
@@ -129,8 +243,9 @@ public class FileProcessingServiceImpl implements FileProcessingService {
 			if (err.isEmpty()) {
 				MstRegistryDetailsPageEntity e = mapper.toEntity(r);
 				if (e.getBrnNo() == null || e.getBrnNo().isBlank())
-					e.setBrnNo(generateBrn());
-				entities.add(e);
+//					e.setBrnNo(generateBrn());
+//				e.setRegUserId(Integer.parseInt(getLoginUsernameId().toString()));
+					entities.add(e);
 			}
 		}
 		if (!entities.isEmpty())
@@ -216,7 +331,77 @@ public class FileProcessingServiceImpl implements FileProcessingService {
 		};
 	}
 
-	private String generateBrn() {
-		return "BRN-" + UUID.randomUUID().toString();
+	public String getLocationCode(String districtName, String talukaName, String villageName) {
+
+		// Normalize inputs
+		districtName = StringUtils.trimToEmpty(districtName);
+		talukaName = StringUtils.trimToEmpty(talukaName);
+		villageName = StringUtils.trimToEmpty(villageName);
+
+		// Validate required inputs
+		List<String> missingFields = new ArrayList<>();
+		if (districtName.isEmpty())
+			missingFields.add("DISTRICT");
+		if (talukaName.isEmpty())
+			missingFields.add("TALUKA");
+		if (villageName.isEmpty())
+			missingFields.add("VILLAGE");
+
+		if (!missingFields.isEmpty()) {
+			logger.warn("Missing mandatory location fields: {}", missingFields);
+			return "NA";
+		}
+
+		try {
+			// Step 1 → Get Census District Code
+			Optional<String> districtCodeOpt = districtMasterRepository
+					.findCensusDistrictCodeByNameAndState(districtName, "27");
+
+			if (districtCodeOpt.isEmpty()) {
+				logger.warn("District not found: {}", districtName);
+				return "NA";
+			}
+
+			String districtCode = districtCodeOpt.get();
+
+			// Step 2 → Get Taluka
+			Optional<TalukaMaster> talukaOpt = talukaMasterRepository
+					.findByDistrictCodeAndTalukaNameIgnoreCase(districtCode, talukaName);
+
+			if (talukaOpt.isEmpty()) {
+				logger.warn("Taluka not found for district={}, taluka={}", districtCode, talukaName);
+				return "NA";
+			}
+
+			TalukaMaster taluka = talukaOpt.get();
+
+			// Step 3 → Get Village
+			Optional<VillageMaster> villageOpt = villageMasterRepository
+					.findByCensusDistrictCodeAndCensusTalukaCodeAndVillageNameIgnoreCase(districtCode,
+							taluka.getCensusTalukaCode(), villageName);
+
+			if (villageOpt.isEmpty()) {
+				logger.warn("Village not found for district={}, taluka={}, village={}", districtCode,
+						taluka.getCensusTalukaCode(), villageName);
+				return "NA";
+			}
+
+			VillageMaster village = villageOpt.get();
+
+			// Step 4 → Build Final Location Code
+			return "27"+districtCode + taluka.getCensusTalukaCode() + village.getCensusVillageCode();
+
+		} catch (Exception ex) {
+			logger.error("Unexpected error generating location code", ex);
+			return "NA";
+		}
 	}
+
+	/**
+	 * Converts null values to empty string and trims.
+	 */
+	private String safeCode(Object code) {
+		return code == null ? "" : code.toString().trim();
+	}
+
 }

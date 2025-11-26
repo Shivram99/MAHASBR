@@ -24,7 +24,7 @@ public class FileValidator {
             throw new IllegalArgumentException("File is empty");
         }
 
-        long maxBytes = properties.getMaxFileSizeMb() * 1024 * 1024;
+        long maxBytes = properties.getMaxFileSizeMb() * 1024 * 1024*50;
         if (file.getSize() > maxBytes) {
             throw new IllegalArgumentException("File size exceeds limit of " + properties.getMaxFileSizeMb() + "MB");
         }

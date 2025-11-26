@@ -459,7 +459,7 @@ public class MstRegistryDetailsPageServiceImpl implements MstRegistryDetailsPage
 
 		BRNGenartionRemark locRemark = new BRNGenartionRemark();
 		StringBuilder sb = new StringBuilder();
-		String censusStateCode = "";
+		String censusStateCode = "27";
 
 		String locationCode = "";
 		String censusDistrictCode = "";
@@ -492,8 +492,7 @@ public class MstRegistryDetailsPageServiceImpl implements MstRegistryDetailsPage
 			if (stateName != null && !stateName.isEmpty() && districtName != null && !districtName.isEmpty()
 					&& talukaName != null && !talukaName.isEmpty() && villageName != null && !villageName.isEmpty()) {
 
-				Optional<CensusEntity> censusEntity = censusEntityRepository
-						.findByCensusStateNameAndCensusDistrictNameAndCensusTahsilNameAndCensusVillageName(stateName,
+				Optional<CensusEntity> censusEntity = censusEntityRepository.findMatchIgnoreCase(stateName,
 								districtName, talukaName, villageName);
 
 				if (censusEntity.isPresent()) {
@@ -610,7 +609,7 @@ public class MstRegistryDetailsPageServiceImpl implements MstRegistryDetailsPage
 				&& !townVillage.equalsIgnoreCase("N/A")) {
 			try {
 				Optional<CensusEntity> censusEntity = censusEntityRepository
-						.findByCensusStateNameAndCensusDistrictNameAndCensusTahsilNameAndCensusVillageName(stateName,
+						.findMatchIgnoreCase(stateName,
 								district, taluka, townVillage);
 
 				if (censusEntity.isPresent()) {

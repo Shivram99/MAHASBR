@@ -30,7 +30,7 @@ public class VillageMaster extends Auditable {
 	private Long villageId;
 
 	@NotNull(message = "Village code is mandatory")
-	@Column(name = "census_village_code", unique = true, nullable = false, updatable = false)
+	@Column(name = "census_village_code",updatable = false)
 	private String censusVillageCode;
 
 	@NotBlank(message = "Village name is mandatory")
@@ -44,6 +44,10 @@ public class VillageMaster extends Auditable {
 	@NotBlank(message = "District code is mandatory")
 	@Column(name = "census_district_code")
 	private String censusDistrictCode;
+	
+//	@NotBlank(message = "state code is mandatory")
+//	@Column(name = "census_state_code")
+//	private String censusStateCode;
 
 	@Column(name = "is_active", nullable = false)
 	private Boolean isActive = true;

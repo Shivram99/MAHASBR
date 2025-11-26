@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.mahasbr.entity.TalukaMaster;
@@ -30,5 +31,15 @@ public interface TalukaMasterRepository extends JpaRepository<TalukaMaster, Long
 	List<TalukaMaster> findByCensusDistrictCodeInAndIsActiveTrue(List<String> districtCode);
 
 	//Optional<TalukaMaster> findByCensusDistrictCodeAndTalukaName(String censusDistrictCode, String talukaName);
+
+	@Query("""
+		    SELECT t FROM TalukaMaster t
+		    WHERE LOWER(t.censusDistrictCode) = LOWER(:districtCode)
+		      AND LOWER(t.talukaName) = LOWER(:talukaName)
+		""")
+		Optional<TalukaMaster> findByDistrictCodeAndTalukaNameIgnoreCase(
+		        @Param("districtCode") String censusDistrictCode,
+		        @Param("talukaName") String talukaName
+		);
 
 }

@@ -78,10 +78,11 @@ public class VillageMasterServiceImpl implements VillageMasterService {
             for (Row row : sheet) {
                 if (rowIndex++ == 0) continue; // Skip header row
 
-                String censusVillageCode = getCellValue(row.getCell(0));
-                String villageName = getCellValue(row.getCell(1));
+                String censusVillageCode = getCellValue(row.getCell(3));
+                String villageName = getCellValue(row.getCell(4));
                 String censusTalukaCode = getCellValue(row.getCell(2));
-                String censusDistrictCode = getCellValue(row.getCell(3));
+                String censusDistrictCode = getCellValue(row.getCell(1));
+                String censusStateCode = getCellValue(row.getCell(0));
 //                String isActiveStr = getCellValue(row.getCell(4));
 
                 if (StringUtils.isAnyBlank(censusVillageCode, villageName, censusTalukaCode, censusDistrictCode)) {
@@ -89,17 +90,18 @@ public class VillageMasterServiceImpl implements VillageMasterService {
                     continue;
                 }
 
-                Optional<VillageMaster> existing = repository.findByCensusVillageCode(censusVillageCode);
-                if (existing.isPresent()) {
-                    System.out.println("Skipping duplicate village code: " + censusVillageCode);
-                    continue;
-                }
+//                Optional<VillageMaster> existing = repository.findByCensusVillageCode(censusVillageCode);
+//                if (existing.isPresent()) {
+//                    System.out.println("Skipping duplicate village code: " + censusVillageCode);
+//                    continue;
+//                }
 
                 VillageMaster village = new VillageMaster();
                 village.setCensusVillageCode(censusVillageCode);
                 village.setVillageName(villageName);
                 village.setCensusTalukaCode(censusTalukaCode);
                 village.setCensusDistrictCode(censusDistrictCode);
+//                village.setCensusStateCode(censusStateCode);
                 village.setIsActive(true);
 
                 repository.save(village);

@@ -5,19 +5,18 @@ import org.springframework.stereotype.Component;
 
 import com.mahasbr.service.BrnGeneratorService;
 import com.mahasbr.service.SequenceBrnGenerator;
-import com.mahasbr.service.TableBrnGenerator;
 
 @Component
 public class BrnGeneratorFactory {
 
     private final SequenceBrnGenerator sequenceGenerator;
-    private final TableBrnGenerator tableGenerator;
+    private final SequenceBrnGenerator  tableGenerator;
 
     @Value("${brn.generator.mode:SEQUENCE}")
     private String mode;
 
     public BrnGeneratorFactory(SequenceBrnGenerator sequenceGenerator,
-                                TableBrnGenerator tableGenerator) {
+    		SequenceBrnGenerator  tableGenerator) {
         this.sequenceGenerator = sequenceGenerator;
         this.tableGenerator = tableGenerator;
     }

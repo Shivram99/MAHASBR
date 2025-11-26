@@ -21,4 +21,5 @@ public class UploadProgressStore {
     public void remove(String fileId) {
         progress.remove(fileId);
     }
+    
 }

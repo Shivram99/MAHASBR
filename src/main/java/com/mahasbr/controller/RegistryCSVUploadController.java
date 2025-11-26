@@ -32,6 +32,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.mahasbr.dto.PreviewResponse;
 import com.mahasbr.dto.RegistryRowDTO;
+import com.mahasbr.dto.UploadResultRecordes;
 import com.mahasbr.entity.ConcernRegistryDetailsPageEntity;
 import com.mahasbr.entity.DistrictMaster;
 import com.mahasbr.entity.DuplicateRegistryDetailsPageEntity;
@@ -45,6 +46,7 @@ import com.mahasbr.service.FileProcessingService;
 import com.mahasbr.service.FileStorageService;
 import com.mahasbr.service.MstRegistryDetailsPageService;
 import com.mahasbr.service.MstRegistryDetailsPageServiceImpl;
+import com.mahasbr.util.UploadDefaultLogger;
 import com.mahasbr.util.UploadProgressStore;
 
 @RestController
@@ -68,6 +70,9 @@ public class RegistryCSVUploadController {
 	
 	@Autowired
 	private MstRegistryDetailsPageServiceImpl mstRegistryDetailsPageServiceImpl;
+	
+	@Autowired
+	private UploadResultRecordes uploadResultRecordes;
 
 	@GetMapping("/registoryData")
 	public ResponseEntity<Page<MstRegistryDetailsPageEntity>> getMasterRegistoryDetails(
@@ -199,31 +204,43 @@ public class RegistryCSVUploadController {
 				.fileName(Optional.ofNullable(file.getOriginalFilename()).orElse("unknown")).rows(rows).build();
 		return ResponseEntity.ok(resp);
 	}
-
+	
+	@Autowired
+	UploadDefaultLogger uploadDefaultLogger;
+	
 	@PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ResponseEntity<?> upload(@RequestParam("files") List<MultipartFile> files) throws Exception {
+	public ResponseEntity<?> upload(@RequestParam("files") List<MultipartFile> files,Authentication authentication) throws Exception {
 
 		List<Map<String, String>> out = new ArrayList<>();
-
+		
+		uploadDefaultLogger.printDefaults();
+		
+		
 		for (MultipartFile f : files) {
 			String fileId = UUID.randomUUID().toString();
 			progressStore.set(fileId, 0);
-
-			// Read file into memory BEFORE async starts
 			byte[] bytes = f.getBytes();
-
-			// Send safe copy to async
-			service1.processAndSave(bytes, fileId, f.getOriginalFilename());
+			service1.processAndSave(bytes, fileId, f.getOriginalFilename(),authentication);
 
 			out.add(Map.of("fileId", fileId, "fileName", f.getOriginalFilename()));
 		}
 
 		return ResponseEntity.ok(Map.of("files", out));
+		
+		
+		
 	}
 
 	@PostMapping("/save")
 	public ResponseEntity<?> save(@RequestBody List<Map<String, String>> rows) throws Exception {
 		service1.saveRows(rows);
 		return ResponseEntity.ok(Map.of("message", "saved"));
+	}
+	
+	@GetMapping("/result/{fileId}")
+	public ResponseEntity<?> getUploadResult(@PathVariable String fileId) {
+	    return ResponseEntity.ok(
+	        Map.of("rows", uploadResultRecordes.get(fileId))
+	    );
 	}
 }

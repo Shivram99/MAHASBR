@@ -3,6 +3,7 @@ package com.mahasbr.controller;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,7 +21,7 @@ import com.mahasbr.service.VillageMasterService;
 
 import jakarta.validation.Valid;
 @RestController
-@RequestMapping("/api/villages")
+@RequestMapping("/citizenSearch/api/villages")
 public class VillageMasterController {
 
     private final VillageMasterService service;
@@ -54,7 +55,7 @@ public class VillageMasterController {
     public ResponseEntity<List<VillageMaster>> getAll() {
         return ResponseEntity.ok(service.getAll());
     }
-    @PostMapping("/upload")
+    @PostMapping(value ="/upload" ,consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> uploadExcel(@RequestParam("file") MultipartFile file) {
         try {
             service.importFromExcel(file);

@@ -36,7 +36,7 @@ public class CensusDataImportController {
 	@GetMapping("/importCensusExcelSheet")
 	public @ResponseBody void importCensusExcelSheet() {
 
-		String fileArr[] = { "C:\\Users\\Mahait\\Downloads\\Rdir_2011_27_MAHARASHTRA.xls" };
+		String fileArr[] = { "C:\\Users\\Mahait\\Downloads\\PC11_TV_DIR_(2).xlsx" };
 
 		for (String path : fileArr) {
 			Workbook workbook = null;
