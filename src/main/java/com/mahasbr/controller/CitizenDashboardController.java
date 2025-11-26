@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mahasbr.dto.CitizenDashboardData;
 import com.mahasbr.dto.CitizenDashboardFilter;
 import com.mahasbr.dto.RegistrationStatsDTO;
+import com.mahasbr.service.ApiSchedulerService;
 import com.mahasbr.service.RegistrationService;
 
 @RestController
@@ -30,6 +31,9 @@ public class CitizenDashboardController {
     
     @Autowired
     private  ObjectMapper objectMapper;
+    
+    @Autowired
+    private ApiSchedulerService apiSchedulerService;
 
     @GetMapping("/registrationStats")
     public ResponseEntity<List<RegistrationStatsDTO>> getRegistrationStats() {
@@ -63,5 +67,11 @@ public class CitizenDashboardController {
 
         return ResponseEntity.ok(citizenDashboardData);
     }
+    
+    @GetMapping("/fetchGovApis")
+    public ResponseEntity<String> fetchGovApis() {
+    	apiSchedulerService.fetchGovApis();
+		return ResponseEntity.ok("Success");
+	}
 
 }

@@ -50,6 +50,10 @@ public class RegistryApiService {
 
 	private final MstRegistryDetailsMapper mstRegistryDetailsMapper;
 
+	private final FileProcessingServiceImpl fileProcessingService;
+
+	private final BrnGeneratorService brnGeneratorService;
+
 	private final ObjectMapper objectMapper;
 
 	private static final Logger logger = LoggerFactory.getLogger(RegistryApiService.class);
@@ -77,7 +81,7 @@ public class RegistryApiService {
 			Map<String, String> dateMap = new LinkedHashMap<>();
 
 			// Start date
-			LocalDate startDate = LocalDate.parse("2020-01-01");
+			LocalDate startDate = LocalDate.parse("2015-01-01");
 			// End date (can be dynamic or fixed)
 			LocalDate endDate = LocalDate.now();
 
@@ -224,22 +228,10 @@ public class RegistryApiService {
 		// 2. Enrich with additional fields
 		entity.setRegUserId(2);
 
-		// 4. Generate Location Code (example: state + district + taluka + village)
-		String locationCode = generateLocationCode(dto.getDistrict(), dto.getTaluka(), dto.getTownVillage());
-		// 4. Check Location Code
-		if ("NA".equals(locationCode)) {
-
-			try {
-				saveFailedRecord(dto, objectMapper.writeValueAsString(dto), "Missing location code", apiName, url);
-			} catch (JsonProcessingException e) {
-				// TODO Auto-generated catch block
-				saveFailedRecord(dto, dto.toString(), "Missing location code", apiName, url);
-			}
-			return;
-		}
-		entity.setBrnNo(generateBrn());
+		entity.setBrnNo(brnGeneratorService.generateBrn("27"));
 		entity.setRegUserId(getKeyByValue(registory));
-		entity.setLocationCode(locationCode);
+		entity.setLocationCode(
+				fileProcessingService.getLocationCode(dto.getDistrict(), dto.getTaluka(), dto.getTownVillage()));
 
 		// 5. Save entity
 		repository.save(entity);
@@ -253,7 +245,7 @@ public class RegistryApiService {
 			String apiUrl) {
 		try {
 			MstRegistryFailedEntity failed = new MstRegistryFailedEntity();
-			//failed.setRawData(rawData);
+			// failed.setRawData(rawData);
 			failed.setErrorMessage(reason);
 			failed.setApiName(apiName);
 			failed.setApiUrl(apiUrl);

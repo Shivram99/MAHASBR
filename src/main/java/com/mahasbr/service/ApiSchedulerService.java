@@ -18,7 +18,7 @@ public class ApiSchedulerService {
 
 //    @Scheduled(cron = "0 0 23 * * *") // every day at 11 PM
 //    @Scheduled(fixedRate = 120000)
-    @Scheduled(fixedDelay = 120000)
+//    @Scheduled(fixedDelay = 120000)
     public void fetchGovApis() {
         System.out.println("🚀 Scheduler started at 11 PM...");
         
