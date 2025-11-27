@@ -39,7 +39,10 @@ public interface DistrictMasterRepository extends JpaRepository<DistrictMaster, 
 	@Query("SELECT d FROM DistrictMaster d WHERE LOWER(d.divisionCode) = LOWER(:divisionCode) AND d.isActive = true")
 	List<DistrictMaster> findByDivisionCodeAndIsActiveTrue(@Param("divisionCode") String divisionCode);
 
-	@Query("SELECT d.districtName FROM DistrictMaster d WHERE d.censusDistrictCode = :censusDistrictCode AND d.isActive = true")
-	Optional<String> findDistrictNameById(@Param("censusDistrictCode") Long districtId);
+//	@Query("SELECT d.districtName FROM DistrictMaster d WHERE d.censusDistrictCode = :censusDistrictCode AND d.isActive = true")
+//	Optional<String> findDistrictNameById(@Param("censusDistrictCode") Long districtId);
+	
+	@Query("SELECT d.districtName FROM DistrictMaster d WHERE d.districtId = :districtId AND d.isActive = true")
+	Optional<String> findDistrictNameById(@Param("districtId") Long districtId);
 
 }

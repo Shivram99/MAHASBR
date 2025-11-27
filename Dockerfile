@@ -20,7 +20,7 @@ RUN mvn clean package -DskipTests
 FROM eclipse-temurin:17-jdk-jammy
 
 # Set environment variables
-ENV JAVA_OPTS="-Xms512m -Xmx1024m"
+ENV JAVA_OPTS="-Xms1024m -Xmx2048m"
 ENV TZ=Asia/Kolkata
 ENV APP_HOME=/opt/app
 ENV FILE_UPLOAD_DIR=/opt/app/uploads
