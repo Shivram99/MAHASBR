@@ -76,13 +76,13 @@ public class TalukaMasterServiceImpl implements TalukaMasterService {
             for (Row row : sheet) {
                 if (rowIndex++ == 0) continue; // skip header row
 
-                String censusTalukaCode = getCellValue(row.getCell(0));
-                String talukaName = getCellValue(row.getCell(1));
-                String censusDistrictCode = getCellValue(row.getCell(2));
+                String censusTalukaCode = getCellValue(row.getCell(2));
+                String talukaName = getCellValue(row.getCell(4));
+                String censusDistrictCode = getCellValue(row.getCell(1));
 //                String isActiveStr = getCellValue(row.getCell(3));
 //                boolean isActive = Boolean.parseBoolean(isActiveStr);
 
-                if (censusTalukaCode == null || talukaName == null || censusDistrictCode == null) continue;
+//                if (censusTalukaCode == null || talukaName == null || censusDistrictCode == null) continue;
 
                 TalukaMaster taluka = new TalukaMaster();
                 taluka.setCensusTalukaCode(censusTalukaCode);
