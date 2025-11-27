@@ -80,9 +80,14 @@ public class LocationGenerator {
 			TalukaMaster taluka = talukaOpt.get();
 
 			// Step 3 → Get Village
+			String cleanedVillageName = villageName.trim().replaceAll("[,]+$", "").trim();
+
 			Optional<VillageMaster> villageOpt = villageMasterRepository
-					.findByCensusDistrictCodeAndCensusTalukaCodeAndVillageNameIgnoreCase(districtCode,
-							taluka.getCensusTalukaCode(), villageName);
+			        .findByCensusDistrictCodeAndCensusTalukaCodeAndVillageNameIgnoreCase(
+			                districtCode,
+			                taluka.getCensusTalukaCode(),
+			                cleanedVillageName
+			        );
 
 			if (villageOpt.isEmpty()) {
 				logger.warn("Village not found for district={}, taluka={}, village={}", districtCode,
