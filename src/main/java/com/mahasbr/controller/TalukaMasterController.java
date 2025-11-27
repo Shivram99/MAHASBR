@@ -3,6 +3,7 @@ package com.mahasbr.controller;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,7 +22,7 @@ import com.mahasbr.service.TalukaMasterService;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/api/talukas")
+@RequestMapping("/citizenSearch/api/talukas")
 public class TalukaMasterController {
 
 
@@ -56,7 +57,7 @@ public class TalukaMasterController {
 	public ResponseEntity<List<TalukaMaster>> getAll() {
 		return ResponseEntity.ok(service.getAll());
 	}
-	@PostMapping("/upload")
+	@PostMapping(value ="/upload" ,consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<String> uploadTalukaExcel(@RequestParam("file") MultipartFile file) {
 	    try {
 	        service.importTalukasFromExcel(file);

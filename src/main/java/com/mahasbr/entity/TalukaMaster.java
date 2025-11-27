@@ -31,7 +31,7 @@ public class TalukaMaster extends Auditable {
 	private Long talukaId;
 
 	@NotBlank(message = "Taluka code is mandatory")
-	@Column(name = "census_taluka_code", nullable = false, updatable = false)
+	@Column(name = "census_taluka_code", updatable = false)
 	private String censusTalukaCode;
 
 	@NotBlank(message = "Taluka name is mandatory")
