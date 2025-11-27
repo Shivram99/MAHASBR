@@ -10,12 +10,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.util.IOUtils;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +55,10 @@ public class FileProcessingServiceImpl implements FileProcessingService {
 	private final RegistryMapper mapper;
 	private final RowValidator validator;
 	private final UploadResultRecordes uploadResultRecordes;
+	
+	static {
+        IOUtils.setByteArrayMaxOverride(200_000_000); // Allow large file
+    }
 
 	@Autowired
 	private MstRegistryDetailsPageServiceImpl mstRegistryDetailsPageServiceImpl;
@@ -270,34 +275,81 @@ public class FileProcessingServiceImpl implements FileProcessingService {
 		return list;
 	}
 
+//	private List<RegistryRowDTO> parseExcel(InputStream is) throws Exception {
+//		List<RegistryRowDTO> list = new ArrayList<>();
+//		Workbook workbook = WorkbookFactory.create(is);
+//		for (Sheet sheet : workbook) {
+//			Iterator<Row> it = sheet.iterator();
+//			if (!it.hasNext())
+//				continue;
+//			Row headerRow = it.next();
+//			List<String> headers = new ArrayList<>();
+//			for (Cell c : headerRow)
+//				headers.add(normalizeHeader(cellToString(c)));
+//			int rowNum = 1;
+//			while (it.hasNext()) {
+//				Row r = it.next();
+//				rowNum++;
+//				Map<String, String> map = new LinkedHashMap<>();
+//				for (int i = 0; i < headers.size(); i++) {
+//					Cell cell = r.getCell(i, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
+//					map.put(headers.get(i), cellToString(cell).trim());
+//				}
+//				Optional<String> err = validator.validate(map);
+//				list.add(RegistryRowDTO.builder().rowData(map).valid(err.isEmpty()).errorMessage(err.orElse(""))
+//						.rowNumber(rowNum).build());
+//			}
+//		}
+//		workbook.close();
+//		return list;
+//	}
+	
 	private List<RegistryRowDTO> parseExcel(InputStream is) throws Exception {
-		List<RegistryRowDTO> list = new ArrayList<>();
-		Workbook workbook = WorkbookFactory.create(is);
-		for (Sheet sheet : workbook) {
-			Iterator<Row> it = sheet.iterator();
-			if (!it.hasNext())
-				continue;
-			Row headerRow = it.next();
-			List<String> headers = new ArrayList<>();
-			for (Cell c : headerRow)
-				headers.add(normalizeHeader(cellToString(c)));
-			int rowNum = 1;
-			while (it.hasNext()) {
-				Row r = it.next();
-				rowNum++;
-				Map<String, String> map = new LinkedHashMap<>();
-				for (int i = 0; i < headers.size(); i++) {
-					Cell cell = r.getCell(i, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
-					map.put(headers.get(i), cellToString(cell).trim());
-				}
-				Optional<String> err = validator.validate(map);
-				list.add(RegistryRowDTO.builder().rowData(map).valid(err.isEmpty()).errorMessage(err.orElse(""))
-						.rowNumber(rowNum).build());
-			}
-		}
-		workbook.close();
-		return list;
+	    List<RegistryRowDTO> list = new ArrayList<>();
+
+	    OPCPackage pkg = OPCPackage.open(is);
+	    XSSFWorkbook workbook = new XSSFWorkbook(pkg);
+
+	    for (Sheet sheet : workbook) {
+	        Iterator<Row> it = sheet.iterator();
+	        if (!it.hasNext())
+	            continue;
+
+	        Row headerRow = it.next();
+	        List<String> headers = new ArrayList<>();
+	        for (Cell c : headerRow) {
+	            headers.add(normalizeHeader(cellToString(c)));
+	        }
+
+	        int rowNum = 1;
+	        while (it.hasNext()) {
+	            Row r = it.next();
+	            rowNum++;
+
+	            Map<String, String> map = new LinkedHashMap<>();
+	            for (int i = 0; i < headers.size(); i++) {
+	                Cell cell = r.getCell(i, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
+	                map.put(headers.get(i), cellToString(cell).trim());
+	            }
+
+	            Optional<String> err = validator.validate(map);
+
+	            list.add(
+	                RegistryRowDTO.builder()
+	                    .rowData(map)
+	                    .valid(err.isEmpty())
+	                    .errorMessage(err.orElse(""))
+	                    .rowNumber(rowNum)
+	                    .build()
+	            );
+	        }
+	    }
+
+	    workbook.close();
+	    pkg.close();
+	    return list;
 	}
+
 
 	private String normalizeHeader(String header) {
 		if (header == null)
