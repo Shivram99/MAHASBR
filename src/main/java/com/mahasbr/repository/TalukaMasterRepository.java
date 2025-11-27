@@ -34,7 +34,7 @@ public interface TalukaMasterRepository extends JpaRepository<TalukaMaster, Long
 
 	@Query("""
 		    SELECT t FROM TalukaMaster t
-		    WHERE LOWER(t.censusDistrictCode) = LOWER(:districtCode)
+		    WHERE LOWER(t.censusDistrictCode) = LOWER(:districtCode) and isActive = true
 		      AND LOWER(t.talukaName) = LOWER(:talukaName)
 		""")
 		Optional<TalukaMaster> findByDistrictCodeAndTalukaNameIgnoreCase(

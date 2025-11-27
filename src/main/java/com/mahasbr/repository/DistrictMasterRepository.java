@@ -18,29 +18,28 @@ public interface DistrictMasterRepository extends JpaRepository<DistrictMaster, 
 	@Query("SELECT d FROM DistrictMaster d WHERE d.isActive = true")
 	List<DistrictMaster> findByIsActiveTrue();
 
-	// Optional<DistrictMaster> findByCensusStateCodeAndDistrictName(Long
-	// censusStateCode, String districtName);
-
 	@Query("SELECT d.districtName FROM DistrictMaster d WHERE d.censusDistrictCode IN :censusDistrictCodes")
 	List<String> findDistrictNamesByCensusDistrictCodes(List<Long> censusDistrictCodes);
 
-	@Query("SELECT d.censusDistrictCode " +
-		       "FROM DistrictMaster d " +
-		       "WHERE d.districtName = :districtName " +
-		       "AND d.censusStateCode = :censusStateCode")
-		Optional<String> findCensusDistrictCodeByNameAndState(@Param("districtName") String districtName,
-		                                                     @Param("censusStateCode") String censusStateCode);
-	
-	 // Get district names by divisionCode
-    @Query("SELECT d.districtName FROM DistrictMaster d WHERE d.divisionCode = :divisionCode AND d.isActive = true")
-    List<String> findDistrictNamesByDivisionCode(@Param("divisionCode") String divisionCode);
+	// IGNORE CASE for districtName only (stateCode remains exact as your
+	// requirement)
+	@Query("""
+			SELECT d.censusDistrictCode
+			FROM DistrictMaster d
+			WHERE LOWER(d.districtName) = LOWER(:districtName)
+			  AND d.censusStateCode = :censusStateCode
+			""")
+	Optional<String> findCensusDistrictCodeByNameAndState(@Param("districtName") String districtName,
+			@Param("censusStateCode") String censusStateCode);
 
-    // If you need full entities instead of just names
-    @Query("SELECT d FROM DistrictMaster d WHERE d.divisionCode = :divisionCode AND d.isActive = true")
-    List<DistrictMaster> findByDivisionCodeAndIsActiveTrue(@Param("divisionCode") String divisionCode);
-    
-    @Query("SELECT d.districtName FROM DistrictMaster d WHERE d.censusDistrictCode = :censusDistrictCode AND d.isActive = true")
-    Optional<String> findDistrictNameById(@Param("censusDistrictCode") Long districtId);
+	// Make divisionCode ALSO ignore case (without changing parameter name/type)
+	@Query("SELECT d.districtName FROM DistrictMaster d WHERE LOWER(d.divisionCode) = LOWER(:divisionCode) AND d.isActive = true")
+	List<String> findDistrictNamesByDivisionCode(@Param("divisionCode") String divisionCode);
 
+	@Query("SELECT d FROM DistrictMaster d WHERE LOWER(d.divisionCode) = LOWER(:divisionCode) AND d.isActive = true")
+	List<DistrictMaster> findByDivisionCodeAndIsActiveTrue(@Param("divisionCode") String divisionCode);
+
+	@Query("SELECT d.districtName FROM DistrictMaster d WHERE d.censusDistrictCode = :censusDistrictCode AND d.isActive = true")
+	Optional<String> findDistrictNameById(@Param("censusDistrictCode") Long districtId);
 
 }

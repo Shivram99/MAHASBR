@@ -25,7 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mahasbr.dto.MstRegistryDetailsPagesDTO;
@@ -34,6 +33,7 @@ import com.mahasbr.entity.MstRegistryFailedEntity;
 import com.mahasbr.mapper.MstRegistryDetailsMapper;
 import com.mahasbr.repository.MstRegistryDetailsPageRepository;
 import com.mahasbr.repository.MstRegistryFailedRepository;
+import com.mahasbr.util.LocationGenerator;
 
 import lombok.RequiredArgsConstructor;
 
@@ -50,7 +50,7 @@ public class RegistryApiService {
 
 	private final MstRegistryDetailsMapper mstRegistryDetailsMapper;
 
-	private final FileProcessingServiceImpl fileProcessingService;
+	private final LocationGenerator locationGenerator;
 
 	private final BrnGeneratorService brnGeneratorService;
 
@@ -230,8 +230,9 @@ public class RegistryApiService {
 
 		entity.setBrnNo(brnGeneratorService.generateBrn("27"));
 		entity.setRegUserId(getKeyByValue(registory));
+
 		entity.setLocationCode(
-				fileProcessingService.getLocationCode(dto.getDistrict(), dto.getTaluka(), dto.getTownVillage()));
+				locationGenerator.getLocationCode(dto.getDistrict(), dto.getTaluka(), dto.getTownVillage()));
 
 		// 5. Save entity
 		repository.save(entity);
