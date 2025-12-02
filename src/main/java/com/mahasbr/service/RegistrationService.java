@@ -24,7 +24,16 @@ public class RegistrationService {
 
 	public List<CitizenDashboardData> citizenDashboardDataNR() {
 		List<CitizenDashboardData> citizenDashboardData = repository.citizenDashboardDataNR();
-
+		for (CitizenDashboardData data : citizenDashboardData) {
+		    System.out.println("Registry Name: " + data.getRegistryName());
+		    System.out.println("District: " + data.getDistrict());
+		    System.out.println("Division: " + data.getDivision());
+		    System.out.println("Year: " + data.getYear());
+		    System.out.println("Quarter: " + data.getQuarter());
+		    System.out.println("Total Registrations: " + data.getTotalRegistrations());
+		    System.out.println("Total Persons Working: " + data.getTOTALPERSONSWORKING());
+		    System.out.println("----------------------------------------");
+		}
 		return citizenDashboardData;
 	}
 	

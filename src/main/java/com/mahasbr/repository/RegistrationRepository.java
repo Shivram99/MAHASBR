@@ -27,22 +27,24 @@ public interface RegistrationRepository extends JpaRepository<MstRegistryDetails
     
     
     @Query(value = """
-            SELECT 
-                mstreg.registry_name_en AS registryName,
-                mst.DISTRICT AS district,
-                divi.division_name AS divisionName,
-                EXTRACT(YEAR FROM mst.REGISTRATION_DATE) AS year,
-                'Q' || TO_CHAR(mst.REGISTRATION_DATE, 'Q') AS quarter,
-                COUNT(*) AS totalRegistrations
-            FROM MST_REG_DETAILS mst
-            INNER JOIN MST_REGISTRY_MASTER mstreg 
-                ON mstreg.ID = mst.REG_USER_ID
-            INNER JOIN district_master dist 
-                ON UPPER(dist.district_name) = UPPER(mst.DISTRICT)
-            INNER JOIN division_master divi 
-                ON UPPER(divi.division_Code) = UPPER(dist.division_code)
+             SELECT
+    	        mstreg.registry_name_en AS "REGISTRYNAME",
+    	        mst.DISTRICT AS "DISTRICT",
+    	        divi.division_name AS "DIVISION",
+    	        EXTRACT(YEAR FROM mst.REGISTRATION_DATE) AS "YEAR",
+    	        'Q' || TO_CHAR(mst.REGISTRATION_DATE, 'Q') AS "QUARTER",
+    	        COUNT(*) AS "TOTALREGISTRATIONS",
+    	        SUM(NVL(mst.TOTAL_PERSONS_WORKING, 0)) AS "TOTALPERSONSWORKING"
+    	    FROM MST_REG_DETAILS mst
+    	    INNER JOIN MST_REGISTRY_MASTER mstreg
+    	        ON mstreg.ID = mst.REG_USER_ID
+    	    INNER JOIN district_master dist
+    	        ON UPPER(dist.district_name) = UPPER(mst.DISTRICT)
+    	    INNER JOIN division_master divi
+    	        ON UPPER(divi.division_Code) = UPPER(dist.division_code)
             WHERE mst.REGISTRATION_DATE IS NOT NULL
               AND mst.REGISTRATION_DATE >= ADD_MONTHS(SYSDATE, -12)
+              AND TRUNC(mst.REGISTRATION_DATE) <= TRUNC(SYSDATE)
             GROUP BY 
                 mstreg.registry_name_en,
                 mst.DISTRICT,
@@ -59,52 +61,59 @@ public interface RegistrationRepository extends JpaRepository<MstRegistryDetails
         List<CitizenDashboardData> citizenDashboardDataNR();
     
     @Query(value = """
-            SELECT 
-                mstreg.registry_name_en AS registryName,
-                mst.DISTRICT AS district,
-                divi.division_name AS divisionName,
-                EXTRACT(YEAR FROM mst.REGISTRATION_DATE) AS year,
-                'Q' || TO_CHAR(mst.REGISTRATION_DATE, 'Q') AS quarter,
-                COUNT(*) AS totalRegistrations
-            FROM MST_REG_DETAILS mst
-            INNER JOIN MST_REGISTRY_MASTER mstreg 
-                ON mstreg.ID = mst.REG_USER_ID
-            INNER JOIN district_master dist 
-                ON UPPER(dist.district_name) = UPPER(mst.DISTRICT)
-            INNER JOIN division_master divi 
-                ON UPPER(divi.division_Code) = UPPER(dist.division_code)
-            WHERE mst.REGISTRATION_DATE IS NOT NULL
-            GROUP BY 
-                mstreg.registry_name_en,
-                mst.DISTRICT,
-                divi.division_name,
-                EXTRACT(YEAR FROM mst.REGISTRATION_DATE),
-                TO_CHAR(mst.REGISTRATION_DATE, 'Q')
-            ORDER BY 
-                mstreg.registry_name_en,
-                divi.division_name,
-                mst.DISTRICT,
-                EXTRACT(YEAR FROM mst.REGISTRATION_DATE),
-                TO_CHAR(mst.REGISTRATION_DATE, 'Q')
-            """, nativeQuery = true)
-        List<CitizenDashboardData> citizenDashboardDataTR();
+    	    SELECT
+    	        mstreg.registry_name_en AS "REGISTRYNAME",
+    	        mst.DISTRICT AS "DISTRICT",
+    	        divi.division_name AS "DIVISION",
+    	        EXTRACT(YEAR FROM mst.REGISTRATION_DATE) AS "YEAR",
+    	        'Q' || TO_CHAR(mst.REGISTRATION_DATE, 'Q') AS "QUARTER",
+    	        COUNT(*) AS "TOTALREGISTRATIONS",
+    	        SUM(NVL(mst.TOTAL_PERSONS_WORKING, 0)) AS "TOTALPERSONSWORKING"
+    	    FROM MST_REG_DETAILS mst
+    	    INNER JOIN MST_REGISTRY_MASTER mstreg
+    	        ON mstreg.ID = mst.REG_USER_ID
+    	    INNER JOIN district_master dist
+    	        ON UPPER(dist.district_name) = UPPER(mst.DISTRICT)
+    	    INNER JOIN division_master divi
+    	        ON UPPER(divi.division_Code) = UPPER(dist.division_code)
+    	    WHERE mst.REGISTRATION_DATE IS NOT NULL
+    	      AND EXTRACT(YEAR FROM mst.REGISTRATION_DATE) >= 2010
+    	      AND TRUNC(mst.REGISTRATION_DATE) <= TRUNC(SYSDATE)
+    	    GROUP BY
+    	        mstreg.registry_name_en,
+    	        mst.DISTRICT,
+    	        divi.division_name,
+    	        EXTRACT(YEAR FROM mst.REGISTRATION_DATE),
+    	        TO_CHAR(mst.REGISTRATION_DATE, 'Q')
+    	    ORDER BY
+    	        EXTRACT(YEAR FROM mst.REGISTRATION_DATE),
+    	        "QUARTER",
+    	        "DIVISION",
+    	        "DISTRICT",
+    	        "REGISTRYNAME"
+    	    """,
+    	    nativeQuery = true)
+    	List<CitizenDashboardData> citizenDashboardDataTR();
+
     
     @Query(value = """
-             SELECT 
-                mstreg.registry_name_en AS registryName,
-                mst.DISTRICT AS district,
-                divi.division_name AS divisionName,
-                EXTRACT(YEAR FROM mst.deregistration_expiry_date) AS year,
-                'Q' || TO_CHAR(mst.deregistration_expiry_date, 'Q') AS quarter,
-                COUNT(*) AS totalRegistrations
-            FROM MST_REG_DETAILS mst
-            INNER JOIN MST_REGISTRY_MASTER mstreg 
-                ON mstreg.ID = mst.REG_USER_ID
-            INNER JOIN district_master dist 
-                ON UPPER(dist.district_name) = UPPER(mst.DISTRICT)
-            INNER JOIN division_master divi 
-                ON UPPER(divi.division_Code) = UPPER(dist.division_code)
+              SELECT
+    	        mstreg.registry_name_en AS "REGISTRYNAME",
+    	        mst.DISTRICT AS "DISTRICT",
+    	        divi.division_name AS "DIVISION",
+    	        EXTRACT(YEAR FROM mst.REGISTRATION_DATE) AS "YEAR",
+    	        'Q' || TO_CHAR(mst.REGISTRATION_DATE, 'Q') AS "QUARTER",
+    	        COUNT(*) AS "TOTALREGISTRATIONS",
+    	        SUM(NVL(mst.TOTAL_PERSONS_WORKING, 0)) AS "TOTALPERSONSWORKING"
+    	    FROM MST_REG_DETAILS mst
+    	    INNER JOIN MST_REGISTRY_MASTER mstreg
+    	        ON mstreg.ID = mst.REG_USER_ID
+    	    INNER JOIN district_master dist
+    	        ON UPPER(dist.district_name) = UPPER(mst.DISTRICT)
+    	    INNER JOIN division_master divi
+    	        ON UPPER(divi.division_Code) = UPPER(dist.division_code)
             WHERE mst.deregistration_expiry_date IS NOT NULL
+            AND TRUNC(mst.REGISTRATION_DATE)<= TRUNC(SYSDATE)
             GROUP BY 
                 mstreg.registry_name_en,
                 mst.DISTRICT,

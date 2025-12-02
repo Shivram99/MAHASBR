@@ -66,11 +66,11 @@ public class MstRegistryDetailsPageEntity extends Auditable {
 	private String emailAddress;
 
 	@Size(max = 10)
-	@Column(name = "pan_number", length = 10)
+	@Column(name = "pan_number")
 	private String panNumber;
 
 	@Size(max = 10)
-	@Column(name = "tan_number", length = 10)
+	@Column(name = "tan_number")
 	private String tanNumber;
 
 	@Size(max = 500)
@@ -97,11 +97,11 @@ public class MstRegistryDetailsPageEntity extends Auditable {
 	private String headOfficeEmailAddress;
 
 	@Size(max = 10)
-	@Column(name = "head_office_pan_number", length = 10)
+	@Column(name = "head_office_pan_number")
 	private String headOfficePanNumber;
 
 	@Size(max = 10)
-	@Column(name = "head_office_tan_number", length = 10)
+	@Column(name = "head_office_tan_number")
 	private String headOfficeTanNumber;
 
 	@Size(max = 100)
@@ -112,7 +112,7 @@ public class MstRegistryDetailsPageEntity extends Auditable {
 	private String nic2008ActivityCode;
 
 	@Size(max = 5)
-	@Column(name = "nic2008_activity_code_description", length = 5)
+	@Column(name = "nic2008_activity_code_description")
 	private String nic2008ActivityCodeDescription;
 
 	@Column(name = "operation_start_year")
@@ -133,39 +133,39 @@ public class MstRegistryDetailsPageEntity extends Auditable {
 	private String remarks;
 
 	@Size(max = 16)
-	@Column(name = "location_code", length = 16)
+	@Column(name = "location_code")
 	private String locationCode;
 
 	@Size(max = 1)
-	@Column(name = "registration_status", length = 10)
+	@Column(name = "registration_status")
 	private String registrationStatus;
 
 	@Size(max = 100)
-	@Column(name = "town_village", length = 100)
+	@Column(name = "town_village")
 	private String townVillage;
 
 	@Size(max = 100)
-	@Column(name = "taluka", length = 100)
+	@Column(name = "taluka")
 	private String taluka;
 
 	@Size(max = 100)
-	@Column(name = "district", length = 100)
+	@Column(name = "district")
 	private String district;
 
 	@Size(max = 6)
-	@Column(name = "sector", length = 6)
+	@Column(name = "sector")
 	private String sector;
 
 	@Size(max = 10)
-	@Column(name = "ward_number", length = 10)
+	@Column(name = "ward_number")
 	private String wardNumber;
 
 	@Size(max = 200)
-	@Column(name = "authority_name", length = 200)
+	@Column(name = "authority_name")
 	private String nameOfAuthority;
 
 	@Size(max = 200)
-	@Column(name = "act_name", length = 200)
+	@Column(name = "act_name")
 	private String nameOfAct;
 
 	@Column(name = "registration_date")
@@ -177,15 +177,15 @@ public class MstRegistryDetailsPageEntity extends Auditable {
 	private LocalDate dateOfDeregistrationExpiry;
 
 	@Size(max = 15)
-	@Column(name = "gst_number", length = 15)
+	@Column(name = "gst_number")
 	private String gstNumber;
 
 	@Size(max = 10)
-	@Column(name = "hsn_code", length = 10)
+	@Column(name = "hsn_code")
 	private String hsnCode;
 
 	@Size(max = 20)
-	@Column(name = "record_status", length = 20)
+	@Column(name = "record_status")
 	private String recordStatus;
 
 	@NotNull

@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -41,7 +42,10 @@ import com.mahasbr.repository.VillageMasterRepository;
 import com.mahasbr.util.LocationGenerator;
 import com.mahasbr.util.RowValidator;
 import com.mahasbr.util.UploadProgressStore;
+import com.opencsv.CSVParser;
+import com.opencsv.CSVParserBuilder;
 import com.opencsv.CSVReader;
+import com.opencsv.CSVReaderBuilder;
 
 import lombok.RequiredArgsConstructor;
 
@@ -251,29 +255,124 @@ public class FileProcessingServiceImpl implements FileProcessingService {
 			repository.saveAll(entities);
 	}
 
+//	private List<RegistryRowDTO> parseCsv(InputStream is) throws Exception {
+//		List<RegistryRowDTO> list = new ArrayList<>();
+//		try (CSVReader reader = new CSVReader(new InputStreamReader(is))) {
+//			String[] headers = reader.readNext();
+//			if (headers == null)
+//				return list;
+//			int rowNum = 1;
+//			String[] line;
+//			while ((line = reader.readNext()) != null) {
+//				rowNum++;
+//				Map<String, String> map = new LinkedHashMap<>();
+//				for (int i = 0; i < headers.length; i++) {
+//					String key = normalizeHeader(headers[i]);
+//					String val = i < line.length ? line[i] : "";
+//					map.put(key, val == null ? "" : val.trim());
+//				}
+//				Optional<String> err = validator.validate(map);
+//				list.add(RegistryRowDTO.builder().rowData(map).valid(err.isEmpty()).errorMessage(err.orElse(""))
+//						.rowNumber(rowNum).build());
+//			}
+//		}
+//		return list;
+//	}
+	
 	private List<RegistryRowDTO> parseCsv(InputStream is) throws Exception {
-		List<RegistryRowDTO> list = new ArrayList<>();
-		try (CSVReader reader = new CSVReader(new InputStreamReader(is))) {
-			String[] headers = reader.readNext();
-			if (headers == null)
-				return list;
-			int rowNum = 1;
-			String[] line;
-			while ((line = reader.readNext()) != null) {
-				rowNum++;
-				Map<String, String> map = new LinkedHashMap<>();
-				for (int i = 0; i < headers.length; i++) {
-					String key = normalizeHeader(headers[i]);
-					String val = i < line.length ? line[i] : "";
-					map.put(key, val == null ? "" : val.trim());
-				}
-				Optional<String> err = validator.validate(map);
-				list.add(RegistryRowDTO.builder().rowData(map).valid(err.isEmpty()).errorMessage(err.orElse(""))
-						.rowNumber(rowNum).build());
-			}
-		}
-		return list;
+	    List<RegistryRowDTO> list = new ArrayList<>();
+
+	    // Robust CSV parser for handling quoted values with commas
+	    CSVParser parser = new CSVParserBuilder()
+	            .withSeparator(',')
+	            .withQuoteChar('"')
+	            .withEscapeChar('\\') // Must be different from quote char
+	            .withIgnoreQuotations(true)
+	            .build();
+
+	    try (CSVReader reader = new CSVReaderBuilder(new InputStreamReader(is))
+	            .withCSVParser(parser)
+	            .build()) {
+
+	        String[] headers = reader.readNext();
+	        if (headers == null || headers.length == 0) {
+	            throw new IllegalArgumentException("CSV file does not contain a header row!");
+	        }
+
+	        int expectedColumnCount = headers.length;
+
+	        // Normalize headers upfront
+	        String[] normalizedHeaders = new String[expectedColumnCount];
+	        for (int i = 0; i < expectedColumnCount; i++) {
+	            normalizedHeaders[i] = normalizeHeader(headers[i]);
+	        }
+
+	        int rowNum = 1;
+	        String[] line;
+
+	        while ((line = reader.readNext()) != null) {
+	            rowNum++;
+
+	            // Skip blank rows (one-column with empty string too)
+	            if (line.length == 0 || (line.length == 1 && line[0].trim().isEmpty())) {
+	                continue;
+	            }
+
+	            // If row has fewer columns, pad it
+	            if (line.length < expectedColumnCount) {
+	                line = Arrays.copyOf(line, expectedColumnCount);
+	                for (int i = 0; i < expectedColumnCount; i++) {
+	                    if (line[i] == null) line[i] = "";
+	                }
+	            }
+
+	            // If row has extra columns, merge extras into the last column
+	            if (line.length > expectedColumnCount) {
+	                String[] fixed = new String[expectedColumnCount];
+	                System.arraycopy(line, 0, fixed, 0, expectedColumnCount - 1);
+	                fixed[expectedColumnCount - 1] = String.join(" ",
+	                        Arrays.copyOfRange(line, expectedColumnCount - 1, line.length));
+	                line = fixed;
+	            }
+
+	            Map<String, String> map = new LinkedHashMap<>();
+	            boolean allEmpty = true;
+
+	            // Populate map and check if row is completely empty
+	            for (int i = 0; i < expectedColumnCount; i++) {
+	                String val = (line[i] == null ? "" : line[i].trim());
+	                if (!val.isEmpty()) {
+	                    allEmpty = false;
+	                }
+	                map.put(normalizedHeaders[i], val);
+	            }
+
+	            // ❌ Skip row only if ALL columns are empty
+	            if (allEmpty) {
+	            	logger.warn("Skipping row #{} because row is empty", rowNum);
+	                continue;
+	            }
+
+	            Optional<String> err = validator.validate(map);
+
+	            list.add(
+	                RegistryRowDTO.builder()
+	                        .rowData(map)
+	                        .valid(err.isEmpty())
+	                        .errorMessage(err.orElse(""))
+	                        .rowNumber(rowNum)
+	                        .build()
+	            );
+	        }
+
+	    } catch (com.opencsv.exceptions.CsvMalformedLineException e) {
+	        throw new RuntimeException("Invalid CSV format — ensure fields with commas are enclosed in quotes.", e);
+	    }
+
+	    return list;
 	}
+
+
 
 //	private List<RegistryRowDTO> parseExcel(InputStream is) throws Exception {
 //		List<RegistryRowDTO> list = new ArrayList<>();
