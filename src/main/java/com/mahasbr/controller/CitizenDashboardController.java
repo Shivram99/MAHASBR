@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mahasbr.dto.CitizenDashboardData;
+import com.mahasbr.dto.CitizenDashboardDataRegDeRegNewReg;
 import com.mahasbr.dto.CitizenDashboardFilter;
 import com.mahasbr.dto.RegistrationStatsDTO;
 import com.mahasbr.service.ApiSchedulerService;
@@ -67,6 +68,12 @@ public class CitizenDashboardController {
 
         return ResponseEntity.ok(citizenDashboardData);
     }
+    
+    @GetMapping("/citizenDashboardDataRegDeRegNewReg")
+    public ResponseEntity<List<CitizenDashboardDataRegDeRegNewReg>> citizenDashboardDataRegDeRegNewReg() {
+    	List<CitizenDashboardDataRegDeRegNewReg> citizenDashboardDataRegDeRegNewReg = registrationService.citizenDashboardDataRegDeRegNewReg();
+    	return ResponseEntity.ok(citizenDashboardDataRegDeRegNewReg);
+	}
     
     @GetMapping("/fetchGovApis")
     public ResponseEntity<String> fetchGovApis() {

@@ -1,13 +1,15 @@
 package com.mahasbr.service;
 
-import com.mahasbr.dto.CitizenDashboardData;
-import com.mahasbr.dto.RegistrationStatsDTO;
-import com.mahasbr.repository.RegistrationRepository;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import com.mahasbr.dto.CitizenDashboardData;
+import com.mahasbr.dto.CitizenDashboardDataRegDeRegNewReg;
+import com.mahasbr.dto.RegistrationStatsDTO;
+import com.mahasbr.repository.RegistrationRepository;
 
 @Service
 public class RegistrationService {
@@ -45,6 +47,11 @@ public class RegistrationService {
 	public List<CitizenDashboardData> citizenDashboardDataDR() {
 		List<CitizenDashboardData> citizenDashboardData = repository.citizenDashboardDataDR();
 
+		return citizenDashboardData;
+	}
+	public List<CitizenDashboardDataRegDeRegNewReg> citizenDashboardDataRegDeRegNewReg() {
+		List<CitizenDashboardDataRegDeRegNewReg> citizenDashboardData = repository.citizenDashboardDataRegDeRegNewReg();
+		
 		return citizenDashboardData;
 	}
 }
