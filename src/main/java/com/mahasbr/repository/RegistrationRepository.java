@@ -205,7 +205,7 @@ public interface RegistrationRepository extends JpaRepository<MstRegistryDetails
 			    CAST(SUBSTR(r.quarter, 2) AS NUMBER),
 			    r.division,
 			    r.district,
-			    r.registryName;
+			    r.registryName
 			            """, nativeQuery = true)
 	List<CitizenDashboardDataRegDeRegNewReg> citizenDashboardDataRegDeRegNewReg();
 
