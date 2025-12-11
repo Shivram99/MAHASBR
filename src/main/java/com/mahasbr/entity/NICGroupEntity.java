@@ -2,8 +2,7 @@ package com.mahasbr.entity;
 
 import java.util.Set;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -23,6 +22,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class NICGroupEntity {
 
     @Id
@@ -32,12 +32,17 @@ public class NICGroupEntity {
     @Column(name = "description", nullable = false)
     private String description;
 
+    // Many groups belong to one division
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "division_code", nullable = false)
-    @JsonBackReference // Child in the relationship with NICDivisionEntity
+    @JsonIgnoreProperties({"groups"}) 
     private NICDivisionEntity division;
 
+    // One group can have many classes
     @OneToMany(mappedBy = "group", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonManagedReference // Parent in the relationship with NICClassEntity
+    @JsonIgnoreProperties({"group"})
     private Set<NICClassEntity> classes;
+
+    @Column(name = "is_active", nullable = false)
+    private String isActive = "Y";
 }

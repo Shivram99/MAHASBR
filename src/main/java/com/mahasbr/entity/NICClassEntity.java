@@ -40,4 +40,7 @@ public class NICClassEntity {
     @OneToMany(mappedBy = "nicClass", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference // Parent in the relationship with NICCodeEntity
     private Set<NICCodeEntity> nicCodes;
+    
+    @Column(name = "is_active", nullable = false)
+    private String isActive = "Y";
 }

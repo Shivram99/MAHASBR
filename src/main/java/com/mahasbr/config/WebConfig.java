@@ -14,7 +14,7 @@ public class WebConfig implements WebMvcConfigurer {
 	public void addCorsMappings(CorsRegistry registry) {
 		registry.addMapping("/**")
 		        .allowedOrigins("http://10.0.0.78:4200","http://localhost:4200","http://13.204.181.90:80","http://13.204.181.90") // or your Angular app URL
-				.allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+				.allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")
 				.allowedHeaders("*")
 //				.exposedHeaders("Authorization");
 				.allowedHeaders("Authorization", "Content-Type").allowCredentials(true);

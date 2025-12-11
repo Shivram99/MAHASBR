@@ -21,20 +21,22 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class NICCodeEntity {
-
 	
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "code", nullable = false, unique = true)
+    @Column(name = "code", unique = true)
     public String code;
 
-    @Column(name = "description", nullable = false)
+    @Column(name = "description")
     private String description;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "class_code", nullable = false)
+    @JoinColumn(name = "class_code")
     @JsonBackReference 
     private NICClassEntity nicClass;
+    
+    @Column(name = "is_active", nullable = false)
+    private String isActive = "Y";
 }

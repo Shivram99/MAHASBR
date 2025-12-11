@@ -2,7 +2,7 @@ package com.mahasbr.entity;
 
 import java.util.Set;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -29,7 +29,17 @@ public class NICCategoryEntity {
     @Column(name = "description", nullable = false)
     private String description;
 
-    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonManagedReference 
+    @JsonIgnore
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, fetch = FetchType.LAZY) 
     private Set<NICDivisionEntity> divisions;
+    
+    @Column(name = "is_active", nullable = false)
+    private String isActive = "Y";
+
+	public NICCategoryEntity(String categoryCode, String description, String isActive) {
+		super();
+		this.categoryCode = categoryCode;
+		this.description = description;
+		this.isActive = isActive;
+	}
 }
