@@ -16,6 +16,6 @@ public interface UserMapper {
 	UserProfileDto toUserProfileDto(UserProfileEntity profile);
 
 	default String map(Role role) {
-		return role != null ? role.getName().name() : null;
+		return role != null ? role.getName(): null;
 	}
 }

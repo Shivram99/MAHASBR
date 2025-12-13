@@ -131,26 +131,34 @@ public class MenuPermissionServiceImpl implements MenuPermissionService {
 	}
 
 	// builds parent-child tree from flat list
-	private List<MenuDTO> buildTree(List<Menu> flat) {
-		Map<Long, MenuDTO> map = new HashMap<>();
-		List<MenuDTO> roots = new ArrayList<>();
+	/* =====================================================
+    BUILD HIERARCHY TREE FOR ROLE MENUS
+    ===================================================== */
+ private List<MenuDTO> buildTree(List<Menu> flat) {
 
-		for (Menu m : flat) {
-			MenuDTO dto = mapper.toDto(m);
-			map.put(dto.getId(), dto);
-		}
+     Map<Long, MenuDTO> dtoMap = new HashMap<>();
+     List<MenuDTO> roots = new ArrayList<>();
 
-		for (Menu m : flat) {
-			MenuDTO dto = map.get(m.getId());
-			if (m.getParent() == null || !map.containsKey(m.getParent().getId())) {
-				roots.add(dto);
-			} else {
-				MenuDTO parentDto = map.get(m.getParent().getId());
-				parentDto.getChildren().add(dto);
-			}
-		}
+     flat.forEach(menu -> dtoMap.put(menu.getId(), mapper.toDTO(menu)));
 
-		roots.sort(Comparator.comparing(MenuDTO::getSequence));
-		return roots;
-	}
+     for (Menu menu : flat) {
+
+         MenuDTO dto = dtoMap.get(menu.getId());
+         Long parentId = menu.getParent() != null ? menu.getParent().getId() : null;
+
+         if (parentId == null || !dtoMap.containsKey(parentId)) {
+             roots.add(dto);
+         } else {
+             MenuDTO parent = dtoMap.get(parentId);
+
+             // Prevent duplicates inside children list
+             if (parent.getChildren().stream().noneMatch(c -> c.getId().equals(dto.getId()))) {
+                 parent.getChildren().add(dto);
+             }
+         }
+     }
+
+     roots.sort(Comparator.comparing(MenuDTO::getSequence));
+     return roots;
+ }
 }

@@ -18,22 +18,22 @@ public class RegionDataInitializer implements CommandLineRunner {
 	 private  RoleRepository roleRepository;
 
 	 @Override
-	    public void run(String... args) {
+	  public void run(String... args) {
 
-	        for (ERole roleEnum : ERole.values()) {
-
-	            Optional<Role> existingRole = roleRepository.findByName(roleEnum);
-
-	            if (!existingRole.isPresent()) { // If role not found → insert
-	                Role role = new Role();
-	                role.setName(roleEnum);
-
-	                roleRepository.save(role);
-	                System.out.println("✔ Role created: " + roleEnum);
-	            } else {
-	                System.out.println("ℹ Role already exists: " + roleEnum);
-	            }
-	        }
+//	        for (ERole roleEnum : ERole.values()) {
+//
+//	            Optional<Role> existingRole = roleRepository.findByName(roleEnum);
+//
+//	            if (!existingRole.isPresent()) { // If role not found → insert
+//	                Role role = new Role();
+////	                role.setName(roleEnum);
+//
+//	                roleRepository.save(role);
+//	                System.out.println("✔ Role created: " + roleEnum);
+//	            } else {
+//	                System.out.println("ℹ Role already exists: " + roleEnum);
+//	            }
+//	        }
 
 	        System.out.println("🎯 Roles initialization finished!");
 	    }

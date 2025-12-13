@@ -78,7 +78,7 @@ public class RegistrationController {
     Set<Role> roles = new HashSet<>();
 
     
-    Role userRole = roleRepository.findByName(ERole.valueOf(strRoles))
+    Role userRole = roleRepository.findByName(strRoles)
             .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
         roles.add(userRole);
     

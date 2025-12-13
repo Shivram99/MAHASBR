@@ -18,6 +18,7 @@ public class MenuDTO {
 	private String icon;
 	private Integer sequence;
 	private Boolean active;
-	private Long parentId;    
+	private Long parentId; 
+	 private String menuType;
 	private List<MenuDTO> children = new ArrayList<>();
 }

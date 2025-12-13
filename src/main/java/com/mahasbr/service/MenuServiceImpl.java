@@ -1,6 +1,14 @@
 package com.mahasbr.service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Set;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -10,11 +18,9 @@ import com.mahasbr.entity.Menu;
 import com.mahasbr.entity.Role;
 import com.mahasbr.entity.RoleMenu;
 import com.mahasbr.mapper.MenuMapper;
-import com.mahasbr.model.ERole;
 import com.mahasbr.repository.MenuRepository;
 import com.mahasbr.repository.RoleMenuRepository;
 import com.mahasbr.repository.RoleRepository;
-
 @Service
 @Transactional
 public class MenuServiceImpl implements MenuService {
@@ -39,29 +45,42 @@ public class MenuServiceImpl implements MenuService {
        ===================================================== */
     @Override
     public List<MenuDTO> getAllMenus() {
-        List<Menu> rootMenus = menuRepository.findByParentIsNullAndActiveTrueOrderBySequenceAsc();
-        return rootMenus.stream()
+
+        List<Menu> rootMenus = menuRepository.findRootMenusWithChildren();
+
+        // remove any duplicated children (Hibernate safety)
+        List<Menu> cleanMenus = rootMenus.stream()
+                .map(this::removeDuplicates)
+                .toList();
+
+        // convert to DTO recursively
+        return cleanMenus.stream()
                 .map(this::convertRecursive)
                 .toList();
     }
 
+
     private MenuDTO convertRecursive(Menu menu) {
-        MenuDTO dto = mapper.toDto(menu);
+        MenuDTO dto = mapper.toDTO(menu);
 
-        menu.getChildren().stream()
-                .filter(Menu::getActive)
-                .sorted(Comparator.comparing(Menu::getSequence))
-                .forEach(child -> dto.getChildren().add(convertRecursive(child)));
-
-        return dto;
+        dto.setChildren(
+        	    menu.getChildren().stream()
+        	        .sorted(Comparator.comparing(Menu::getSequence))
+        	        .map(this::convertRecursive)
+        	        .toList()
+        	);
+           return dto;
     }
 
+    /* =====================================================
+       GET MENU BY ID
+       ===================================================== */
     @Override
     public MenuDTO getMenuById(Long id) {
-        return mapper.toDto(
-                menuRepository.findById(id)
-                        .orElseThrow(() -> new NoSuchElementException("Menu not found"))
-        );
+        Menu menu = menuRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Menu not found"));
+
+        return mapper.toDTO(menu);
     }
 
     /* =====================================================
@@ -72,13 +91,11 @@ public class MenuServiceImpl implements MenuService {
 
         Menu menu = new Menu();
 
-        // Parent handling
+        // Parent
         if (dto.getParentId() != null) {
             Menu parent = menuRepository.findById(dto.getParentId())
                     .orElseThrow(() -> new NoSuchElementException("Parent menu not found"));
             menu.setParent(parent);
-        } else {
-            menu.setParent(null);
         }
 
         menu.setNameEn(dto.getNameEn());
@@ -89,7 +106,7 @@ public class MenuServiceImpl implements MenuService {
         menu.setSequence(dto.getSequence());
         menu.setActive(dto.getActive() != null ? dto.getActive() : true);
 
-        return mapper.toDto(menuRepository.save(menu));
+        return mapper.toDTO(menuRepository.save(menu));
     }
 
     /* =====================================================
@@ -101,22 +118,17 @@ public class MenuServiceImpl implements MenuService {
         Menu menu = menuRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Menu not found"));
 
-        /* -----------------------------------------------
-           HANDLE PARENT CHANGE (remove / update / validate)
-           ----------------------------------------------- */
+        // Parent handling
         if (dto.getParentId() == null) {
-            // Remove parent
             menu.setParent(null);
-
         } else {
 
-            if (Objects.equals(dto.getParentId(), id)) {
-                throw new IllegalArgumentException("A menu cannot be its own parent");
+            if (dto.getParentId().equals(id)) {
+                throw new IllegalArgumentException("Menu cannot be its own parent");
             }
 
-            // Prevent cycle: don't allow a descendant to be assigned as parent
             if (isDescendant(id, dto.getParentId())) {
-                throw new IllegalArgumentException("Cannot assign a descendant as parent (cyclic hierarchy)");
+                throw new IllegalArgumentException("Cannot assign a descendant as parent");
             }
 
             Menu parent = menuRepository.findById(dto.getParentId())
@@ -125,7 +137,7 @@ public class MenuServiceImpl implements MenuService {
             menu.setParent(parent);
         }
 
-        // Update normal fields
+        // Normal fields
         menu.setNameEn(dto.getNameEn());
         menu.setNameMr(dto.getNameMr());
         menu.setRoute(dto.getRoute());
@@ -133,24 +145,27 @@ public class MenuServiceImpl implements MenuService {
         menu.setSequence(dto.getSequence());
         menu.setActive(dto.getActive());
 
-        return mapper.toDto(menuRepository.save(menu));
+        return mapper.toDTO(menuRepository.save(menu));
     }
 
     /* =====================================================
-       HELPER – CHECK CYCLIC ASSIGNMENT
+       CHECK CYCLIC RELATIONSHIP
        ===================================================== */
     private boolean isDescendant(Long menuId, Long supposedParentId) {
 
         List<Menu> children = menuRepository.findChildren(menuId);
 
         for (Menu child : children) {
-            if (Objects.equals(child.getId(), supposedParentId)) {
+
+            if (child.getId().equals(supposedParentId)) {
                 return true; // cycle found
             }
+
             if (isDescendant(child.getId(), supposedParentId)) {
                 return true;
             }
         }
+
         return false;
     }
 
@@ -166,33 +181,48 @@ public class MenuServiceImpl implements MenuService {
     }
 
     /* =====================================================
-       ROLE → MENU MAPPING
+       GET MENUS FOR MULTIPLE ROLES
        ===================================================== */
     @Override
-    public List<MenuDTO> getMenusForRole(ERole role) {
-        List<Menu> flatMenus = menuRepository.findMenusByRole(role);
+    public List<MenuDTO> getMenusForRoles(Set<String> roleNames) {
+
+        List<Menu> flatMenus = menuRepository.findMenusByRoleNames(roleNames);
+//        List<Menu> flatMenus = menuRepository.findMenusByRoleNames();
+
         return buildTree(flatMenus);
     }
 
+    /* =====================================================
+       BUILD HIERARCHY TREE FOR ROLE MENUS
+       ===================================================== */
     private List<MenuDTO> buildTree(List<Menu> flat) {
 
-        Map<Long, MenuDTO> map = new HashMap<>();
+        Map<Long, MenuDTO> dtoMap = new HashMap<>();
         List<MenuDTO> roots = new ArrayList<>();
 
-        flat.forEach(m -> map.put(m.getId(), mapper.toDto(m)));
+        flat.forEach(menu -> dtoMap.put(menu.getId(), mapper.toDTO(menu)));
 
         for (Menu menu : flat) {
-            if (menu.getParent() == null) {
-                roots.add(map.get(menu.getId()));
+
+            MenuDTO dto = dtoMap.get(menu.getId());
+            Long parentId = menu.getParent() != null ? menu.getParent().getId() : null;
+
+            if (parentId == null || !dtoMap.containsKey(parentId)) {
+                roots.add(dto);
             } else {
-                MenuDTO parent = map.get(menu.getParent().getId());
-                parent.getChildren().add(map.get(menu.getId()));
+                MenuDTO parent = dtoMap.get(parentId);
+
+                // Prevent duplicates inside children list
+                if (parent.getChildren().stream().noneMatch(c -> c.getId().equals(dto.getId()))) {
+                    parent.getChildren().add(dto);
+                }
             }
         }
 
         roots.sort(Comparator.comparing(MenuDTO::getSequence));
         return roots;
     }
+
 
     /* =====================================================
        ROLE MENU ASSIGNMENT
@@ -215,6 +245,47 @@ public class MenuServiceImpl implements MenuService {
 
     @Override
     public void removeMenuFromRole(Long menuId, Long roleId) {
-//        roleMenuRepository.deleteByRole_IdAndMenu_IdIn(roleId, menuId);
+//        roleMenuRepository.deleteByRoleIdAndMenuId(roleId, menuId);
     }
+    private Menu removeDuplicates(Menu menu) {
+
+        if (menu.getChildren() == null) return menu;
+
+        Map<Long, Menu> unique = new LinkedHashMap<>();
+
+        for (Menu child : menu.getChildren()) {
+            Menu cleaned = removeDuplicates(child);
+            unique.put(child.getId(), cleaned);
+        }
+
+        menu.setChildren(new ArrayList<>(unique.values()));
+        return menu;
+    }
+    private Menu removeDuplicateChildren(Menu menu) {
+
+        if (menu.getChildren() == null) {
+            return menu;
+        }
+
+        // Use LinkedHashMap to preserve order + remove duplicates by ID
+        Map<Long, Menu> unique = new LinkedHashMap<>();
+
+        for (Menu child : menu.getChildren()) {
+            // Clean duplicates recursively
+            Menu cleaned = removeDuplicateChildren(child);
+            unique.put(child.getId(), cleaned);
+        }
+
+        // Replace children with unique list
+        menu.setChildren(new ArrayList<>(unique.values()));
+        return menu;
+    }
+
+	@Override
+	public List<MenuDTO> getMenusForRole(Role role) {
+		List<Menu> flatMenus = menuRepository.findMenusByRole(role);
+		return buildTree(flatMenus);
+	}
+
+
 }

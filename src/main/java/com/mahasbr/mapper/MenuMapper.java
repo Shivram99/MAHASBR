@@ -1,6 +1,6 @@
 package com.mahasbr.mapper;
 
-import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
@@ -10,23 +10,33 @@ import com.mahasbr.entity.Menu;
 @Component
 public class MenuMapper {
 
-	public MenuDTO toDto(Menu menu) {
-	    MenuDTO dto = new MenuDTO();
-	    dto.setId(menu.getId());
-	    dto.setNameEn(menu.getNameEn());
-	    dto.setNameMr(menu.getNameMr());
-	    dto.setRoute(menu.getRoute());
-	    dto.setIcon(menu.getIcon());
-	    dto.setSequence(menu.getSequence());
-	    dto.setActive(menu.getActive());
+	 public MenuDTO toDTO(Menu menu) {
+	        if (menu == null) {
+	            return null;
+	        }
 
-	    // Only set parentId—not children
-	    dto.setParentId(menu.getParent() != null ? menu.getParent().getId() : null);
+	        MenuDTO dto = new MenuDTO();
+	        dto.setId(menu.getId());
+	        dto.setNameEn(menu.getNameEn());
+	        dto.setNameMr(menu.getNameMr());
+	        dto.setRoute(menu.getRoute());
+	        dto.setIcon(menu.getIcon());
+	        dto.setSequence(menu.getSequence());
+	        dto.setActive(menu.getActive());
+	        dto.setMenuType(menu.getMenuType());
 
-	    // Children will be assigned manually in service
-	    dto.setChildren(new ArrayList<>());
+	        dto.setParentId(menu.getParent() != null ? menu.getParent().getId() : null);
 
-	    return dto;
-	}
+	        // Convert children recursively
+	        if (menu.getChildren() != null) {
+	            dto.setChildren(
+	                menu.getChildren().stream()
+	                    .map(this::toDTO)
+	                    .collect(Collectors.toList())
+	            );
+	        }
+
+	        return dto;
+	    }
 
 }

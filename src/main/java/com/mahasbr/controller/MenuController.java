@@ -1,10 +1,13 @@
 package com.mahasbr.controller;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,8 +20,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.mahasbr.dto.AssignMenuToRoleDTO;
 import com.mahasbr.dto.MenuCreateDTO;
 import com.mahasbr.dto.MenuDTO;
-import com.mahasbr.model.ERole;
+import com.mahasbr.entity.Role;
 import com.mahasbr.service.MenuService;
+import com.mahasbr.service.UserDetailsImpl;
 import com.mahasbr.util.ApiResponse;
 
 import lombok.RequiredArgsConstructor;
@@ -73,7 +77,7 @@ public class MenuController {
           ROLE-BASED MENU
        ============================= */
     @GetMapping("/role/{role}")
-    public ResponseEntity<ApiResponse<List<MenuDTO>>> getMenusByRole(@PathVariable ERole role) {
+    public ResponseEntity<ApiResponse<List<MenuDTO>>> getMenusByRole(@PathVariable Role role) {
         List<MenuDTO> menus = menuService.getMenusForRole(role);
         return ResponseEntity.ok(new ApiResponse<>(true, "Menus fetched for role " + role, menus));
     }
@@ -92,4 +96,43 @@ public class MenuController {
         menuService.removeMenuFromRole(dto.getMenuId(), dto.getRoleId());
         return ResponseEntity.ok(new ApiResponse<>(true, "Menu removed from role successfully", null));
     }
+    
+    
+    @GetMapping("/my")
+    public ResponseEntity<ApiResponse<List<MenuDTO>>> getMyMenus(Authentication authentication) {
+
+
+        // Extract authenticated user from JWT
+    	  UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+
+        // Extract user roles
+        Set<Role> roles = userDetails.getRoles();
+
+        // Convert to String role names
+        Set<String> roleNames = roles.stream()
+                .map(Role::getName)
+                .collect(Collectors.toSet());
+
+        // Load menus for these roles
+        List<MenuDTO> menus = menuService.getMenusForRoles(roleNames);
+        
+     // PRINT MENUS
+        System.out.println("===== MENUS FOR USER =====");
+        menus.forEach(m -> printMenu(m, 0));
+
+        return ResponseEntity.ok(
+            new ApiResponse<>(true, "Menus loaded successfully", menus)
+        );
+    }
+    
+    private void printMenu(MenuDTO menu, int level) {
+        String indent = "  ".repeat(level);
+        System.out.println(indent + "- " + menu.getNameEn() + " (" + menu.getId() + ")");
+
+        if (menu.getChildren() != null) {
+            menu.getChildren().forEach(child -> printMenu(child, level + 1));
+        }
+    }
+
+    
 }

@@ -117,7 +117,7 @@ public class UserService {
         // Update roles
         if (dto.getRoles() != null) {
             Set<Role> roles = dto.getRoles().stream()
-                    .map(roleName -> roleRepository.findByName(ERole.valueOf(roleName))
+                    .map(roleName -> roleRepository.findByName(roleName)
                             .orElseThrow(() -> new RuntimeException("Role not found: " + roleName)))
                     .collect(Collectors.toSet());
             existing.setRoles(roles);
@@ -161,7 +161,7 @@ public class UserService {
 
         if (user.getRoles() != null) {
             dto.setRoles(user.getRoles().stream()
-                    .map(r -> r.getName().name())
+                    .map(r -> r.getName())
                     .collect(Collectors.toSet()));
         }
 
@@ -179,7 +179,7 @@ public class UserService {
     
     public List<RoleDto> getAllRoles() {
         return roleRepository.findAll().stream()
-                .map(role -> new RoleDto(role.getId(), role.getName().name()))
+                .map(role -> new RoleDto(role.getId(), role.getName()))
                 .collect(Collectors.toList());
     }
     
@@ -187,12 +187,12 @@ public class UserService {
         Set<Role> roles = new HashSet<>();
 
         if (roleNames == null || roleNames.isEmpty()) {
-            Role defaultRole = roleRepository.findByName(ERole.ROLE_USER)
+            Role defaultRole = roleRepository.findByName("ROLE_USER")
                     .orElseThrow(() -> new RuntimeException("Default role not found"));
             roles.add(defaultRole);
         } else {
             for (String roleName : roleNames) {
-                Role role = roleRepository.findByName(ERole.valueOf(roleName))
+                Role role = roleRepository.findByName(roleName)
                         .orElseThrow(() -> new RuntimeException("Role not found: " + roleName));
                 roles.add(role);
             }

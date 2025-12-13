@@ -1,10 +1,11 @@
 package com.mahasbr.service;
 
 import java.util.List;
+import java.util.Set;
 
 import com.mahasbr.dto.MenuCreateDTO;
 import com.mahasbr.dto.MenuDTO;
-import com.mahasbr.model.ERole;
+import com.mahasbr.entity.Role;
 
 public interface MenuService {
 	 List<MenuDTO> getAllMenus();
@@ -18,9 +19,11 @@ public interface MenuService {
 	    void deleteMenu(Long id);
 
 	    // Role Based
-	    List<MenuDTO> getMenusForRole(ERole role);
+	    List<MenuDTO> getMenusForRole(Role role);
 
 	    void assignMenuToRole(Long menuId, Long roleId);
 
 	    void removeMenuFromRole(Long menuId, Long roleId);
+
+		List<MenuDTO> getMenusForRoles(Set<String> roleNames);
 }

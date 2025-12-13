@@ -31,9 +31,8 @@ public class Role extends Auditable {
     @SequenceGenerator(name = "role_seq_generator", sequenceName = "roles_seq", allocationSize = 1)
     private Long id;
 
-    @Enumerated(EnumType.STRING)
-    @Column(length = 20)
-    private ERole name;
+    @Column(name = "name", length = 50, unique = true, nullable = false)
+    private String name; // dynamic role name (ADMIN, USER, etc.)
     
 }
 

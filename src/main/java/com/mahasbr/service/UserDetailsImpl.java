@@ -3,6 +3,7 @@ package com.mahasbr.service;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.security.core.GrantedAuthority;
@@ -10,6 +11,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.mahasbr.entity.Role;
 import com.mahasbr.entity.User;
 
 public class UserDetailsImpl implements UserDetails {
@@ -24,24 +26,36 @@ public class UserDetailsImpl implements UserDetails {
 
 	@JsonIgnore
 	private Boolean isFirstTimeLogin;
+	
+	private Set<Role> roles;
 
 	private Collection<? extends GrantedAuthority> authorities;
 
 	public UserDetailsImpl(Long id, String username, String password,
-			Collection<? extends GrantedAuthority> authorities, Boolean isFirstTimeLogin) {
-		this.id = id;
-		this.username = username;
-		this.password = password;
-		this.authorities = authorities;
-		this.isFirstTimeLogin = isFirstTimeLogin;
+	        Collection<? extends GrantedAuthority> authorities, Boolean isFirstTimeLogin,
+	        Set<Role> roles) {
+
+	    this.id = id;
+	    this.username = username;
+	    this.password = password;
+	    this.authorities = authorities;
+	    this.isFirstTimeLogin = isFirstTimeLogin;
+	    this.roles = roles;
 	}
 
 	public static UserDetailsImpl build(User user) {
-		List<GrantedAuthority> authorities = user.getRoles().stream()
-				.map(role -> new SimpleGrantedAuthority(role.getName().name())).collect(Collectors.toList());
+	    List<GrantedAuthority> authorities = user.getRoles().stream()
+	            .map(role -> new SimpleGrantedAuthority(role.getName()))
+	            .collect(Collectors.toList());
 
-		return new UserDetailsImpl(user.getId(), user.getUsername(), user.getPassword(), authorities,
-				user.getIsFirstTimeLogin());
+	    return new UserDetailsImpl(
+	            user.getId(),
+	            user.getUsername(),
+	            user.getPassword(),
+	            authorities,
+	            user.getIsFirstTimeLogin(),
+	            user.getRoles()       // <-- ADD THIS
+	    );
 	}
 
 	@Override
@@ -81,6 +95,10 @@ public class UserDetailsImpl implements UserDetails {
 	@Override
 	public boolean isEnabled() {
 		return true;
+	}
+	
+	public Set<Role> getRoles() {
+	    return roles;
 	}
 
 	@Override

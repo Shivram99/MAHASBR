@@ -37,8 +37,8 @@ public class DataInitializer implements CommandLineRunner {
 	private void createUserIfNotExists(String username, String email,  String rawPassword, String roleName) {
 	    if (!userRepository.existsByEmail(email)) {
 	        try {
-	            ERole roleEnum = ERole.valueOf(roleName); // Convert String to ERole
-	            Optional<Role> roleOpt = roleRepository.findByName(roleEnum);
+//	            ERole roleEnum = ERole.valueOf(roleName); // Convert String to ERole
+	            Optional<Role> roleOpt = roleRepository.findByName(roleName);
 	            
 	            if (roleOpt.isPresent()) {
 	                User user = new User();

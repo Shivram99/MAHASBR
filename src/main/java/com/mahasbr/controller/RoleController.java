@@ -1,6 +1,5 @@
 package com.mahasbr.controller;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,50 +15,44 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.mahasbr.entity.Role;
 import com.mahasbr.service.RoleService;
-
+import com.mahasbr.util.ApiResponse;
 @RestController
-@RequestMapping("/admin")
+@RequestMapping("/admin/roles")
 public class RoleController {
 
-	
-	@Autowired
-	private  RoleService roleService;
+    @Autowired
+    private RoleService roleService;
 
-
-    @GetMapping("/getRoleById/{id}")
-    public ResponseEntity<Role> getRoleById(@PathVariable("id") Long id) {
-        Optional<Role> role = roleService.findRoleById(id);
-        return role.map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    @GetMapping
+    public ResponseEntity<ApiResponse<List<Role>>> getAllRoles() {
+        return ResponseEntity.ok(ApiResponse.ok(roleService.getAllRoles(), "Roles fetched successfully"));
     }
 
-    @GetMapping("/getAllRoles")
-    public List<Role> getAllRoles() {
-        return roleService.getAllRoles();
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<Role>> getRoleById(@PathVariable Long id) {
+        Role role = roleService.getRoleById(id);
+        return ResponseEntity.ok(ApiResponse.ok(role, "Role fetched successfully"));
     }
 
-    @PostMapping("/createRole")
-    public ResponseEntity<Role> createRole(@RequestBody Role role) {
-        Role savedRole = roleService.saveOrUpdateRole(role);
-        return ResponseEntity.status(HttpStatus.OK).body(savedRole);
+    @PostMapping
+    public ResponseEntity<ApiResponse<Role>> createRole(@RequestBody Role role) {
+        Role created = roleService.createRole(role);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.ok(created, "Role created successfully"));
     }
 
-    @PutMapping("/updateRole/{id}")
-    public ResponseEntity<Role> updateRole(@PathVariable("id") Long id, @RequestBody Role role) {
-        if (!roleService.findRoleById(id).isPresent()) {
-            return ResponseEntity.notFound().build();
-        }
-        role.setId(id); // Ensure the ID is set for the correct role
-        Role updatedRole = roleService.saveOrUpdateRole(role);
-        return ResponseEntity.ok(updatedRole);
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<Role>> updateRole(
+            @PathVariable Long id,
+            @RequestBody Role role) {
+
+        Role updated = roleService.updateRole(id, role);
+        return ResponseEntity.ok(ApiResponse.ok(updated, "Role updated successfully"));
     }
 
-    @DeleteMapping("/deleteRole/{id}")
-    public ResponseEntity<Void> deleteRole(@PathVariable("id") Long id) {
-        if (!roleService.findRoleById(id).isPresent()) {
-            return ResponseEntity.notFound().build();
-        }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<Void>> deleteRole(@PathVariable Long id) {
         roleService.deleteRole(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(ApiResponse.ok(null, "Role deleted successfully"));
     }
 }

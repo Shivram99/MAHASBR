@@ -11,9 +11,13 @@ import com.mahasbr.model.ERole;
 
 @Repository
 public interface RoleRepository extends JpaRepository<Role, Long> {
-  Optional<Role> findByName(ERole name);
+//  Optional<Role> findByName(ERole name);
 
   Optional<Role> findByName(String roleName);
+  
+  boolean existsByNameIgnoreCase(String name);
+
+  Optional<Role> findByNameIgnoreCase(String name);
 }
 
 
