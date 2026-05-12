@@ -30,7 +30,7 @@ import lombok.Setter;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Menu {
+public class Menu extends Auditable{
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

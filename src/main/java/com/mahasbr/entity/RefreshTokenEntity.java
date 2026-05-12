@@ -17,7 +17,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class RefreshTokenEntity {
+public class RefreshTokenEntity extends Auditable{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -3,12 +3,15 @@ package com.mahasbr.repository;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.mahasbr.entity.DistrictMaster;
+import com.mahasbr.entity.MstRegistryDetailsPageEntity;
 
 @Repository
 public interface DistrictMasterRepository extends JpaRepository<DistrictMaster, Long> {
@@ -44,5 +47,18 @@ public interface DistrictMasterRepository extends JpaRepository<DistrictMaster, 
 	
 	@Query("SELECT d.districtName FROM DistrictMaster d WHERE d.districtId = :districtId AND d.isActive = true")
 	Optional<String> findDistrictNameById(@Param("districtId") Long districtId);
+	
+	@Query("""
+			SELECT m FROM MstRegistryDetailsPageEntity m
+			WHERE LOWER(m.district) = :district
+			AND (:cursor IS NULL OR m.id < :cursor)
+			ORDER BY m.id DESC
+			""")
+			Slice<MstRegistryDetailsPageEntity> findNextByDistrict(
+			        @Param("district") String district,
+			        @Param("cursor") Long cursor,
+			        Pageable pageable
+			);
+
 
 }

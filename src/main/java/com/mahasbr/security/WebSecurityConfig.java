@@ -16,13 +16,13 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mahasbr.filter.AuthEntryPointJwt;
 import com.mahasbr.filter.AuthTokenFilter;
+import com.mahasbr.filter.CorrelationIdFilter;
 import com.mahasbr.filter.XssFilter;
 import com.mahasbr.repository.PermissionRepository;
 import com.mahasbr.service.RefreshTokenService;
@@ -52,24 +52,6 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
 	@Autowired
 	private ObjectMapper mapper;
 
-	// @Autowired
-	// private CustomAuthenticationFailureHandler authenticationFailureHandler;
-
-//	@Bean
-//	public ObjectMapper objectMapper() {
-//		ObjectMapper objectMapper = new ObjectMapper();
-//		objectMapper.registerModule(new JavaTimeModule());
-//		return objectMapper;
-//		// return new ObjectMapper();
-//	}
-
-//	@Bean
-//    public ObjectMapper objectMapper() {
-//        ObjectMapper mapper = new ObjectMapper();
-//        mapper.registerModule(new JavaTimeModule());
-//        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-//        return mapper;
-//    }
 
 	@Bean
 	public AuthTokenFilter authenticationJwtTokenFilter() {
@@ -100,10 +82,6 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
 		return new XssFilter();
 	}
 
-//	@Bean
-//	public LogoutSuccessHandler logoutSuccessHandler() {
-//		return new HttpStatusReturningLogoutSuccessHandler();
-//	}
 
 	@Bean
 	public LogoutSuccessHandler logoutSuccessHandler() {
@@ -138,18 +116,17 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
 				// .failureHandler(authenticationFailureHandler)
 				.authorizeHttpRequests(auth -> auth.requestMatchers("/api/auth/signin", "/citizenSearch/**").permitAll()
 						.requestMatchers("/api/auth/signup").permitAll().requestMatchers("/api/test/**").permitAll()
-						.requestMatchers("/common/api**").permitAll()
-						.requestMatchers("/api/auth/progress/**").permitAll() 
-						.requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+						.requestMatchers("/common/api**").permitAll().requestMatchers("/api/auth/progress/**")
+						.permitAll().requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
 						.requestMatchers(" /common/department**").permitAll().requestMatchers("/admin/**").permitAll()
 						.requestMatchers("/moderator/**").hasRole("MODERATOR").requestMatchers("/developer/**")
 						.hasRole("DEVELOPER").requestMatchers("/user/**").permitAll().anyRequest().authenticated());
-//				.logout(logout -> logout.logoutUrl("/api/auth/logout").permitAll()
-//						.logoutSuccessHandler(logoutSuccessHandler()));
 
-		http.authenticationProvider(authenticationProvider());
-		http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+		http.authenticationProvider(authenticationProvider());	
+		http.addFilterBefore(correlationIdFilter(),UsernamePasswordAuthenticationFilter.class);
+		http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);		
 		http.addFilterBefore(xssFilter(), UsernamePasswordAuthenticationFilter.class);
+		
 		return http.build();
 	}
 
@@ -157,28 +134,11 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
 	public AuthenticationFailureHandler authenticationFailureHandler() {
 		return new CustomAuthenticationFailureHandler(mapper);
 	}
+	
+	@Bean
+	public CorrelationIdFilter correlationIdFilter() {
+	    return new CorrelationIdFilter();
+	}
 
-//	@Bean
-//	public AuthenticationSuccessHandler myAuthenticationSuccessHandler() {
-//		return new CustomSimpleUrlAuthenticationSuccessHandler();
-//	}
-
-//	@Bean
-//	public LogoutSuccessHandler logoutSuccessHandler() {
-//		return (request, response, authentication) -> {
-//			if (authentication != null) {
-//				// revoke refresh token for the logged-in user
-//				refreshTokenService.revoke(authentication.getName());
-//			}
-//
-//			// clear refresh token cookie
-//			ResponseCookie cookie = ResponseCookie.from("refresh", "").httpOnly(true).secure(true).sameSite("Strict")
-//					.path("/").maxAge(0).build();
-//
-//			response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());
-//			response.setStatus(HttpServletResponse.SC_OK);
-//			response.getWriter().write("{\"message\": \"Logout successful\"}");
-//		};
-//	}
 
 }

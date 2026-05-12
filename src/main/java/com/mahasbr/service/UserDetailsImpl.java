@@ -26,37 +26,61 @@ public class UserDetailsImpl implements UserDetails {
 
 	@JsonIgnore
 	private Boolean isFirstTimeLogin;
-	
+
 	private Set<Role> roles;
 
+	private Long registryId;
+	private Long districtId;
+
 	private Collection<? extends GrantedAuthority> authorities;
+	 public UserDetailsImpl(
+	            Long id,
+	            String username,
+	            String password,
+	            Collection<? extends GrantedAuthority> authorities,
+	            Boolean isFirstTimeLogin,
+	            Set<Role> roles,
+	            Long registryId,
+	            Long districtId
+	    ) {
+	        this.id = id;
+	        this.username = username;
+	        this.password = password;
+	        this.authorities = authorities;
+	        this.isFirstTimeLogin = isFirstTimeLogin;
+	        this.roles = roles;
+	        this.registryId = registryId;
+	        this.districtId = districtId;
+	    }
 
-	public UserDetailsImpl(Long id, String username, String password,
-	        Collection<? extends GrantedAuthority> authorities, Boolean isFirstTimeLogin,
-	        Set<Role> roles) {
+	   
 
-	    this.id = id;
-	    this.username = username;
-	    this.password = password;
-	    this.authorities = authorities;
-	    this.isFirstTimeLogin = isFirstTimeLogin;
-	    this.roles = roles;
-	}
+	 public static UserDetailsImpl build(User user) {
 
-	public static UserDetailsImpl build(User user) {
-	    List<GrantedAuthority> authorities = user.getRoles().stream()
-	            .map(role -> new SimpleGrantedAuthority(role.getName()))
-	            .collect(Collectors.toList());
+		    List<GrantedAuthority> authorities = user.getRoles().stream()
+		            .map(role -> new SimpleGrantedAuthority(role.getName()))
+		            .collect(Collectors.toList());
 
-	    return new UserDetailsImpl(
-	            user.getId(),
-	            user.getUsername(),
-	            user.getPassword(),
-	            authorities,
-	            user.getIsFirstTimeLogin(),
-	            user.getRoles()       // <-- ADD THIS
-	    );
-	}
+		    Long registryId = user.getRegistry() != null
+		            ? user.getRegistry().getId()
+		            : null;
+
+		    Long districtId = user.getDistrict() != null
+		            ? user.getDistrict().getDistrictId()
+		            : null;
+
+		    return new UserDetailsImpl(
+		            user.getId(),                 // userId
+		            user.getUsername(),           // username
+		            user.getPassword(),           // password
+		            authorities,                  // authorities
+		            user.getIsFirstTimeLogin(),   // first time login flag
+		            user.getRoles(),              // roles
+		            registryId,                   // ✅ registryId
+		            districtId                    // ✅ districtId
+		    );
+		}
+
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -96,9 +120,9 @@ public class UserDetailsImpl implements UserDetails {
 	public boolean isEnabled() {
 		return true;
 	}
-	
+
 	public Set<Role> getRoles() {
-	    return roles;
+		return roles;
 	}
 
 	@Override
@@ -118,4 +142,12 @@ public class UserDetailsImpl implements UserDetails {
 	public void setIsFirstTimeLogin(Boolean isFirstTimeLogin) {
 		this.isFirstTimeLogin = isFirstTimeLogin;
 	}
+	
+	 public Long getRegistryId() {
+	        return registryId;
+	    }
+
+	    public Long getDistrictId() {
+	        return districtId;
+	    }
 }

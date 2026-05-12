@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -33,106 +34,107 @@ import lombok.RequiredArgsConstructor;
 public class MenuController {
 
 	private static final Logger logger = LoggerFactory.getLogger(MenuController.class);
-    private final MenuService menuService;
+	private final MenuService menuService;
 
-    /* =============================
-          MENU CRUD API
-       ============================= */
+	/*
+	 * ============================= MENU CRUD API =============================
+	 */
 
-    @GetMapping
-    public ResponseEntity<ApiResponse<List<MenuDTO>>> getAllMenus() {
-        List<MenuDTO> menus = menuService.getAllMenus();
-        return ResponseEntity.ok(new ApiResponse<>(true, "Menus fetched successfully", menus));
-    }
+	@GetMapping
+	public ResponseEntity<ApiResponse<List<MenuDTO>>> getAllMenus() {
+		List<MenuDTO> menus = menuService.getAllMenus();
+		return ResponseEntity.ok(new ApiResponse<>(true, "Menus fetched successfully", menus));
+	}
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<MenuDTO>> getMenuById(@PathVariable Long id) {
-        MenuDTO menu = menuService.getMenuById(id);
-        return ResponseEntity.ok(new ApiResponse<>(true, "Menu fetched successfully", menu));
-    }
+	@GetMapping("/{id}")
+	public ResponseEntity<ApiResponse<MenuDTO>> getMenuById(@PathVariable Long id) {
+		MenuDTO menu = menuService.getMenuById(id);
+		return ResponseEntity.ok(new ApiResponse<>(true, "Menu fetched successfully", menu));
+	}
 
-    @PostMapping
-    public ResponseEntity<ApiResponse<MenuDTO>> createMenu(@RequestBody MenuCreateDTO dto) {
-    	
-        MenuDTO created = menuService.createMenu(dto);
-        return ResponseEntity.ok(new ApiResponse<>(true, "Menu created successfully", created));
-    }
+	@PostMapping
+	public ResponseEntity<ApiResponse<MenuDTO>> createMenu(@RequestBody MenuCreateDTO dto) {
 
-    @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<MenuDTO>> updateMenu(
-            @PathVariable Long id,
-            @RequestBody MenuCreateDTO dto) {
+		MenuDTO created = menuService.createMenu(dto);
+		return ResponseEntity.ok(new ApiResponse<>(true, "Menu created successfully", created));
+	}
 
-        MenuDTO updated = menuService.updateMenu(id, dto);
-        return ResponseEntity.ok(new ApiResponse<>(true, "Menu updated successfully", updated));
-    }
+	@PutMapping("/{id}")
+	public ResponseEntity<ApiResponse<MenuDTO>> updateMenu(@PathVariable Long id, @RequestBody MenuCreateDTO dto) {
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> deleteMenu(@PathVariable Long id) {
-        menuService.deleteMenu(id);
-        return ResponseEntity.ok(new ApiResponse<>(true, "Menu deleted successfully", null));
-    }
+		MenuDTO updated = menuService.updateMenu(id, dto);
+		return ResponseEntity.ok(new ApiResponse<>(true, "Menu updated successfully", updated));
+	}
 
-    /* =============================
-          ROLE-BASED MENU
-       ============================= */
-    @GetMapping("/role/{role}")
-    public ResponseEntity<ApiResponse<List<MenuDTO>>> getMenusByRole(@PathVariable Role role) {
-        List<MenuDTO> menus = menuService.getMenusForRole(role);
-        return ResponseEntity.ok(new ApiResponse<>(true, "Menus fetched for role " + role, menus));
-    }
+	@DeleteMapping("/{id}")
+	public ResponseEntity<ApiResponse<Void>> deleteMenu(@PathVariable Long id) {
+		menuService.deleteMenu(id);
+		return ResponseEntity.ok(new ApiResponse<>(true, "Menu deleted successfully", null));
+	}
 
-    /* =============================
-          ASSIGN MENU TO ROLE
-       ============================= */
-    @PostMapping("/assign")
-    public ResponseEntity<ApiResponse<Void>> assignMenuToRole(@RequestBody AssignMenuToRoleDTO dto) {
-        menuService.assignMenuToRole(dto.getMenuId(), dto.getRoleId());
-        return ResponseEntity.ok(new ApiResponse<>(true, "Menu assigned to role successfully", null));
-    }
+	/*
+	 * ============================= ROLE-BASED MENU =============================
+	 */
+	@GetMapping("/role/{role}")
+	public ResponseEntity<ApiResponse<List<MenuDTO>>> getMenusByRole(@PathVariable Role role) {
+		List<MenuDTO> menus = menuService.getMenusForRole(role);
+		return ResponseEntity.ok(new ApiResponse<>(true, "Menus fetched for role " + role, menus));
+	}
 
-    @PostMapping("/remove")
-    public ResponseEntity<ApiResponse<Void>> removeMenuFromRole(@RequestBody AssignMenuToRoleDTO dto) {
-        menuService.removeMenuFromRole(dto.getMenuId(), dto.getRoleId());
-        return ResponseEntity.ok(new ApiResponse<>(true, "Menu removed from role successfully", null));
-    }
-    
-    
-    @GetMapping("/my")
-    public ResponseEntity<ApiResponse<List<MenuDTO>>> getMyMenus(Authentication authentication) {
+	/*
+	 * ============================= ASSIGN MENU TO ROLE
+	 * =============================
+	 */
+	@PostMapping("/assign")
+	public ResponseEntity<ApiResponse<Void>> assignMenuToRole(@RequestBody AssignMenuToRoleDTO dto) {
+		menuService.assignMenuToRole(dto.getMenuId(), dto.getRoleId());
+		return ResponseEntity.ok(new ApiResponse<>(true, "Menu assigned to role successfully", null));
+	}
+
+	@PostMapping("/remove")
+	public ResponseEntity<ApiResponse<Void>> removeMenuFromRole(@RequestBody AssignMenuToRoleDTO dto) {
+		menuService.removeMenuFromRole(dto.getMenuId(), dto.getRoleId());
+		return ResponseEntity.ok(new ApiResponse<>(true, "Menu removed from role successfully", null));
+	}
+
+	@GetMapping("/my")
+	public ResponseEntity<ApiResponse<List<MenuDTO>>> getMyMenus(
+	        Authentication authentication) {
+
+	    // 1. Authentication null check
+	    if (authentication == null || !authentication.isAuthenticated()) {
+	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+	                .body(new ApiResponse<>(false, "Unauthorized", null));
+	    }
+
+	    // 2. Principal type check
+	    Object principal = authentication.getPrincipal();
+	    if (!(principal instanceof UserDetailsImpl userDetails)) {
+	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+	                .body(new ApiResponse<>(false, "Invalid user principal", null));
+	    }
+
+	    // 3. Roles safety
+	    Set<Role> roles = userDetails.getRoles();
+	    if (roles == null || roles.isEmpty()) {
+	        return ResponseEntity.ok(
+	                new ApiResponse<>(true, "No menus available", List.of())
+	        );
+	    }
+
+	    // 4. Convert roles
+	    Set<String> roleNames = roles.stream()
+	            .map(Role::getName)
+	            .collect(Collectors.toSet());
+
+	    // 5. Load menus
+	    List<MenuDTO> menus =
+	            menuService.getMenusForRoles(roleNames);
+
+	    return ResponseEntity.ok(
+	            new ApiResponse<>(true, "Menus loaded successfully", menus)
+	    );
+	}
 
 
-        // Extract authenticated user from JWT
-    	  UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-
-        // Extract user roles
-        Set<Role> roles = userDetails.getRoles();
-
-        // Convert to String role names
-        Set<String> roleNames = roles.stream()
-                .map(Role::getName)
-                .collect(Collectors.toSet());
-
-        // Load menus for these roles
-        List<MenuDTO> menus = menuService.getMenusForRoles(roleNames);
-        
-     // PRINT MENUS
-        System.out.println("===== MENUS FOR USER =====");
-        menus.forEach(m -> printMenu(m, 0));
-
-        return ResponseEntity.ok(
-            new ApiResponse<>(true, "Menus loaded successfully", menus)
-        );
-    }
-    
-    private void printMenu(MenuDTO menu, int level) {
-        String indent = "  ".repeat(level);
-        System.out.println(indent + "- " + menu.getNameEn() + " (" + menu.getId() + ")");
-
-        if (menu.getChildren() != null) {
-            menu.getChildren().forEach(child -> printMenu(child, level + 1));
-        }
-    }
-
-    
 }

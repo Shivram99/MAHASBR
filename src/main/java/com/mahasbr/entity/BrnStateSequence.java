@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class BrnStateSequence {
+public class BrnStateSequence  extends Auditable{
     @Id
     @Column(name = "state_code", length = 2)
     private String stateCode;

@@ -19,7 +19,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class RequestFormEntity {
+public class RequestFormEntity extends Auditable{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

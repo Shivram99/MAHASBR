@@ -20,9 +20,12 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/user")
 public class FeedbackFormController {
+	
+	private static final Logger logger = LoggerFactory.getLogger(FeedbackFormController.class);
+	
 	@Autowired
 	FeedbackFormService feedbackFeedbackFormService;
-	  private static final Logger logger = LoggerFactory.getLogger(FeedbackFormController.class);
+	
 	@PostMapping("/feedbackForm")
 	public ResponseEntity<?> getFeedbackFormDetails(@Valid @RequestBody FeedbackFormModel feedbackFormModel) {
 		FeedbackForm details = feedbackFeedbackFormService.getFeedbackFormDetails(feedbackFormModel);

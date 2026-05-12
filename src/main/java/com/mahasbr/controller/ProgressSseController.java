@@ -1,5 +1,7 @@
 package com.mahasbr.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,6 +18,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ProgressSseController {
 
+	private static final Logger logger = LoggerFactory.getLogger(ProgressSseController.class);
+	
   private final UploadProgressStore store;
 
   @GetMapping(value="/{fileId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)

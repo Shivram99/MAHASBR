@@ -2,6 +2,8 @@ package com.mahasbr.controller;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +28,8 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/states")
 @RequiredArgsConstructor
 public class StatesMasterController {
+	
+	private static final Logger logger = LoggerFactory.getLogger(StatesMasterController.class);
 
 	private final StatesMasterService service;
 

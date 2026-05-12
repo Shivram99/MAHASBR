@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "feedback_form")
 @Data
 @NoArgsConstructor
-public class FeedbackForm {
+public class FeedbackForm extends Auditable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "feedbackform_seq_generator")
 	@SequenceGenerator(name = "feedbackform_seq_generator", sequenceName = "feedbackform_seq", allocationSize = 1)

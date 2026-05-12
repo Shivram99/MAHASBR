@@ -15,7 +15,7 @@ import lombok.Setter;
 @Entity
 @Table(name = "role_menus")
 @Getter @Setter
-public class RoleMenu {
+public class RoleMenu extends Auditable{
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "role_menu_seq_gen")

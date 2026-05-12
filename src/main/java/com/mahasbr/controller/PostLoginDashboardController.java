@@ -3,12 +3,13 @@ package com.mahasbr.controller;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -20,7 +21,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -51,7 +51,9 @@ import com.mahasbr.util.UploadProgressStore;
 
 @RestController
 @RequestMapping("/api/auth")
-public class RegistryCSVUploadController {
+public class PostLoginDashboardController {
+
+	private static final Logger logger = LoggerFactory.getLogger(PostLoginDashboardController.class);
 
 	@Autowired
 	MstRegistryDetailsPageService mstRegistryDetailsPageService;
@@ -67,27 +69,19 @@ public class RegistryCSVUploadController {
 
 	@Autowired
 	private DistrictMasterService districtservice;
-	
+
 	@Autowired
 	private MstRegistryDetailsPageServiceImpl mstRegistryDetailsPageServiceImpl;
-	
+
 	@Autowired
 	private UploadResultRecordes uploadResultRecordes;
 
 	@GetMapping("/registoryData")
 	public ResponseEntity<Page<MstRegistryDetailsPageEntity>> getMasterRegistoryDetails(
-			@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "12") int size,
-			@RequestParam(defaultValue = "siNo") String sortBy, Authentication authentication) {
-
-		// Get logged-in username
-		String username = authentication.getName();
-
-//	    // Get roles
-		Collection<? extends GrantedAuthority> roles = authentication.getAuthorities();
-		System.out.println("username" + username);
-		for (GrantedAuthority role : roles) {
-			System.out.println("Role: " + role.getAuthority());
-		}
+			@RequestParam(defaultValue = "0") int page,
+			@RequestParam(defaultValue = "12") int size,
+			@RequestParam(defaultValue = "siNo") String sortBy,
+			Authentication authentication) {
 
 		Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
 		Page<MstRegistryDetailsPageEntity> registryDetailsPage = mstRegistryDetailsPageService
@@ -187,7 +181,7 @@ public class RegistryCSVUploadController {
 
 	@GetMapping("/districts")
 	public ResponseEntity<List<DistrictMaster>> getAll() {
-//		return ResponseEntity.ok(districtservice.findByIsActiveTrue());
+		// return ResponseEntity.ok(districtservice.findByIsActiveTrue());
 		return ResponseEntity.ok(districtservice.findByIsActiveTrueBasedOnlogin());
 	}
 
@@ -204,31 +198,29 @@ public class RegistryCSVUploadController {
 				.fileName(Optional.ofNullable(file.getOriginalFilename()).orElse("unknown")).rows(rows).build();
 		return ResponseEntity.ok(resp);
 	}
-	
+
 	@Autowired
 	UploadDefaultLogger uploadDefaultLogger;
-	
+
 	@PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ResponseEntity<?> upload(@RequestParam("files") List<MultipartFile> files,Authentication authentication) throws Exception {
+	public ResponseEntity<?> upload(@RequestParam("files") List<MultipartFile> files, Authentication authentication)
+			throws Exception {
 
 		List<Map<String, String>> out = new ArrayList<>();
-		
+
 		uploadDefaultLogger.printDefaults();
-		
-		
+
 		for (MultipartFile f : files) {
 			String fileId = UUID.randomUUID().toString();
 			progressStore.set(fileId, 0);
 			byte[] bytes = f.getBytes();
-			service1.processAndSave(bytes, fileId, f.getOriginalFilename(),authentication);
+			service1.processAndSave(bytes, fileId, f.getOriginalFilename(), authentication);
 
 			out.add(Map.of("fileId", fileId, "fileName", f.getOriginalFilename()));
 		}
 
 		return ResponseEntity.ok(Map.of("files", out));
-		
-		
-		
+
 	}
 
 	@PostMapping("/save")
@@ -236,11 +228,12 @@ public class RegistryCSVUploadController {
 		service1.saveRows(rows);
 		return ResponseEntity.ok(Map.of("message", "saved"));
 	}
-	
+
 	@GetMapping("/result/{fileId}")
 	public ResponseEntity<?> getUploadResult(@PathVariable String fileId) {
-	    return ResponseEntity.ok(
-	        Map.of("rows", uploadResultRecordes.get(fileId))
-	    );
+		return ResponseEntity.ok(
+				Map.of("rows", uploadResultRecordes.get(fileId)));
 	}
 }
+
+

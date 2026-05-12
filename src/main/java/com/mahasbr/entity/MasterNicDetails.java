@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "master_nic_details")
-public class MasterNicDetails {
+public class MasterNicDetails extends Auditable{
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "master_nic_details_generator")
 	@SequenceGenerator(name = "master_nic_details_generator", sequenceName = "master_nic_details_seq", allocationSize = 1)

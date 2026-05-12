@@ -20,7 +20,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class NICCodeEntity {
+public class NICCodeEntity extends Auditable{
 	
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

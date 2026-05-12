@@ -4,6 +4,8 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -13,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.mahasbr.entity.DepartmentMst;
 import com.mahasbr.entity.Role;
 import com.mahasbr.entity.User;
 import com.mahasbr.model.ERole;
@@ -21,7 +22,6 @@ import com.mahasbr.model.SignupRequest;
 import com.mahasbr.repository.RoleRepository;
 import com.mahasbr.repository.UserRepository;
 import com.mahasbr.response.MessageResponse;
-import com.mahasbr.service.DepartmentMstService;
 import com.mahasbr.util.JwtUtils;
 
 import jakarta.validation.Valid;
@@ -29,6 +29,9 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/admin")
 public class RegistrationController {
+	
+  private static final Logger logger = LoggerFactory.getLogger(RegistrationController.class);
+	
   @Autowired
   AuthenticationManager authenticationManager;
 
@@ -46,8 +49,6 @@ public class RegistrationController {
   
   
 
-  @Autowired
-  private  DepartmentMstService departmentMstService;
 
 
 

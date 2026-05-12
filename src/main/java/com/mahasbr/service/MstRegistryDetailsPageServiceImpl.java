@@ -46,7 +46,6 @@ import com.mahasbr.repository.DuplicateRegistryDetailsPageRepository;
 import com.mahasbr.repository.MstRegistryDetailsPageRepository;
 import com.mahasbr.repository.TalukaMasterRepository;
 import com.mahasbr.repository.UserRepository;
-import com.mahasbr.util.BRNGenerator;
 import com.mahasbr.util.JwtUtils;
 import com.mahasbr.util.StringUtils;
 
@@ -58,8 +57,6 @@ public class MstRegistryDetailsPageServiceImpl implements MstRegistryDetailsPage
 	@Autowired
 	MstRegistryDetailsPageRepository mstRegistryDetailsPageRepository;
 
-	@Autowired
-	BRNGenerator bRNGenerator;
 
 	@Autowired
 	StatesMasterService statesMasterService;
@@ -375,7 +372,7 @@ public class MstRegistryDetailsPageServiceImpl implements MstRegistryDetailsPage
 							// save the new record
 							MstRegistryDetailsPageEntity mstRegistryDetailsPageEntity = objectMapper
 									.convertValue(mstRegistryDetailsPageModel, MstRegistryDetailsPageEntity.class);
-							mstRegistryDetailsPageEntity.setBrnNo(bRNGenerator.getBRNNumber());
+//							mstRegistryDetailsPageEntity.setBrnNo(bRNGenerator.getBRNNumber());
 							try {
 								logger.info(" Sheet  no " + count + " row no " + row.getRowNum() + " BRN Data Info "
 										+ mstRegistryDetailsPageEntity.toString());
@@ -703,15 +700,6 @@ public class MstRegistryDetailsPageServiceImpl implements MstRegistryDetailsPage
 		List<String> districtsLower = districtName.stream().map(String::toLowerCase).collect(Collectors.toList());
 
 		List<String> talukaNameLower = talukaName.stream().map(String::toLowerCase).collect(Collectors.toList());
-
-//		if (!talukaName.isEmpty()) {
-//			Page<MstRegistryDetailsPageEntity> mstRegistoryData = mstRegistryDetailsPageRepository
-//					.findByTalukasAndDistrictsAndRegUserId(talukaNameLower, districtsLower, getLoginUsernameId(), pageable);
-//			return mstRegistoryData;
-//		}
-
-//		Page<MstRegistryDetailsPageEntity> mstRegistoryData = mstRegistryDetailsPageRepository
-//				.findByDistrictsAndRegUserId(districtsLower, getLoginUsernameId(), pageable);
 
 		Collection<? extends GrantedAuthority> userRoles = getUsersRole();
 		String role = userRoles.stream().map(GrantedAuthority::getAuthority).findFirst().orElse("UNKNOWN");

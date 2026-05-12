@@ -20,7 +20,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class SiteVisit {
+public class SiteVisit extends Auditable{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

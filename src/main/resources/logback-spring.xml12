@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="30 seconds">
+
+    <!-- ========================= -->
+    <!-- Spring Properties -->
+    <!-- ========================= -->
+      <springProperty name="APP_NAME"
+                    source="spring.application.name"
+                    defaultValue="mahasbr"/>
+
+    <!-- LOG PATH (cross-OS safe) -->
+    <!-- Override using logging.file.path -->
+     <!-- ✅ SINGLE definition with default -->
+    <springProperty name="LOG_PATH"
+                    source="logging.file.path"
+                    defaultValue="./logs"/>
+
+    <!-- ========================= -->
+    <!-- CONSOLE JSON (Docker / K8s) -->
+    <!-- ========================= -->
+    <appender name="CONSOLE_JSON"
+              class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <includeContext>true</includeContext>
+            <includeMdc>true</includeMdc>
+            <includeStructuredArguments>true</includeStructuredArguments>
+            <includeCallerData>false</includeCallerData>
+
+            <!-- Custom static fields -->
+            <customFields>
+                {
+                  "app":"${APP_NAME}",
+                  "environment":"${spring.profiles.active:-default}"
+                }
+            </customFields>
+        </encoder>
+    </appender>
+
+    <!-- ========================= -->
+    <!-- FILE JSON (OpenSearch source) -->
+    <!-- ========================= -->
+    <appender name="FILE_JSON"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+
+        <file>${LOG_PATH}/${APP_NAME}.log</file>
+
+        <rollingPolicy
+            class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+
+            <fileNamePattern>
+                ${LOG_PATH}/archive/${APP_NAME}-%d{yyyy-MM-dd}.%i.log
+            </fileNamePattern>
+
+            <maxFileSize>100MB</maxFileSize>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>10GB</totalSizeCap>
+            <cleanHistoryOnStart>true</cleanHistoryOnStart>
+        </rollingPolicy>
+
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <includeContext>true</includeContext>
+            <includeMdc>true</includeMdc>
+
+            <customFields>
+                {
+                  "app":"${APP_NAME}",
+                  "environment":"${spring.profiles.active:-default}"
+                }
+            </customFields>
+        </encoder>
+    </appender>
+
+    <!-- ========================= -->
+    <!-- ROOT LOGGER -->
+    <!-- ========================= -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE_JSON"/>
+        <appender-ref ref="FILE_JSON"/>
+    </root>
+
+    <!-- ========================= -->
+    <!-- Noise Reduction -->
+    <!-- ========================= -->
+    <logger name="org.springframework" level="WARN"/>
+    <logger name="org.hibernate" level="WARN"/>
+    <logger name="org.apache" level="WARN"/>
+
+</configuration>

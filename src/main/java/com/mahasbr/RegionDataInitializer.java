@@ -14,42 +14,22 @@ import com.mahasbr.repository.RoleRepository;
 
 @Component
 public class RegionDataInitializer implements CommandLineRunner {
-		@Autowired
-	 private  RoleRepository roleRepository;
+	@Autowired
+	private RoleRepository roleRepository;
 
-	 @Override
-	  public void run(String... args) {
+	@Override
+	public void run(String... args) throws Exception {
+//		createRoleIfNotExists(ERole.ROLE_REGION_ADMIN.name());
+//		createRoleIfNotExists(ERole.ROLE_REGION_USER.name());
+	}
 
-//	        for (ERole roleEnum : ERole.values()) {
-//
-//	            Optional<Role> existingRole = roleRepository.findByName(roleEnum);
-//
-//	            if (!existingRole.isPresent()) { // If role not found → insert
-//	                Role role = new Role();
-////	                role.setName(roleEnum);
-//
-//	                roleRepository.save(role);
-//	                System.out.println("✔ Role created: " + roleEnum);
-//	            } else {
-//	                System.out.println("ℹ Role already exists: " + roleEnum);
-//	            }
-//	        }
-
-	        System.out.println("🎯 Roles initialization finished!");
-	    }
-	
-//    @Autowired
-//    private RegionRepository regionRepository;
-
-//    @Override
-//    public void run(String... args) throws Exception {
-////        if (regionRepository.count() == 0) {
-////            regionRepository.save(new RegionEntity("Amravati", 1L));
-////            regionRepository.save(new RegionEntity("Aurangabad", 1L));
-////            regionRepository.save(new RegionEntity("Konkan", 1L));
-////            regionRepository.save(new RegionEntity("Nagpur", 1L));
-////            regionRepository.save(new RegionEntity("Nashik", 1L));
-////            regionRepository.save(new RegionEntity("Pune", 1L));
-////        }
-    
+	private void createRoleIfNotExists(String roleName) {
+		Optional<Role> roleOpt = roleRepository.findByName(roleName);
+		if (!roleOpt.isPresent()) {
+			Role role = new Role();
+			role.setName(roleName);
+			roleRepository.save(role);
+			System.out.println("Role created: " + roleName);
+		}
+	}
 }

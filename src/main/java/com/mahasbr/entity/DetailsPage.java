@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @Table(name = "DetailsPage")
-public class DetailsPage {
+public class DetailsPage  extends Auditable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "detailPage_seq_generator")
 	@SequenceGenerator(name = "detailPage_seq_generator", sequenceName = "deatilspage_seq", allocationSize = 1)

@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -91,5 +92,53 @@ public interface MstRegistryDetailsPageRepository extends JpaRepository<MstRegis
 	@Query("SELECT m FROM MstRegistryDetailsPageEntity m WHERE LOWER(m.taluka) IN :talukas AND LOWER(m.district) IN :districts ")
 	Page<MstRegistryDetailsPageEntity> findByTalukasAndDistricts(@Param("talukas") List<String> talukas,
 			@Param("districts") List<String> districts, Pageable pageable);
+	@Query("""
+			SELECT m FROM MstRegistryDetailsPageEntity m
+			WHERE LOWER(m.district) = :district
+			AND (:cursor IS NULL OR m.id < :cursor)
+			ORDER BY m.id DESC
+			""")
+			Slice<MstRegistryDetailsPageEntity> findNextByDistrict(
+			        @Param("district") String district,
+			        @Param("cursor") Long cursor,
+			        Pageable pageable
+			);
+	
+	@Query("""
+			SELECT m FROM MstRegistryDetailsPageEntity m
+			WHERE (:cursor IS NULL OR m.id < :cursor)
+			ORDER BY m.id DESC
+			""")
+			Slice<MstRegistryDetailsPageEntity> findNextAll(
+			        @Param("cursor") Long cursor,
+			        Pageable pageable
+			);
+	
+	@Query("""
+		    SELECT m
+		    FROM MstRegistryDetailsPageEntity m
+		    WHERE LOWER(m.district) IN :districts
+		      AND (:cursor IS NULL OR m.id < :cursor)
+		    ORDER BY m.id DESC
+		""")
+		List<MstRegistryDetailsPageEntity> findNextByDistricts(
+		        @Param("districts") List<String> districts,
+		        @Param("cursor") Long cursor,
+		        Pageable pageable
+		);
+
+
+	@Query("""
+		    SELECT m FROM MstRegistryDetailsPageEntity m
+		    WHERE m.regUserId = :regUserId
+		      AND (:cursor IS NULL OR m.id < :cursor)
+		    ORDER BY m.id DESC
+		""")
+		List<MstRegistryDetailsPageEntity> findNextByRegUserId(
+		    @Param("regUserId") Long regUserId,
+		    @Param("cursor") Long cursor,
+		    Pageable pageable
+		);
+
 
 }

@@ -27,7 +27,6 @@ import com.mahasbr.entity.TalukaMaster;
 import com.mahasbr.exception.ResourceNotFoundException;
 import com.mahasbr.model.SearchBrnDto;
 import com.mahasbr.service.CircularService;
-import com.mahasbr.service.CommonService;
 import com.mahasbr.service.DistrictMasterService;
 import com.mahasbr.service.DivisionService;
 import com.mahasbr.service.MstRegistryDetailsPageService;
@@ -46,8 +45,6 @@ public class SearchBRNController {
 	private static final Logger logger = LoggerFactory.getLogger(SearchBRNController.class);
 
 	private final DistrictMasterService districtservice;
-
-	private final CommonService commonService;
 
 	private final MstRegistryDetailsPageService mstRegistryDetailsPageService;
 	

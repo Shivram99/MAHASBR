@@ -22,7 +22,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class NICDivisionEntity {
+public class NICDivisionEntity extends Auditable{
 
     @Id
     @Column(name = "division_code", nullable = false, unique = true)

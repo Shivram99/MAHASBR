@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor  
 @Table(name = "VILLAGE_SEQUENCE")
-public class VillageSequenceMaster {
+public class VillageSequenceMaster extends Auditable{
 	
 
 	@Id

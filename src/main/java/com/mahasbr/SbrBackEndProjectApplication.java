@@ -3,15 +3,19 @@ package com.mahasbr;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.EnableAsync;
 
 import jakarta.annotation.PostConstruct;
-import jakarta.servlet.http.HttpServletRequest;
 
 //@EnableJpaAuditing
 @SpringBootApplication
@@ -22,7 +26,8 @@ import jakarta.servlet.http.HttpServletRequest;
 @EnableAsync
 //@EnableScheduling
 public class SbrBackEndProjectApplication {
-
+	private static final Logger logger =
+            LoggerFactory.getLogger(SbrBackEndProjectApplication.class);
 	public static void main(String[] args) {
 
 		LocalDateTime currentDateTimeIndia = LocalDateTime.now(ZoneId.of("Asia/Kolkata"));
@@ -48,19 +53,20 @@ public class SbrBackEndProjectApplication {
     private String maxRequestSize;
 
     @PostConstruct
-    public void log() {
-        System.out.println("=== UPLOAD DEBUG START ===");
-        System.out.println("spring.servlet.multipart.max-file-size = " + maxFileSize);
-        System.out.println("spring.servlet.multipart.max-request-size = " + maxRequestSize);
+    @Profile("local") // 🔥 ONLY in local
+    public void logUploadConfig() {
+
+        logger.debug("=== UPLOAD DEBUG START ===");
+        logger.debug("spring.servlet.multipart.max-file-size = {}", maxFileSize);
+        logger.debug("spring.servlet.multipart.max-request-size = {}", maxRequestSize);
 
         try {
-            Class<?> c = Class.forName("org.apache.catalina.connector.Connector");
-            System.out.println("Connector class: " + c.getName());
+            Class<?> connector = Class.forName("org.apache.catalina.connector.Connector");
+            logger.debug("Tomcat Connector detected: {}", connector.getName());
         } catch (Exception e) {
-            System.out.println("Connector class lookup failed: " + e.getMessage());
+            logger.warn("Connector class lookup failed", e);
         }
 
-        System.out.println("Servlet API = " + HttpServletRequest.class.getPackage().getImplementationVersion());
-        System.out.println("=== UPLOAD DEBUG END ===");
+        logger.debug("=== UPLOAD DEBUG END ===");
     }
 }

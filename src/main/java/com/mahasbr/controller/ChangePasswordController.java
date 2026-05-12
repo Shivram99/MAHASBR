@@ -2,6 +2,8 @@ package com.mahasbr.controller;
 
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,31 +18,31 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.mahasbr.entity.User;
 import com.mahasbr.model.ChangePasswordModel;
+import com.mahasbr.repository.UserRepository;
 import com.mahasbr.response.MessageResponse;
 import com.mahasbr.service.ChangePasswordServceImpl;
-import com.mahasbr.service.CommonService;
 
 import jakarta.servlet.http.HttpSession;
 
 @RestController
 @RequestMapping("/api/auth")
 public class ChangePasswordController {
-
+	private static final Logger logger = LoggerFactory.getLogger(ChangePasswordController.class);
 	@Autowired
 	PasswordEncoder encoder;
 
 	@Autowired
 	private ChangePasswordServceImpl changePasswordServiceImpl;
-
+	
 	@Autowired
-	CommonService commonService;
+	private UserRepository UserRepository;
 
 	@PostMapping("/changePassword")
 	public ResponseEntity<MessageResponse> changePassword(@RequestBody ChangePasswordModel changePasswordModel,
 			BindingResult bindingResult, HttpSession session) {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		String username = authentication.getName();
-		Optional<User> optional = commonService.findByUsername(username);
+		Optional<User> optional = UserRepository.findByUsername(username);
 		if (bindingResult.hasErrors()) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
 					.body(new MessageResponse("Failed to update password!"));

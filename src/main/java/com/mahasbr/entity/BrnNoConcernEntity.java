@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @Table(name = "brn_no_concern_dtls")
-public class BrnNoConcernEntity {
+public class BrnNoConcernEntity extends Auditable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "brn_no_concern_dtls_seq_generator")
 	@SequenceGenerator(name = "brn_no_concern_dtls_seq_generator", sequenceName = "brn_no_concern_dtls_seq", allocationSize = 1)

@@ -10,7 +10,7 @@ import lombok.Data;
 @Data
 @Entity
 @Table(name = "user_menu_mapping")
-public class UserMenuMapping {
+public class UserMenuMapping extends Auditable{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

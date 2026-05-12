@@ -23,7 +23,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-public class NICGroupEntity {
+public class NICGroupEntity extends Auditable{
 
     @Id
     @Column(name = "group_code", nullable = false, unique = true)

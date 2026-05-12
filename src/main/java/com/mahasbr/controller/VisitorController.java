@@ -2,6 +2,8 @@ package com.mahasbr.controller;
 
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,6 +18,8 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/citizenSearch/visitor")
 @RequiredArgsConstructor
 public class VisitorController {
+	
+	private static final Logger logger = LoggerFactory.getLogger(VisitorController.class);
 
 	  private final SiteVisitService siteVisitService;
 

@@ -36,7 +36,6 @@ public class JwtUtils {
 	@Value("${com.mahait.gov.in.jwtExpirationMs}") // e.g., 30000 (30 sec)
 	private int jwtExpirationMs;
 
-	
 	private static final long REFRESH_TOKEN_VALIDITY_MS = 30 * 60 * 1000; // 30 min
 
 	// Key for signing JWT (HS256)
@@ -53,6 +52,8 @@ public class JwtUtils {
 		claims.put("roles", userPrincipal.getAuthorities().stream().map(GrantedAuthority::getAuthority)
 				.collect(Collectors.toList()));
 		claims.put("userId", userPrincipal.getId()); // add userId for audit/filter
+		claims.put("registryId", userPrincipal.getRegistryId()); // ✅ ADD
+		claims.put("districtId", userPrincipal.getDistrictId()); // ✅ ADD
 		claims.put("jti", jti);
 
 		return Jwts.builder().setClaims(claims).setSubject(userPrincipal.getUsername()).setIssuedAt(new Date())
@@ -111,19 +112,15 @@ public class JwtUtils {
 		}
 		return false;
 	}
-	
-	public String getJtiFromJwtToken(String token) {
-	    try {
-	        Claims claims = Jwts.parserBuilder()
-	                .setSigningKey(getSigningKey())
-	                .build()
-	                .parseClaimsJws(token)
-	                .getBody();
 
-	        Object jti = claims.get("jti");
-	        return jti != null ? jti.toString() : null;
-	    } catch (Exception e) {
-	        return null;
-	    }
+	public String getJtiFromJwtToken(String token) {
+		try {
+			Claims claims = Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parseClaimsJws(token).getBody();
+
+			Object jti = claims.get("jti");
+			return jti != null ? jti.toString() : null;
+		} catch (Exception e) {
+			return null;
+		}
 	}
 }

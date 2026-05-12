@@ -2,6 +2,8 @@ package com.mahasbr.controller;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +22,8 @@ import com.mahasbr.service.DashboardService;
 @RestController
 @RequestMapping("/user")
 public class DashboradController {
+	
+	private static final Logger logger = LoggerFactory.getLogger(DashboradController.class);
 	@Autowired
 	DashboardService dashboardService;
 

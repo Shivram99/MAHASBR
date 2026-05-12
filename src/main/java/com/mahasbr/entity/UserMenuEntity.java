@@ -11,7 +11,7 @@ import lombok.Data;
 @Entity
 @Table(name = "user_menu")
 @Data
-public class UserMenuEntity {
+public class UserMenuEntity extends Auditable{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
