@@ -9493,3 +9493,12 @@
 2026-05-12 18:21:14.208 DEBUG
                 [http-nio-8085-exec-1] [8aabb360-45dc-490d-a986-26607c658943]
                 o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-05-12 18:27:59.400 DEBUG
+                [Thread-313] []
+                o.s.d.r.l.RedisMessageListenerContainer - Stopped RedisMessageListenerContainer
+2026-05-12 18:27:59.406 INFO 
+                [Thread-313] []
+                com.zaxxer.hikari.HikariDataSource - HikariPool-18 - Shutdown initiated...
+2026-05-12 18:27:59.465 INFO 
+                [Thread-313] []
+                com.zaxxer.hikari.HikariDataSource - HikariPool-18 - Shutdown completed.

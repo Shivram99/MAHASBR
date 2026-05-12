@@ -8,13 +8,10 @@
                     source="spring.application.name"
                     defaultValue="mahasbr"/>
 
-    <!-- PROD SAFE LOG PATH -->
-    <!-- Linux / Docker / K8s standard -->
-    <property name="LOG_PATH" value="/var/log/${APP_NAME}"/>
-
+    <!-- Logs go to OS temp by default; override with logging.file.path -->
     <springProperty name="LOG_PATH"
                     source="logging.file.path"
-                    defaultValue="./logs"/>
+                    defaultValue="${java.io.tmpdir}/${APP_NAME}/logs"/>
     <!-- ========================= -->
     <!-- Console Appender -->
     <!-- (Docker / K8s / Dev) -->

@@ -13,7 +13,7 @@
      <!-- ✅ SINGLE definition with default -->
     <springProperty name="LOG_PATH"
                     source="logging.file.path"
-                    defaultValue="./logs"/>
+                    defaultValue="${java.io.tmpdir}/${APP_NAME}/logs"/>
 
     <!-- ========================= -->
     <!-- CONSOLE JSON (Docker / K8s) -->
