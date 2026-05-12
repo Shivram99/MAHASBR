@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -91,24 +92,40 @@ public class MstRegistryDetailsPageServiceImpl implements MstRegistryDetailsPage
 	@Autowired
 	private JwtUtils jwtUtils;
 
-	Long userId = 0L;
-
 	public Long getLoginUsernameId() {
-		String username = SecurityContextHolder.getContext().getAuthentication().getName();
-		Optional<User> user = userRepository.findByUsername(username);
-
-		if (user.isPresent()) {
-			userId = user.get().getRegistry().getId();
-		}
-		return userId;
+		return getAuthenticatedUser()
+				.map(User::getRegistry)
+				.filter(Objects::nonNull)
+				.map(registry -> registry.getId())
+				.orElse(null);
 	}
 
 	public Collection<? extends GrantedAuthority> getUsersRole() {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		return authentication != null ? authentication.getAuthorities() : List.of();
+	}
 
-		Collection<? extends GrantedAuthority> roles = SecurityContextHolder.getContext().getAuthentication()
-				.getAuthorities();
+	private Optional<User> getAuthenticatedUser() {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-		return roles;
+		if (authentication == null || !authentication.isAuthenticated()
+				|| "anonymousUser".equals(authentication.getPrincipal())) {
+			return Optional.empty();
+		}
+
+		String username = authentication.getName();
+		if (username == null || username.isBlank()) {
+			return Optional.empty();
+		}
+
+		return userRepository.findByUsername(username);
+	}
+
+	private String getPrimaryRole() {
+		return getUsersRole().stream()
+				.map(GrantedAuthority::getAuthority)
+				.findFirst()
+				.orElse("UNKNOWN");
 	}
 
 	public BRNGenerationRecordCount uploadRegiteryCSVFileForBRNGeneration(MultipartFile file) {
@@ -127,6 +144,7 @@ public class MstRegistryDetailsPageServiceImpl implements MstRegistryDetailsPage
 		Set<String> actualHeaders = new HashSet<>();
 		Set<String> missingHeaders = new HashSet<>(REQUIRED_HEADERS);
 		ObjectMapper objectMapper = new ObjectMapper();
+		Long currentUserRegistryId = getLoginUsernameId();
 		try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
 			for (Sheet sheet : workbook) {
 
@@ -145,7 +163,7 @@ public class MstRegistryDetailsPageServiceImpl implements MstRegistryDetailsPage
 					Row row = sheet.getRow(i);
 					MstRegistryDetailsPageModel mstRegistryDetailsPageModel = new MstRegistryDetailsPageModel();
 					totalRecordCount++;
-					mstRegistryDetailsPageModel.setRegUserId(userId);
+					mstRegistryDetailsPageModel.setRegUserId(currentUserRegistryId);
 					for (int j = 0; j < numberOfCells; j++) {
 						Cell cell = row.getCell(j);
 						String header = stringUtils.safeUpperCase(headerRow.getCell(j).getStringCellValue());
@@ -639,15 +657,19 @@ public class MstRegistryDetailsPageServiceImpl implements MstRegistryDetailsPage
 
 	@Override
 	public Page<MstRegistryDetailsPageEntity> getAllRegistoryDetails(Pageable pageable) {
-		Collection<? extends GrantedAuthority> userRoles = getUsersRole();
-		String role = userRoles.stream().map(GrantedAuthority::getAuthority).findFirst().orElse("UNKNOWN");
+		String role = getPrimaryRole();
+		Long registryId = getLoginUsernameId();
 
 		switch (role) {
 		case "ROLE_REG_AUTH_API":
-			return mstRegistryDetailsPageRepository.findAllByRegUserId(getLoginUsernameId(), pageable);
+			return registryId != null
+					? mstRegistryDetailsPageRepository.findAllByRegUserId(registryId, pageable)
+					: Page.empty(pageable);
 
 		case "ROLE_REG_AUTH_CSV":
-			return mstRegistryDetailsPageRepository.findAllByRegUserId(getLoginUsernameId(), pageable);
+			return registryId != null
+					? mstRegistryDetailsPageRepository.findAllByRegUserId(registryId, pageable)
+					: Page.empty(pageable);
 
 		case "ROLE_DES_DISTRICT":
 			return getDistrictWiseRegistryDetails(pageable);
@@ -688,49 +710,61 @@ public class MstRegistryDetailsPageServiceImpl implements MstRegistryDetailsPage
 	public Page<MstRegistryDetailsPageEntity> getPostLoginDashboardData(Pageable pageable,
 			List<Long> selectedDistrictIds, List<Long> selectedTalukaIds, String registerDateFrom,
 			String registerDateTo) {
-		List<String> formattedCodes = selectedTalukaIds.stream().map(code -> String.format("%05d", code))
+		List<Long> safeSelectedTalukaIds = selectedTalukaIds != null ? selectedTalukaIds : List.of();
+		List<Long> safeSelectedDistrictIds = selectedDistrictIds != null ? selectedDistrictIds : List.of();
+		List<String> formattedCodes = safeSelectedTalukaIds.stream().map(code -> String.format("%05d", code))
 				.collect(Collectors.toList());
 
 		List<String> talukaName = talukaMasterRepository.findTalukaNameByCensusTalukaCode(formattedCodes);
 		List<String> districtName = districtMasterRepository
-				.findDistrictNamesByCensusDistrictCodes(selectedDistrictIds);
+				.findDistrictNamesByCensusDistrictCodes(safeSelectedDistrictIds);
 		List<String> districtsLower = districtName.stream().map(String::toLowerCase).collect(Collectors.toList());
 
 		List<String> talukaNameLower = talukaName.stream().map(String::toLowerCase).collect(Collectors.toList());
 
-		Collection<? extends GrantedAuthority> userRoles = getUsersRole();
-		String role = userRoles.stream().map(GrantedAuthority::getAuthority).findFirst().orElse("UNKNOWN");
+		String role = getPrimaryRole();
+		Long registryId = getLoginUsernameId();
 
 		switch (role) {
 		case "ROLE_REG_AUTH_API":
+			if (registryId == null) {
+				return Page.empty(pageable);
+			}
 			if (!talukaName.isEmpty())
 				return mstRegistryDetailsPageRepository.findByTalukasAndDistrictsAndRegUserId(talukaNameLower,
-						districtsLower, getLoginUsernameId(), pageable);
+						districtsLower, registryId, pageable);
 			else if (!districtName.isEmpty())
 				return mstRegistryDetailsPageRepository.findByDistrictsAndRegUserId(districtsLower,
-						getLoginUsernameId(), pageable);
+						registryId, pageable);
+			else if (registryId != null)
+				return mstRegistryDetailsPageRepository.findAllByRegUserId(registryId, pageable);
 			else
-				return mstRegistryDetailsPageRepository.findAllByRegUserId(getLoginUsernameId(), pageable);
+				return Page.empty(pageable);
 
 		case "ROLE_REG_AUTH_CSV":
+			if (registryId == null) {
+				return Page.empty(pageable);
+			}
 			if (!talukaName.isEmpty())
 				return mstRegistryDetailsPageRepository.findByTalukasAndDistrictsAndRegUserId(talukaNameLower,
-						districtsLower, getLoginUsernameId(), pageable);
+						districtsLower, registryId, pageable);
 			else if (!districtName.isEmpty())
 				return mstRegistryDetailsPageRepository.findByDistrictsAndRegUserId(districtsLower,
-						getLoginUsernameId(), pageable);
+						registryId, pageable);
+			else if (registryId != null)
+				return mstRegistryDetailsPageRepository.findAllByRegUserId(registryId, pageable);
 			else
-				return mstRegistryDetailsPageRepository.findAllByRegUserId(getLoginUsernameId(), pageable);
+				return Page.empty(pageable);
 
 		case "ROLE_DES_DISTRICT":
 			return getDistrictWiseRegistryDetails(pageable);
 
 		case "ROLE_DES_REGION":
-			return getRegionWiseRegistryDetailsBasedOnfilter(selectedDistrictIds, selectedTalukaIds, registerDateFrom,
+			return getRegionWiseRegistryDetailsBasedOnfilter(safeSelectedDistrictIds, safeSelectedTalukaIds, registerDateFrom,
 					registerDateTo, pageable);
 
 		case "ROLE_DES_STATE":
-			return getStateDetailsBasedOnfilter(selectedDistrictIds, selectedTalukaIds, registerDateFrom,
+			return getStateDetailsBasedOnfilter(safeSelectedDistrictIds, safeSelectedTalukaIds, registerDateFrom,
 					registerDateTo, pageable);
 
 		default:
@@ -747,11 +781,11 @@ public class MstRegistryDetailsPageServiceImpl implements MstRegistryDetailsPage
 
 	private Page<MstRegistryDetailsPageEntity> getRegionWiseRegistryDetails(Pageable pageable) {
 
-		String username = SecurityContextHolder.getContext().getAuthentication().getName();
-		Optional<User> user = userRepository.findByUsername(username);
-		// 2. Fetch all district codes under this divisio
-		List<String> districtName = districtMasterRepository
-				.findDistrictNamesByDivisionCode(user.get().getDivisionCode());
+		List<String> districtName = getAuthenticatedUser()
+				.map(User::getDivisionCode)
+				.filter(divisionCode -> divisionCode != null && !divisionCode.isBlank())
+				.map(districtMasterRepository::findDistrictNamesByDivisionCode)
+				.orElseGet(List::of);
 		List<String> lowercaseDistricts = districtName.stream().map(String::toLowerCase).collect(Collectors.toList());
 
 		if (districtName.isEmpty()) {
@@ -762,11 +796,11 @@ public class MstRegistryDetailsPageServiceImpl implements MstRegistryDetailsPage
 
 	private Page<MstRegistryDetailsPageEntity> getDistrictWiseRegistryDetails(Pageable pageable) {
 
-		String username = SecurityContextHolder.getContext().getAuthentication().getName();
-		Optional<User> user = userRepository.findByUsername(username);
-		// 2. Fetch all district codes under this divisio
-		Optional<String> districtName = districtMasterRepository
-				.findDistrictNameById(user.get().getDistrict().getDistrictId());
+		Optional<String> districtName = getAuthenticatedUser()
+				.map(User::getDistrict)
+				.filter(Objects::nonNull)
+				.map(district -> district.getDistrictId())
+				.flatMap(districtMasterRepository::findDistrictNameById);
 
 		if (districtName.isEmpty()) {
 			return Page.empty(pageable);

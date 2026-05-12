@@ -103,15 +103,17 @@ public class MenuController {
 
 	    // 1. Authentication null check
 	    if (authentication == null || !authentication.isAuthenticated()) {
-	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-	                .body(new ApiResponse<>(false, "Unauthorized", null));
+	        return ResponseEntity.ok(
+	                new ApiResponse<>(true, "No menus available", List.of())
+	        );
 	    }
 
 	    // 2. Principal type check
 	    Object principal = authentication.getPrincipal();
 	    if (!(principal instanceof UserDetailsImpl userDetails)) {
-	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-	                .body(new ApiResponse<>(false, "Invalid user principal", null));
+	        return ResponseEntity.ok(
+	                new ApiResponse<>(true, "No menus available", List.of())
+	        );
 	    }
 
 	    // 3. Roles safety

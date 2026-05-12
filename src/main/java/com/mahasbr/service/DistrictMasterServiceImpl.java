@@ -16,6 +16,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -138,13 +139,13 @@ public class DistrictMasterServiceImpl implements DistrictMasterService {
 		Collection<? extends GrantedAuthority> userRoles = getUsersRole();
 		String role = userRoles.stream().map(GrantedAuthority::getAuthority).findFirst().orElse("UNKNOWN");
 
-		String username = SecurityContextHolder.getContext().getAuthentication().getName();
-		Optional<User> user = userRepository.findByUsername(username);
-		// 2. Fetch all district codes under this divisio
-
 		switch (role) {
 		case "ROLE_DES_REGION":
-			return districtMasterRepository.findByDivisionCodeAndIsActiveTrue(user.get().getDivisionCode());
+			return getAuthenticatedUser()
+					.map(User::getDivisionCode)
+					.filter(this::hasText)
+					.map(districtMasterRepository::findByDivisionCodeAndIsActiveTrue)
+					.orElseGet(List::of);
 		default:
 			return districtMasterRepository.findByIsActiveTrue();
 		}
@@ -152,10 +153,27 @@ public class DistrictMasterServiceImpl implements DistrictMasterService {
 	}
 
 	public Collection<? extends GrantedAuthority> getUsersRole() {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		return authentication != null ? authentication.getAuthorities() : List.of();
+	}
 
-		Collection<? extends GrantedAuthority> roles = SecurityContextHolder.getContext().getAuthentication()
-				.getAuthorities();
+	private Optional<User> getAuthenticatedUser() {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-		return roles;
+		if (authentication == null || !authentication.isAuthenticated()
+				|| "anonymousUser".equals(authentication.getPrincipal())) {
+			return Optional.empty();
+		}
+
+		String username = authentication.getName();
+		if (!hasText(username)) {
+			return Optional.empty();
+		}
+
+		return userRepository.findByUsername(username);
+	}
+
+	private boolean hasText(String value) {
+		return value != null && !value.isBlank();
 	}
 }
