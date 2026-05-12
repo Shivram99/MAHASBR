@@ -9052,3 +9052,444 @@
 2026-05-12 18:15:30.709 DEBUG
                 [http-nio-8085-exec-8] [5b596c2e-0c93-46ac-8776-3a7aeab17a8e]
                 o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-05-12 18:18:11.908 DEBUG
+                [http-nio-8085-exec-2] [785eb2ce-2e08-42ae-aa10-73cfc4cc7c46]
+                o.s.web.servlet.DispatcherServlet - GET "/MAHASBR/citizenSearch/visitor/summary", parameters={}
+2026-05-12 18:18:11.909 DEBUG
+                [http-nio-8085-exec-2] [785eb2ce-2e08-42ae-aa10-73cfc4cc7c46]
+                o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.mahasbr.controller.VisitorController#getVisitSummary()
+2026-05-12 18:18:11.927 DEBUG
+                [http-nio-8085-exec-2] [785eb2ce-2e08-42ae-aa10-73cfc4cc7c46]
+                o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-05-12 18:18:11.927 DEBUG
+                [http-nio-8085-exec-2] [785eb2ce-2e08-42ae-aa10-73cfc4cc7c46]
+                o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [{todayVisits=9, totalVisits=161}]
+2026-05-12 18:18:11.928 DEBUG
+                [http-nio-8085-exec-2] [785eb2ce-2e08-42ae-aa10-73cfc4cc7c46]
+                o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-05-12 18:18:13.324 DEBUG
+                [http-nio-8085-exec-10] [7e8248bb-eaa2-4112-963d-2553b4c62633]
+                o.s.web.servlet.DispatcherServlet - GET "/MAHASBR/citizenSearch/districts", parameters={}
+2026-05-12 18:18:13.325 DEBUG
+                [http-nio-8085-exec-10] [7e8248bb-eaa2-4112-963d-2553b4c62633]
+                o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.mahasbr.controller.SearchBRNController#getAll()
+2026-05-12 18:18:13.349 DEBUG
+                [http-nio-8085-exec-10] [7e8248bb-eaa2-4112-963d-2553b4c62633]
+                o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-05-12 18:18:13.350 DEBUG
+                [http-nio-8085-exec-10] [7e8248bb-eaa2-4112-963d-2553b4c62633]
+                o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[DistrictMaster(districtId=373, censusDistrictCode=919, districtName=Palghar, censusStateCode=27, di (truncated)...]
+2026-05-12 18:18:13.351 DEBUG
+                [http-nio-8085-exec-10] [7e8248bb-eaa2-4112-963d-2553b4c62633]
+                o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-05-12 18:18:13.922 DEBUG
+                [http-nio-8085-exec-7] [4f9705c7-75b8-4b2c-ae56-deea460d92f1]
+                o.s.web.servlet.DispatcherServlet - GET "/MAHASBR/citizenSearch/citizenDashboardDataRegDeRegNewReg", parameters={}
+2026-05-12 18:18:13.923 DEBUG
+                [http-nio-8085-exec-7] [4f9705c7-75b8-4b2c-ae56-deea460d92f1]
+                o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.mahasbr.controller.CitizenDashboardController#citizenDashboardDataRegDeRegNewReg()
+2026-05-12 18:18:13.924 DEBUG
+                [http-nio-8085-exec-4] [2d959c11-3cb0-4bd7-aeab-5cb1a0f7bf66]
+                o.s.web.servlet.DispatcherServlet - GET "/MAHASBR/citizenSearch/registry", parameters={}
+2026-05-12 18:18:13.926 DEBUG
+                [http-nio-8085-exec-4] [2d959c11-3cb0-4bd7-aeab-5cb1a0f7bf66]
+                o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.mahasbr.controller.SearchBRNController#getRegistringAutherity()
+2026-05-12 18:18:13.927 DEBUG
+                [http-nio-8085-exec-8] [0ad1fbbd-9049-46d9-ab1a-275e1def54a7]
+                o.s.web.servlet.DispatcherServlet - GET "/MAHASBR/citizenSearch/division", parameters={}
+2026-05-12 18:18:13.927 DEBUG
+                [http-nio-8085-exec-8] [0ad1fbbd-9049-46d9-ab1a-275e1def54a7]
+                o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.mahasbr.controller.SearchBRNController#findDivisionService()
+2026-05-12 18:18:13.928 DEBUG
+                [http-nio-8085-exec-1] [269b6ee8-4927-44be-a5f6-7d47bf7594fe]
+                o.s.web.servlet.DispatcherServlet - POST "/MAHASBR/citizenSearch/dashboardData", parameters={}
+2026-05-12 18:18:13.929 DEBUG
+                [http-nio-8085-exec-1] [269b6ee8-4927-44be-a5f6-7d47bf7594fe]
+                o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.mahasbr.controller.CitizenDashboardController#getDashboardData(CitizenDashboardFilter)
+2026-05-12 18:18:13.930 DEBUG
+                [http-nio-8085-exec-1] [269b6ee8-4927-44be-a5f6-7d47bf7594fe]
+                o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Read "application/json;charset=UTF-8" to [CitizenDashboardFilter(countType=NR, act=, region=, district=, year=, quarter=, nic=)]
+2026-05-12 18:18:13.932 DEBUG
+                [http-nio-8085-exec-5] [6b0cb4cf-8e07-4818-823e-44a2ba4fdb52]
+                o.s.web.servlet.DispatcherServlet - GET "/MAHASBR/citizenSearch/districts", parameters={}
+2026-05-12 18:18:13.933 INFO 
+                [http-nio-8085-exec-1] [269b6ee8-4927-44be-a5f6-7d47bf7594fe]
+                c.m.c.CitizenDashboardController - ? Received Filter: CitizenDashboardFilter(countType=NR, act=, region=, district=, year=, quarter=, nic=)
+2026-05-12 18:18:13.934 DEBUG
+                [http-nio-8085-exec-5] [6b0cb4cf-8e07-4818-823e-44a2ba4fdb52]
+                o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.mahasbr.controller.SearchBRNController#getAll()
+2026-05-12 18:18:13.944 DEBUG
+                [http-nio-8085-exec-4] [2d959c11-3cb0-4bd7-aeab-5cb1a0f7bf66]
+                o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-05-12 18:18:13.944 DEBUG
+                [http-nio-8085-exec-8] [0ad1fbbd-9049-46d9-ab1a-275e1def54a7]
+                o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-05-12 18:18:13.944 DEBUG
+                [http-nio-8085-exec-4] [2d959c11-3cb0-4bd7-aeab-5cb1a0f7bf66]
+                o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[RegistryMasterResponse(id=21, registryNameEn=The Office of Charity Commissioner Maharashtra State,  (truncated)...]
+2026-05-12 18:18:13.944 DEBUG
+                [http-nio-8085-exec-8] [0ad1fbbd-9049-46d9-ab1a-275e1def54a7]
+                o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[DivisionDto(divisionId=7, divisionName=Amravati, divisionCode=AMR, isActive=true), DivisionDto(divi (truncated)...]
+2026-05-12 18:18:13.945 DEBUG
+                [http-nio-8085-exec-4] [2d959c11-3cb0-4bd7-aeab-5cb1a0f7bf66]
+                o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-05-12 18:18:13.945 DEBUG
+                [http-nio-8085-exec-8] [0ad1fbbd-9049-46d9-ab1a-275e1def54a7]
+                o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-05-12 18:18:13.962 DEBUG
+                [http-nio-8085-exec-5] [6b0cb4cf-8e07-4818-823e-44a2ba4fdb52]
+                o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-05-12 18:18:13.962 DEBUG
+                [http-nio-8085-exec-5] [6b0cb4cf-8e07-4818-823e-44a2ba4fdb52]
+                o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[DistrictMaster(districtId=373, censusDistrictCode=919, districtName=Palghar, censusStateCode=27, di (truncated)...]
+2026-05-12 18:18:13.963 DEBUG
+                [http-nio-8085-exec-5] [6b0cb4cf-8e07-4818-823e-44a2ba4fdb52]
+                o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-05-12 18:18:14.404 DEBUG
+                [http-nio-8085-exec-1] [269b6ee8-4927-44be-a5f6-7d47bf7594fe]
+                o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-05-12 18:18:14.405 DEBUG
+                [http-nio-8085-exec-1] [269b6ee8-4927-44be-a5f6-7d47bf7594fe]
+                o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[org.springframework.data.jpa.repository.query.AbstractJpaQuery$TupleConverter$TupleBackedMap@75f569 (truncated)...]
+2026-05-12 18:18:14.407 DEBUG
+                [http-nio-8085-exec-1] [269b6ee8-4927-44be-a5f6-7d47bf7594fe]
+                o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-05-12 18:18:15.847 DEBUG
+                [http-nio-8085-exec-9] [898ea4c1-5f12-4203-86db-151139ea4d83]
+                o.s.web.servlet.DispatcherServlet - GET "/MAHASBR/citizenSearch/districts", parameters={}
+2026-05-12 18:18:15.847 DEBUG
+                [http-nio-8085-exec-9] [898ea4c1-5f12-4203-86db-151139ea4d83]
+                o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.mahasbr.controller.SearchBRNController#getAll()
+2026-05-12 18:18:15.876 DEBUG
+                [http-nio-8085-exec-9] [898ea4c1-5f12-4203-86db-151139ea4d83]
+                o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-05-12 18:18:15.877 DEBUG
+                [http-nio-8085-exec-9] [898ea4c1-5f12-4203-86db-151139ea4d83]
+                o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[DistrictMaster(districtId=373, censusDistrictCode=919, districtName=Palghar, censusStateCode=27, di (truncated)...]
+2026-05-12 18:18:15.878 DEBUG
+                [http-nio-8085-exec-9] [898ea4c1-5f12-4203-86db-151139ea4d83]
+                o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-05-12 18:18:19.489 DEBUG
+                [http-nio-8085-exec-7] [4f9705c7-75b8-4b2c-ae56-deea460d92f1]
+                o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-05-12 18:18:19.503 DEBUG
+                [http-nio-8085-exec-7] [4f9705c7-75b8-4b2c-ae56-deea460d92f1]
+                o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[org.springframework.data.jpa.repository.query.AbstractJpaQuery$TupleConverter$TupleBackedMap@2e6406 (truncated)...]
+2026-05-12 18:18:19.694 DEBUG
+                [http-nio-8085-exec-7] [4f9705c7-75b8-4b2c-ae56-deea460d92f1]
+                o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-05-12 18:19:05.191 DEBUG
+                [http-nio-8085-exec-3] [abf66fb4-a4d1-4b6e-abc2-0ee2a209c845]
+                o.s.web.servlet.DispatcherServlet - GET "/MAHASBR/citizenSearch/visitor/summary", parameters={}
+2026-05-12 18:19:05.192 DEBUG
+                [http-nio-8085-exec-3] [abf66fb4-a4d1-4b6e-abc2-0ee2a209c845]
+                o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.mahasbr.controller.VisitorController#getVisitSummary()
+2026-05-12 18:19:05.193 DEBUG
+                [http-nio-8085-exec-6] [cd5149e0-b3a6-4bae-a1c7-de85a4c18ffb]
+                o.s.web.servlet.DispatcherServlet - GET "/MAHASBR/citizenSearch/districts", parameters={}
+2026-05-12 18:19:05.193 DEBUG
+                [http-nio-8085-exec-6] [cd5149e0-b3a6-4bae-a1c7-de85a4c18ffb]
+                o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.mahasbr.controller.SearchBRNController#getAll()
+2026-05-12 18:19:05.208 DEBUG
+                [http-nio-8085-exec-3] [abf66fb4-a4d1-4b6e-abc2-0ee2a209c845]
+                o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-05-12 18:19:05.209 DEBUG
+                [http-nio-8085-exec-3] [abf66fb4-a4d1-4b6e-abc2-0ee2a209c845]
+                o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [{todayVisits=9, totalVisits=161}]
+2026-05-12 18:19:05.210 DEBUG
+                [http-nio-8085-exec-3] [abf66fb4-a4d1-4b6e-abc2-0ee2a209c845]
+                o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-05-12 18:19:05.217 DEBUG
+                [http-nio-8085-exec-6] [cd5149e0-b3a6-4bae-a1c7-de85a4c18ffb]
+                o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-05-12 18:19:05.217 DEBUG
+                [http-nio-8085-exec-6] [cd5149e0-b3a6-4bae-a1c7-de85a4c18ffb]
+                o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[DistrictMaster(districtId=373, censusDistrictCode=919, districtName=Palghar, censusStateCode=27, di (truncated)...]
+2026-05-12 18:19:05.218 DEBUG
+                [http-nio-8085-exec-6] [cd5149e0-b3a6-4bae-a1c7-de85a4c18ffb]
+                o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-05-12 18:20:05.815 DEBUG
+                [http-nio-8085-exec-3] [c982fb91-8b11-49d0-826e-069e5c461ef3]
+                o.s.web.servlet.DispatcherServlet - GET "/MAHASBR/citizenSearch/districts", parameters={}
+2026-05-12 18:20:05.815 DEBUG
+                [http-nio-8085-exec-7] [b47c72fa-3d61-40bb-a2a2-cc97f44c0663]
+                o.s.web.servlet.DispatcherServlet - GET "/MAHASBR/citizenSearch/visitor/summary", parameters={}
+2026-05-12 18:20:05.815 DEBUG
+                [http-nio-8085-exec-3] [c982fb91-8b11-49d0-826e-069e5c461ef3]
+                o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.mahasbr.controller.SearchBRNController#getAll()
+2026-05-12 18:20:05.815 DEBUG
+                [http-nio-8085-exec-7] [b47c72fa-3d61-40bb-a2a2-cc97f44c0663]
+                o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.mahasbr.controller.VisitorController#getVisitSummary()
+2026-05-12 18:20:05.852 DEBUG
+                [http-nio-8085-exec-7] [b47c72fa-3d61-40bb-a2a2-cc97f44c0663]
+                o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-05-12 18:20:05.852 DEBUG
+                [http-nio-8085-exec-7] [b47c72fa-3d61-40bb-a2a2-cc97f44c0663]
+                o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [{todayVisits=9, totalVisits=161}]
+2026-05-12 18:20:05.853 DEBUG
+                [http-nio-8085-exec-7] [b47c72fa-3d61-40bb-a2a2-cc97f44c0663]
+                o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-05-12 18:20:05.862 DEBUG
+                [http-nio-8085-exec-3] [c982fb91-8b11-49d0-826e-069e5c461ef3]
+                o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-05-12 18:20:05.863 DEBUG
+                [http-nio-8085-exec-3] [c982fb91-8b11-49d0-826e-069e5c461ef3]
+                o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[DistrictMaster(districtId=373, censusDistrictCode=919, districtName=Palghar, censusStateCode=27, di (truncated)...]
+2026-05-12 18:20:05.864 DEBUG
+                [http-nio-8085-exec-3] [c982fb91-8b11-49d0-826e-069e5c461ef3]
+                o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-05-12 18:20:09.096 DEBUG
+                [http-nio-8085-exec-6] [2831a47e-583d-411a-86e2-c64b87344547]
+                o.s.web.servlet.DispatcherServlet - GET "/MAHASBR/citizenSearch/visitor/summary", parameters={}
+2026-05-12 18:20:09.096 DEBUG
+                [http-nio-8085-exec-6] [2831a47e-583d-411a-86e2-c64b87344547]
+                o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.mahasbr.controller.VisitorController#getVisitSummary()
+2026-05-12 18:20:09.108 DEBUG
+                [http-nio-8085-exec-8] [b238375a-9cdb-4578-8a27-7f44fb0b1588]
+                o.s.web.servlet.DispatcherServlet - GET "/MAHASBR/citizenSearch/districts", parameters={}
+2026-05-12 18:20:09.109 DEBUG
+                [http-nio-8085-exec-8] [b238375a-9cdb-4578-8a27-7f44fb0b1588]
+                o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.mahasbr.controller.SearchBRNController#getAll()
+2026-05-12 18:20:09.118 DEBUG
+                [http-nio-8085-exec-6] [2831a47e-583d-411a-86e2-c64b87344547]
+                o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-05-12 18:20:09.119 DEBUG
+                [http-nio-8085-exec-6] [2831a47e-583d-411a-86e2-c64b87344547]
+                o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [{todayVisits=9, totalVisits=161}]
+2026-05-12 18:20:09.119 DEBUG
+                [http-nio-8085-exec-6] [2831a47e-583d-411a-86e2-c64b87344547]
+                o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-05-12 18:20:09.132 DEBUG
+                [http-nio-8085-exec-8] [b238375a-9cdb-4578-8a27-7f44fb0b1588]
+                o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-05-12 18:20:09.133 DEBUG
+                [http-nio-8085-exec-8] [b238375a-9cdb-4578-8a27-7f44fb0b1588]
+                o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[DistrictMaster(districtId=373, censusDistrictCode=919, districtName=Palghar, censusStateCode=27, di (truncated)...]
+2026-05-12 18:20:09.134 DEBUG
+                [http-nio-8085-exec-8] [b238375a-9cdb-4578-8a27-7f44fb0b1588]
+                o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-05-12 18:20:16.998 DEBUG
+                [http-nio-8085-exec-10] [f4de37d8-0099-472f-880c-564bed236b76]
+                o.s.web.servlet.DispatcherServlet - GET "/MAHASBR/citizenSearch/visitor/summary", parameters={}
+2026-05-12 18:20:16.998 DEBUG
+                [http-nio-8085-exec-10] [f4de37d8-0099-472f-880c-564bed236b76]
+                o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.mahasbr.controller.VisitorController#getVisitSummary()
+2026-05-12 18:20:17.003 DEBUG
+                [http-nio-8085-exec-2] [3f4b59d0-fc68-47a8-a9ce-6febf8e5740d]
+                o.s.web.servlet.DispatcherServlet - GET "/MAHASBR/citizenSearch/districts", parameters={}
+2026-05-12 18:20:17.003 DEBUG
+                [http-nio-8085-exec-2] [3f4b59d0-fc68-47a8-a9ce-6febf8e5740d]
+                o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.mahasbr.controller.SearchBRNController#getAll()
+2026-05-12 18:20:17.013 DEBUG
+                [http-nio-8085-exec-10] [f4de37d8-0099-472f-880c-564bed236b76]
+                o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-05-12 18:20:17.015 DEBUG
+                [http-nio-8085-exec-10] [f4de37d8-0099-472f-880c-564bed236b76]
+                o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [{todayVisits=9, totalVisits=161}]
+2026-05-12 18:20:17.016 DEBUG
+                [http-nio-8085-exec-10] [f4de37d8-0099-472f-880c-564bed236b76]
+                o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-05-12 18:20:17.029 DEBUG
+                [http-nio-8085-exec-2] [3f4b59d0-fc68-47a8-a9ce-6febf8e5740d]
+                o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-05-12 18:20:17.029 DEBUG
+                [http-nio-8085-exec-2] [3f4b59d0-fc68-47a8-a9ce-6febf8e5740d]
+                o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[DistrictMaster(districtId=373, censusDistrictCode=919, districtName=Palghar, censusStateCode=27, di (truncated)...]
+2026-05-12 18:20:17.030 DEBUG
+                [http-nio-8085-exec-2] [3f4b59d0-fc68-47a8-a9ce-6febf8e5740d]
+                o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-05-12 18:20:17.785 DEBUG
+                [http-nio-8085-exec-4] [51c78a76-9fce-45fc-af4c-3e6b6ad608e4]
+                o.s.web.servlet.DispatcherServlet - GET "/MAHASBR/citizenSearch/visitor/summary", parameters={}
+2026-05-12 18:20:17.788 DEBUG
+                [http-nio-8085-exec-4] [51c78a76-9fce-45fc-af4c-3e6b6ad608e4]
+                o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.mahasbr.controller.VisitorController#getVisitSummary()
+2026-05-12 18:20:17.794 DEBUG
+                [http-nio-8085-exec-5] [4b41dc9a-0eb5-4584-bb27-a1a1b20e2b94]
+                o.s.web.servlet.DispatcherServlet - GET "/MAHASBR/citizenSearch/districts", parameters={}
+2026-05-12 18:20:17.796 DEBUG
+                [http-nio-8085-exec-5] [4b41dc9a-0eb5-4584-bb27-a1a1b20e2b94]
+                o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.mahasbr.controller.SearchBRNController#getAll()
+2026-05-12 18:20:17.807 DEBUG
+                [http-nio-8085-exec-4] [51c78a76-9fce-45fc-af4c-3e6b6ad608e4]
+                o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-05-12 18:20:17.807 DEBUG
+                [http-nio-8085-exec-4] [51c78a76-9fce-45fc-af4c-3e6b6ad608e4]
+                o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [{todayVisits=9, totalVisits=161}]
+2026-05-12 18:20:17.808 DEBUG
+                [http-nio-8085-exec-4] [51c78a76-9fce-45fc-af4c-3e6b6ad608e4]
+                o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-05-12 18:20:17.820 DEBUG
+                [http-nio-8085-exec-5] [4b41dc9a-0eb5-4584-bb27-a1a1b20e2b94]
+                o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-05-12 18:20:17.821 DEBUG
+                [http-nio-8085-exec-5] [4b41dc9a-0eb5-4584-bb27-a1a1b20e2b94]
+                o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[DistrictMaster(districtId=373, censusDistrictCode=919, districtName=Palghar, censusStateCode=27, di (truncated)...]
+2026-05-12 18:20:17.822 DEBUG
+                [http-nio-8085-exec-5] [4b41dc9a-0eb5-4584-bb27-a1a1b20e2b94]
+                o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-05-12 18:20:18.600 DEBUG
+                [http-nio-8085-exec-1] [cf6875b9-df5c-4fef-b764-97f576dd1229]
+                o.s.web.servlet.DispatcherServlet - GET "/MAHASBR/citizenSearch/visitor/summary", parameters={}
+2026-05-12 18:20:18.600 DEBUG
+                [http-nio-8085-exec-1] [cf6875b9-df5c-4fef-b764-97f576dd1229]
+                o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.mahasbr.controller.VisitorController#getVisitSummary()
+2026-05-12 18:20:18.606 DEBUG
+                [http-nio-8085-exec-9] [f49890ba-91fc-47e7-99b0-cfa147831831]
+                o.s.web.servlet.DispatcherServlet - GET "/MAHASBR/citizenSearch/districts", parameters={}
+2026-05-12 18:20:18.606 DEBUG
+                [http-nio-8085-exec-9] [f49890ba-91fc-47e7-99b0-cfa147831831]
+                o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.mahasbr.controller.SearchBRNController#getAll()
+2026-05-12 18:20:18.615 DEBUG
+                [http-nio-8085-exec-1] [cf6875b9-df5c-4fef-b764-97f576dd1229]
+                o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-05-12 18:20:18.615 DEBUG
+                [http-nio-8085-exec-1] [cf6875b9-df5c-4fef-b764-97f576dd1229]
+                o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [{todayVisits=9, totalVisits=161}]
+2026-05-12 18:20:18.616 DEBUG
+                [http-nio-8085-exec-1] [cf6875b9-df5c-4fef-b764-97f576dd1229]
+                o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-05-12 18:20:18.627 DEBUG
+                [http-nio-8085-exec-9] [f49890ba-91fc-47e7-99b0-cfa147831831]
+                o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-05-12 18:20:18.628 DEBUG
+                [http-nio-8085-exec-9] [f49890ba-91fc-47e7-99b0-cfa147831831]
+                o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[DistrictMaster(districtId=373, censusDistrictCode=919, districtName=Palghar, censusStateCode=27, di (truncated)...]
+2026-05-12 18:20:18.629 DEBUG
+                [http-nio-8085-exec-9] [f49890ba-91fc-47e7-99b0-cfa147831831]
+                o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-05-12 18:20:19.144 DEBUG
+                [http-nio-8085-exec-7] [5df69840-2994-4e26-a072-969392841f13]
+                o.s.web.servlet.DispatcherServlet - GET "/MAHASBR/citizenSearch/visitor/summary", parameters={}
+2026-05-12 18:20:19.144 DEBUG
+                [http-nio-8085-exec-7] [5df69840-2994-4e26-a072-969392841f13]
+                o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.mahasbr.controller.VisitorController#getVisitSummary()
+2026-05-12 18:20:19.150 DEBUG
+                [http-nio-8085-exec-3] [32e48b39-cdd4-43a4-91bc-18fece3d011b]
+                o.s.web.servlet.DispatcherServlet - GET "/MAHASBR/citizenSearch/districts", parameters={}
+2026-05-12 18:20:19.151 DEBUG
+                [http-nio-8085-exec-3] [32e48b39-cdd4-43a4-91bc-18fece3d011b]
+                o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.mahasbr.controller.SearchBRNController#getAll()
+2026-05-12 18:20:19.172 DEBUG
+                [http-nio-8085-exec-7] [5df69840-2994-4e26-a072-969392841f13]
+                o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-05-12 18:20:19.174 DEBUG
+                [http-nio-8085-exec-7] [5df69840-2994-4e26-a072-969392841f13]
+                o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [{todayVisits=9, totalVisits=161}]
+2026-05-12 18:20:19.178 DEBUG
+                [http-nio-8085-exec-7] [5df69840-2994-4e26-a072-969392841f13]
+                o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-05-12 18:20:19.197 DEBUG
+                [http-nio-8085-exec-3] [32e48b39-cdd4-43a4-91bc-18fece3d011b]
+                o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-05-12 18:20:19.198 DEBUG
+                [http-nio-8085-exec-3] [32e48b39-cdd4-43a4-91bc-18fece3d011b]
+                o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[DistrictMaster(districtId=373, censusDistrictCode=919, districtName=Palghar, censusStateCode=27, di (truncated)...]
+2026-05-12 18:20:19.198 DEBUG
+                [http-nio-8085-exec-3] [32e48b39-cdd4-43a4-91bc-18fece3d011b]
+                o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-05-12 18:20:30.551 DEBUG
+                [http-nio-8085-exec-6] [139d8b3c-2a2f-4af8-8b1f-7eda97a46e25]
+                o.s.web.servlet.DispatcherServlet - GET "/MAHASBR/citizenSearch/visitor/summary", parameters={}
+2026-05-12 18:20:30.552 DEBUG
+                [http-nio-8085-exec-6] [139d8b3c-2a2f-4af8-8b1f-7eda97a46e25]
+                o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.mahasbr.controller.VisitorController#getVisitSummary()
+2026-05-12 18:20:30.557 DEBUG
+                [http-nio-8085-exec-8] [e01e09f7-f046-4519-89d8-7d9c2480c19d]
+                o.s.web.servlet.DispatcherServlet - GET "/MAHASBR/citizenSearch/districts", parameters={}
+2026-05-12 18:20:30.557 DEBUG
+                [http-nio-8085-exec-8] [e01e09f7-f046-4519-89d8-7d9c2480c19d]
+                o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.mahasbr.controller.SearchBRNController#getAll()
+2026-05-12 18:20:30.570 DEBUG
+                [http-nio-8085-exec-6] [139d8b3c-2a2f-4af8-8b1f-7eda97a46e25]
+                o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-05-12 18:20:30.570 DEBUG
+                [http-nio-8085-exec-6] [139d8b3c-2a2f-4af8-8b1f-7eda97a46e25]
+                o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [{todayVisits=9, totalVisits=161}]
+2026-05-12 18:20:30.571 DEBUG
+                [http-nio-8085-exec-6] [139d8b3c-2a2f-4af8-8b1f-7eda97a46e25]
+                o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-05-12 18:20:30.582 DEBUG
+                [http-nio-8085-exec-8] [e01e09f7-f046-4519-89d8-7d9c2480c19d]
+                o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-05-12 18:20:30.582 DEBUG
+                [http-nio-8085-exec-8] [e01e09f7-f046-4519-89d8-7d9c2480c19d]
+                o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[DistrictMaster(districtId=373, censusDistrictCode=919, districtName=Palghar, censusStateCode=27, di (truncated)...]
+2026-05-12 18:20:30.583 DEBUG
+                [http-nio-8085-exec-8] [e01e09f7-f046-4519-89d8-7d9c2480c19d]
+                o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-05-12 18:20:30.946 DEBUG
+                [http-nio-8085-exec-10] [c6512604-e0b3-4ce4-93e7-86d4c072e683]
+                o.s.web.servlet.DispatcherServlet - GET "/MAHASBR/citizenSearch/visitor/summary", parameters={}
+2026-05-12 18:20:30.947 DEBUG
+                [http-nio-8085-exec-10] [c6512604-e0b3-4ce4-93e7-86d4c072e683]
+                o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.mahasbr.controller.VisitorController#getVisitSummary()
+2026-05-12 18:20:30.949 DEBUG
+                [http-nio-8085-exec-2] [c68f05aa-456d-4ded-93b4-730b1960575a]
+                o.s.web.servlet.DispatcherServlet - GET "/MAHASBR/citizenSearch/districts", parameters={}
+2026-05-12 18:20:30.949 DEBUG
+                [http-nio-8085-exec-2] [c68f05aa-456d-4ded-93b4-730b1960575a]
+                o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.mahasbr.controller.SearchBRNController#getAll()
+2026-05-12 18:20:30.963 DEBUG
+                [http-nio-8085-exec-10] [c6512604-e0b3-4ce4-93e7-86d4c072e683]
+                o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-05-12 18:20:30.963 DEBUG
+                [http-nio-8085-exec-10] [c6512604-e0b3-4ce4-93e7-86d4c072e683]
+                o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [{todayVisits=9, totalVisits=161}]
+2026-05-12 18:20:30.964 DEBUG
+                [http-nio-8085-exec-10] [c6512604-e0b3-4ce4-93e7-86d4c072e683]
+                o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-05-12 18:20:30.985 DEBUG
+                [http-nio-8085-exec-2] [c68f05aa-456d-4ded-93b4-730b1960575a]
+                o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-05-12 18:20:30.986 DEBUG
+                [http-nio-8085-exec-2] [c68f05aa-456d-4ded-93b4-730b1960575a]
+                o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[DistrictMaster(districtId=373, censusDistrictCode=919, districtName=Palghar, censusStateCode=27, di (truncated)...]
+2026-05-12 18:20:30.987 DEBUG
+                [http-nio-8085-exec-2] [c68f05aa-456d-4ded-93b4-730b1960575a]
+                o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-05-12 18:20:31.382 DEBUG
+                [http-nio-8085-exec-4] [bbecf01b-f5eb-486e-b211-b015fd6291c4]
+                o.s.web.servlet.DispatcherServlet - GET "/MAHASBR/citizenSearch/visitor/summary", parameters={}
+2026-05-12 18:20:31.385 DEBUG
+                [http-nio-8085-exec-4] [bbecf01b-f5eb-486e-b211-b015fd6291c4]
+                o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.mahasbr.controller.VisitorController#getVisitSummary()
+2026-05-12 18:20:31.388 DEBUG
+                [http-nio-8085-exec-5] [17f4f10b-65b9-4ca3-8fe5-3d8d4badb06b]
+                o.s.web.servlet.DispatcherServlet - GET "/MAHASBR/citizenSearch/districts", parameters={}
+2026-05-12 18:20:31.388 DEBUG
+                [http-nio-8085-exec-5] [17f4f10b-65b9-4ca3-8fe5-3d8d4badb06b]
+                o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.mahasbr.controller.SearchBRNController#getAll()
+2026-05-12 18:20:31.401 DEBUG
+                [http-nio-8085-exec-4] [bbecf01b-f5eb-486e-b211-b015fd6291c4]
+                o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-05-12 18:20:31.402 DEBUG
+                [http-nio-8085-exec-4] [bbecf01b-f5eb-486e-b211-b015fd6291c4]
+                o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [{todayVisits=9, totalVisits=161}]
+2026-05-12 18:20:31.402 DEBUG
+                [http-nio-8085-exec-4] [bbecf01b-f5eb-486e-b211-b015fd6291c4]
+                o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-05-12 18:20:31.416 DEBUG
+                [http-nio-8085-exec-5] [17f4f10b-65b9-4ca3-8fe5-3d8d4badb06b]
+                o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-05-12 18:20:31.416 DEBUG
+                [http-nio-8085-exec-5] [17f4f10b-65b9-4ca3-8fe5-3d8d4badb06b]
+                o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [[DistrictMaster(districtId=373, censusDistrictCode=919, districtName=Palghar, censusStateCode=27, di (truncated)...]
+2026-05-12 18:20:31.417 DEBUG
+                [http-nio-8085-exec-5] [17f4f10b-65b9-4ca3-8fe5-3d8d4badb06b]
+                o.s.web.servlet.DispatcherServlet - Completed 200 OK
+2026-05-12 18:21:14.173 DEBUG
+                [http-nio-8085-exec-1] [8aabb360-45dc-490d-a986-26607c658943]
+                o.s.web.servlet.DispatcherServlet - GET "/MAHASBR/citizenSearch/visitor/summary", parameters={}
+2026-05-12 18:21:14.175 DEBUG
+                [http-nio-8085-exec-1] [8aabb360-45dc-490d-a986-26607c658943]
+                o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.mahasbr.controller.VisitorController#getVisitSummary()
+2026-05-12 18:21:14.207 DEBUG
+                [http-nio-8085-exec-1] [8aabb360-45dc-490d-a986-26607c658943]
+                o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2026-05-12 18:21:14.207 DEBUG
+                [http-nio-8085-exec-1] [8aabb360-45dc-490d-a986-26607c658943]
+                o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Writing [{todayVisits=9, totalVisits=161}]
+2026-05-12 18:21:14.208 DEBUG
+                [http-nio-8085-exec-1] [8aabb360-45dc-490d-a986-26607c658943]
+                o.s.web.servlet.DispatcherServlet - Completed 200 OK
