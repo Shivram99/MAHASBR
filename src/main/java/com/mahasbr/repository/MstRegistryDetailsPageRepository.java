@@ -54,12 +54,31 @@ public interface MstRegistryDetailsPageRepository extends JpaRepository<MstRegis
 			@Param("taluka") String taluka, @Param("district") String district, @Param("pinCode") Integer pinCode,
 			@Param("sector") String sector);
 
-	// search brnNo or nameOfEstablishmentOrOwner form the district
-	@Query("SELECT m FROM MstRegistryDetailsPageEntity m WHERE LOWER(m.district) = LOWER(:district) AND "
-			+ "(m.brnNo = :brnNo OR LOWER(m.nameOfEstablishmentOrOwner) = LOWER(:nameOfEstablishmentOrOwner))")
-	List<MstRegistryDetailsPageEntity> findByDistrictAndBrnNoOrNameOfEstablishmentOrOwner(
-			@Param("district") String district, @Param("brnNo") String brnNo,
-			@Param("nameOfEstablishmentOrOwner") String nameOfEstablishmentOrOwner);
+	@Query(value = """
+			SELECT m
+			FROM MstRegistryDetailsPageEntity m
+			WHERE LOWER(m.district) = LOWER(:district)
+			  AND (:taluka IS NULL OR LOWER(m.taluka) = LOWER(:taluka))
+			  AND (:brn IS NULL OR m.brnNo = :brn)
+			  AND (:establishmentName IS NULL
+			       OR LOWER(m.nameOfEstablishmentOrOwner) LIKE LOWER(CONCAT('%', :establishmentName, '%')))
+			""",
+			countQuery = """
+			SELECT COUNT(m)
+			FROM MstRegistryDetailsPageEntity m
+			WHERE LOWER(m.district) = LOWER(:district)
+			  AND (:taluka IS NULL OR LOWER(m.taluka) = LOWER(:taluka))
+			  AND (:brn IS NULL OR m.brnNo = :brn)
+			  AND (:establishmentName IS NULL
+			       OR LOWER(m.nameOfEstablishmentOrOwner) LIKE LOWER(CONCAT('%', :establishmentName, '%')))
+			""")
+	Page<MstRegistryDetailsPageEntity> searchByCitizenFilters(
+			@Param("district") String district,
+			@Param("taluka") String taluka,
+			@Param("brn") String brn,
+			@Param("establishmentName") String establishmentName,
+			Pageable pageable
+	);
 
 	Optional<MstRegistryDetailsPageEntity> findByBrnNo(String brnno);
 

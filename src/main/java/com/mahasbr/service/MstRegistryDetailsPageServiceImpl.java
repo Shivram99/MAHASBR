@@ -631,13 +631,10 @@ public class MstRegistryDetailsPageServiceImpl implements MstRegistryDetailsPage
 
 	}
 
-	public List<MstRegistryDetailsPageEntity> getsearchBRNAndEstablishmentDetails(String district, String brnNo,
-			String establishment) {
-		List<MstRegistryDetailsPageEntity> searchBRNAndEstablishmentDetails = new ArrayList<>();
-		searchBRNAndEstablishmentDetails = mstRegistryDetailsPageRepository
-				.findByDistrictAndBrnNoOrNameOfEstablishmentOrOwner(district, brnNo, establishment);
-
-		return searchBRNAndEstablishmentDetails;
+	@Override
+	public Page<MstRegistryDetailsPageEntity> searchBrnRecords(Pageable pageable, String district, String taluka, String brn,
+			String establishmentName) {
+		return mstRegistryDetailsPageRepository.searchByCitizenFilters(district, taluka, brn, establishmentName, pageable);
 	}
 
 	@Override

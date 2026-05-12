@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
@@ -107,6 +108,16 @@ public class TalukaMasterServiceImpl implements TalukaMasterService {
 	public List<TalukaMaster> findByCensusDistrictCodeInAndIsActiveTrue(List<String> districtCode) {
 		// TODO Auto-generated method stub
 		return repository.findByCensusDistrictCodeInAndIsActiveTrue(districtCode);
+	}
+
+	@Override
+	public List<TalukaMaster> findActiveByDistrictCode(String districtCode) {
+		return repository.findByCensusDistrictCodeAndIsActiveTrueOrderByTalukaNameAsc(districtCode);
+	}
+
+	@Override
+	public Optional<TalukaMaster> findActiveByDistrictCodeAndTalukaCode(String districtCode, String talukaCode) {
+		return repository.findByCensusDistrictCodeAndCensusTalukaCodeAndIsActiveTrue(districtCode, talukaCode);
 	}
 
 }

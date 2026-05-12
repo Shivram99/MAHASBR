@@ -14,8 +14,8 @@ public interface MstRegistryDetailsPageService {
 
 	BRNGenerationRecordCount uploadRegiteryCSVFileForBRNGeneration(MultipartFile file);
 
-	List<MstRegistryDetailsPageEntity> getsearchBRNAndEstablishmentDetails(String district, String brnNo,
-			String establishment);
+	Page<MstRegistryDetailsPageEntity> searchBrnRecords(Pageable pageable, String district, String taluka, String brn,
+			String establishmentName);
 
 	Page<MstRegistryDetailsPageEntity> getAllRegistoryDetails(Pageable pageable);
 

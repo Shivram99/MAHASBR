@@ -4,9 +4,11 @@ import java.io.FileNotFoundException;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -32,7 +34,6 @@ import com.mahasbr.service.DivisionService;
 import com.mahasbr.service.MstRegistryDetailsPageService;
 import com.mahasbr.service.RegistryMasterService;
 import com.mahasbr.service.TalukaMasterService;
-import com.mahasbr.util.BrnGeneratorFactory;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -41,16 +42,12 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/citizenSearch")
 @RequiredArgsConstructor
 public class SearchBRNController {
-	
-	private static final Logger logger = LoggerFactory.getLogger(SearchBRNController.class);
 
 	private final DistrictMasterService districtservice;
 
 	private final MstRegistryDetailsPageService mstRegistryDetailsPageService;
 	
 	private final TalukaMasterService talukaMasterService;
-	
-	private final BrnGeneratorFactory generatorFactory;
 	
     private final CircularService circularService;
     
@@ -64,20 +61,27 @@ public class SearchBRNController {
 	}
 
 	@PostMapping("/searchBRN")
-	public ResponseEntity<List<MstRegistryDetailsPageEntity>> searchBRN(@Valid @RequestBody SearchBrnDto searchBrnDto) {
-		if (StringUtils.isBlank(searchBrnDto.getDistrict())) {
-			throw new IllegalArgumentException("District code must not be blank");
+	public ResponseEntity<Page<MstRegistryDetailsPageEntity>> searchBRN(
+			@Valid @RequestBody SearchBrnDto searchBrnDto,
+			@org.springframework.web.bind.annotation.RequestParam(defaultValue = "0") int page,
+			@org.springframework.web.bind.annotation.RequestParam(defaultValue = "10") int size,
+			@org.springframework.web.bind.annotation.RequestParam(defaultValue = "siNo") String sortBy) {
+		if (StringUtils.isAllBlank(searchBrnDto.getEstablishmentName(), searchBrnDto.getBrn())) {
+			throw new IllegalArgumentException("At least one of the fields 'Name of Establishment' or 'BRN No' is required.");
 		}
 
-		DistrictMaster district = districtservice.findByCensusDistrictCode(searchBrnDto.getDistrict()).orElseThrow(
-				() -> new ResourceNotFoundException("District", "CensusDistrictCode", searchBrnDto.getDistrict()));
+		String districtCode = formatDistrictCode(searchBrnDto.getDistrictId());
+		DistrictMaster district = districtservice.findByCensusDistrictCode(districtCode).orElseThrow(
+				() -> new ResourceNotFoundException("District", "CensusDistrictCode", districtCode));
 
-		String districtName = StringUtils.upperCase(district.getDistrictName());
-		String brnNo = StringUtils.upperCase(searchBrnDto.getBrnNo());
-		String establishmentOrOwnerName = StringUtils.upperCase(searchBrnDto.getNameOfEstablishmentOrOwner());
+		String districtName = StringUtils.upperCase(StringUtils.trimToNull(district.getDistrictName()));
+		String talukaName = resolveTalukaName(districtCode, searchBrnDto.getTalukaId());
+		String brn = StringUtils.upperCase(StringUtils.trimToNull(searchBrnDto.getBrn()));
+		String establishmentName = StringUtils.upperCase(StringUtils.trimToNull(searchBrnDto.getEstablishmentName()));
+		Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
 
-		List<MstRegistryDetailsPageEntity> result = mstRegistryDetailsPageService
-				.getsearchBRNAndEstablishmentDetails(districtName, brnNo, establishmentOrOwnerName);
+		Page<MstRegistryDetailsPageEntity> result = mstRegistryDetailsPageService
+				.searchBrnRecords(pageable, districtName, talukaName, brn, establishmentName);
 
 		return ResponseEntity.ok(result);
 	}
@@ -85,6 +89,27 @@ public class SearchBRNController {
 	@PostMapping("/districtTaluka")
 	public ResponseEntity<List<TalukaMaster>> getDistrictTaluka(@RequestBody List<String> districtCode) {
 		return ResponseEntity.ok(talukaMasterService.findByCensusDistrictCodeInAndIsActiveTrue(districtCode));
+	}
+
+	private String resolveTalukaName(String districtCode, Long talukaId) {
+		if (talukaId == null) {
+			return null;
+		}
+
+		String talukaCode = formatTalukaCode(talukaId);
+		TalukaMaster taluka = talukaMasterService
+				.findActiveByDistrictCodeAndTalukaCode(districtCode, talukaCode)
+				.orElseThrow(() -> new ResourceNotFoundException("Taluka", "CensusTalukaCode", talukaCode));
+
+		return StringUtils.upperCase(StringUtils.trimToNull(taluka.getTalukaName()));
+	}
+
+	private String formatDistrictCode(Long districtId) {
+		return StringUtils.leftPad(String.valueOf(districtId), 3, '0');
+	}
+
+	private String formatTalukaCode(Long talukaId) {
+		return StringUtils.leftPad(String.valueOf(talukaId), 5, '0');
 	}
 	
 	@GetMapping("/circulars")

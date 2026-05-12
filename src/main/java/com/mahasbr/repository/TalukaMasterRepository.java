@@ -30,6 +30,13 @@ public interface TalukaMasterRepository extends JpaRepository<TalukaMaster, Long
 
 	List<TalukaMaster> findByCensusDistrictCodeInAndIsActiveTrue(List<String> districtCode);
 
+	List<TalukaMaster> findByCensusDistrictCodeAndIsActiveTrueOrderByTalukaNameAsc(String censusDistrictCode);
+
+	Optional<TalukaMaster> findByCensusDistrictCodeAndCensusTalukaCodeAndIsActiveTrue(
+			String censusDistrictCode,
+			String censusTalukaCode
+	);
+
 	//Optional<TalukaMaster> findByCensusDistrictCodeAndTalukaName(String censusDistrictCode, String talukaName);
 
 	@Query("""

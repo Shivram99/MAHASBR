@@ -2,8 +2,7 @@ package com.mahasbr.controller;
 
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -26,8 +25,6 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/citizenSearch/api/talukas")
 public class TalukaMasterController {
-
-	private static final Logger logger = LoggerFactory.getLogger(TalukaMasterController.class);
 
 	private final TalukaMasterService service;
 
@@ -60,6 +57,12 @@ public class TalukaMasterController {
 	public ResponseEntity<List<TalukaMaster>> getAll() {
 		return ResponseEntity.ok(service.getAll());
 	}
+
+	@GetMapping("/by-district/{districtId}")
+	public ResponseEntity<List<TalukaMaster>> getByDistrict(@PathVariable Long districtId) {
+		return ResponseEntity.ok(service.findActiveByDistrictCode(formatDistrictCode(districtId)));
+	}
+
 	@PostMapping(value ="/upload" ,consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<String> uploadTalukaExcel(@RequestParam("file") MultipartFile file) {
 	    try {
@@ -69,6 +72,10 @@ public class TalukaMasterController {
 	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
 	                .body("Failed to upload file: " + e.getMessage());
 	    }
+	}
+
+	private String formatDistrictCode(Long districtId) {
+		return StringUtils.leftPad(String.valueOf(districtId), 3, '0');
 	}
 
 }
