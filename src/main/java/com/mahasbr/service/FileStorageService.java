@@ -1,5 +1,7 @@
 package com.mahasbr.service;
+
 import java.io.InputStream;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -21,12 +23,21 @@ public class FileStorageService {
     private final VirusScanner scanner;
 
     public FileStorageService(FileStorageProperties props, FileValidator validator, VirusScanner scanner) throws Exception {
+        if (props.getUploadDir() == null || props.getUploadDir().isBlank()) {
+            throw new IllegalStateException("Upload directory is not configured. Set app.file.upload-dir or FILE_UPLOAD_DIR.");
+        }
+
         this.uploadDir = Paths.get(props.getUploadDir()).toAbsolutePath().normalize();
         this.validator = validator;
         this.scanner = scanner;
 
-        if (!Files.exists(uploadDir)) {
+        try {
             Files.createDirectories(uploadDir);
+        } catch (IOException ex) {
+            throw new IllegalStateException(
+                    "Unable to create upload directory '" + uploadDir
+                            + "'. Ensure the container user has write permission to this path.",
+                    ex);
         }
     }
 

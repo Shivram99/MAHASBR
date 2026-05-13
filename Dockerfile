@@ -23,15 +23,16 @@ FROM eclipse-temurin:17-jdk-jammy
 ENV JAVA_OPTS="-Xms1024m -Xmx2048m"
 ENV TZ=Asia/Kolkata
 ENV APP_HOME=/opt/app
-ENV FILE_UPLOAD_DIR=/opt/app/uploads
-ENV LOG_DIR=/opt/app/logs
+ENV FILE_UPLOAD_DIR=/data/upload
+ENV LOG_DIR=/tmp/MAHASBR/logs
 
 WORKDIR $APP_HOME
 
-# Create required directories and grant full access
-RUN mkdir -p $FILE_UPLOAD_DIR $LOG_DIR && \
-    chmod -R 777 $FILE_UPLOAD_DIR $LOG_DIR && \
-    chmod -R 777 $APP_HOME
+# Create application user and writable directories before switching users
+RUN useradd -ms /bin/bash springuser && \
+    mkdir -p "$APP_HOME" "$FILE_UPLOAD_DIR" "$LOG_DIR" && \
+    chown -R springuser:springuser "$APP_HOME" /data /tmp/MAHASBR && \
+    chmod -R 775 "$FILE_UPLOAD_DIR" "$LOG_DIR"
 
 # Copy WAR from builder stage
 COPY --from=builder /app/target/*.war app.war
@@ -39,10 +40,9 @@ COPY --from=builder /app/target/*.war app.war
 # Expose application port
 EXPOSE 8085
 
-# Create non-root user and grant permissions
-RUN useradd -ms /bin/bash springuser && \
-    chown -R springuser:springuser $APP_HOME
 USER springuser
+
+VOLUME ["/data/upload"]
 
 # Entry point
 ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.war"]
