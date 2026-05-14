@@ -25,11 +25,16 @@ ENV TZ=Asia/Kolkata
 ENV APP_HOME=/opt/app
 ENV FILE_UPLOAD_DIR=/data/upload
 ENV LOG_DIR=/tmp/MAHASBR/logs
+ENV VIRUS_SCAN_REQUIRED=true
 
 WORKDIR $APP_HOME
 
-# Create application user and writable directories before switching users
+# Install antivirus engine and create application user/directories before switching users
 RUN useradd -ms /bin/bash springuser && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends clamav clamav-freshclam && \
+    rm -rf /var/lib/apt/lists/* && \
+    (freshclam || true) && \
     mkdir -p "$APP_HOME" "$FILE_UPLOAD_DIR" "$LOG_DIR" && \
     chown -R springuser:springuser "$APP_HOME" /data /tmp/MAHASBR && \
     chmod -R 775 "$FILE_UPLOAD_DIR" "$LOG_DIR"

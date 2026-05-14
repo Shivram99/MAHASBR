@@ -16,6 +16,7 @@ import lombok.Setter;
 public class CircularResponseDTO {
     private Long id;
     private String subject;
+    private String activity;
     private LocalDate date;
     private String fileUrl;
     private String message;

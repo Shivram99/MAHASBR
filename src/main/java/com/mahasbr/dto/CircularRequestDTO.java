@@ -20,6 +20,7 @@ import lombok.ToString;
 public class CircularRequestDTO {
 	private Long id;
     private String subject;
+    private String activity;
     private LocalDate date;
     private MultipartFile file; // PDF file
 }

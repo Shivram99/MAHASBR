@@ -3,9 +3,7 @@ package com.mahasbr.controller;
 import java.time.LocalDate;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,23 +19,25 @@ import com.mahasbr.dto.CircularRequestDTO;
 import com.mahasbr.dto.CircularResponseDTO;
 import com.mahasbr.service.CircularService;
 
+import lombok.RequiredArgsConstructor;
+
 @RestController
 @RequestMapping("/api/circulars")
+@RequiredArgsConstructor
 public class CircularController {
 
-	private static final Logger logger = LoggerFactory.getLogger(CircularController.class);
+    private final CircularService circularService;
 
-	@Autowired
-    private CircularService circularService;
-
-    @PostMapping
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<CircularResponseDTO> createCircular(
             @RequestParam String subject,
+            @RequestParam(required = false) String activity,
             @RequestParam String date,
             @RequestParam MultipartFile file) {
 
         CircularRequestDTO dto = CircularRequestDTO.builder()
                 .subject(subject)
+                .activity(activity)
                 .date(LocalDate.parse(date))
                 .file(file)
                 .build();
@@ -45,16 +45,18 @@ public class CircularController {
         return ResponseEntity.ok(circularService.createCircular(dto));
     }
     
-    @PutMapping
-    public ResponseEntity<CircularResponseDTO> UpdateCircular(
+    @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<CircularResponseDTO> updateCircular(
     		@RequestParam Long id,
             @RequestParam String subject,
+            @RequestParam(required = false) String activity,
             @RequestParam String date,
-            @RequestParam MultipartFile file) {
+            @RequestParam(required = false) MultipartFile file) {
 
         CircularRequestDTO dto = CircularRequestDTO.builder()
         		.id(id)
                 .subject(subject)
+                .activity(activity)
                 .date(LocalDate.parse(date))
                 .file(file)
                 .build();

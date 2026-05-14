@@ -18,8 +18,10 @@ public class FileStorageProperties {
 
     private String uploadDir;
     private long maxFileSizeMb;
+    private long circularMaxFileSizeMb;
     private Set<String> allowedExtensions;
     private Set<String> allowedMimePrefixes;
     private String virusScannerCommand;
+    private boolean virusScanRequired;
 
 }
