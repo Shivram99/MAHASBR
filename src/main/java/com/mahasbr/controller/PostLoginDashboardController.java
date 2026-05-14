@@ -1,5 +1,6 @@
 package com.mahasbr.controller;
 
+import java.io.ByteArrayOutputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -46,6 +47,7 @@ import com.mahasbr.service.FileProcessingService;
 import com.mahasbr.service.FileStorageService;
 import com.mahasbr.service.MstRegistryDetailsPageService;
 import com.mahasbr.service.MstRegistryDetailsPageServiceImpl;
+import com.mahasbr.service.RegisteredEstablishmentExportService;
 import com.mahasbr.util.UploadDefaultLogger;
 import com.mahasbr.util.UploadProgressStore;
 
@@ -75,6 +77,9 @@ public class PostLoginDashboardController {
 
 	@Autowired
 	private UploadResultRecordes uploadResultRecordes;
+
+	@Autowired
+	private RegisteredEstablishmentExportService registeredEstablishmentExportService;
 
 	@GetMapping("/registoryData")
 	public ResponseEntity<Page<MstRegistryDetailsPageEntity>> getMasterRegistoryDetails(
@@ -183,6 +188,21 @@ public class PostLoginDashboardController {
 	public ResponseEntity<List<DistrictMaster>> getAll() {
 		// return ResponseEntity.ok(districtservice.findByIsActiveTrue());
 		return ResponseEntity.ok(districtservice.findByIsActiveTrueBasedOnlogin());
+	}
+
+	@GetMapping(value = "/registered-establishments/export/pdf", produces = MediaType.APPLICATION_PDF_VALUE)
+	public ResponseEntity<byte[]> exportRegisteredEstablishmentsPdf(
+			@RequestParam(name = "districtId", required = false) List<Long> districtIds,
+			@RequestParam(name = "talukaId", required = false) List<Long> talukaIds,
+			@RequestParam(name = "brn", required = false) String brn) {
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		registeredEstablishmentExportService.exportRegisteredEstablishmentsPdf(districtIds, talukaIds, brn,
+				outputStream);
+
+		return ResponseEntity.ok()
+				.contentType(MediaType.APPLICATION_PDF)
+				.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"registered-establishments.pdf\"")
+				.body(outputStream.toByteArray());
 	}
 
 	@Autowired
