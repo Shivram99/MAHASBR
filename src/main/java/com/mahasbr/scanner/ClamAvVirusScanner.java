@@ -59,6 +59,7 @@ implements VirusScanner {
         int exit = process.waitFor();
         if (exit == 0) return true;   // clean
         if (exit == 1) return false;  // infected
+        logger.error("Virus scan failed for file '{}'. Exit code={}, output={}", file, exit, output);
         throw new RuntimeException("Virus scan failed: " + output);
     }
 }

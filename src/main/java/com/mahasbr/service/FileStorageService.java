@@ -16,6 +16,8 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
@@ -28,6 +30,7 @@ import com.mahasbr.validators.FileValidator;
 
 @Service
 public class FileStorageService {
+    private static final Logger logger = LoggerFactory.getLogger(FileStorageService.class);
 
     private static final String DEFAULT_SEGMENT = "general";
     private static final Set<PosixFilePermission> DIRECTORY_PERMISSIONS = EnumSet.of(
@@ -88,6 +91,8 @@ public class FileStorageService {
         } catch (Exception ex) {
             deleteIfExists(temporaryFile);
             deleteIfExists(target);
+            logger.error("Failed to store file. uploadDir='{}', targetDirectory='{}', target='{}', originalFilename='{}'",
+                    uploadDir, targetDirectory, target, file.getOriginalFilename(), ex);
             throw new RuntimeException("Failed to store file", ex);
         }
     }
