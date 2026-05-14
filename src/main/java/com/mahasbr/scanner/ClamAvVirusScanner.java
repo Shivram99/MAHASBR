@@ -4,7 +4,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +37,7 @@ implements VirusScanner {
             return true;
         }
 
-        List<String> cmd = List.of(command, "--fdpass", file.toAbsolutePath().toString());
+        List<String> cmd = buildScanCommand(file);
         Process process;
         try {
             process = new ProcessBuilder(cmd).redirectErrorStream(true).start();
@@ -61,5 +63,18 @@ implements VirusScanner {
         if (exit == 1) return false;  // infected
         logger.error("Virus scan failed for file '{}'. Exit code={}, output={}", file, exit, output);
         throw new RuntimeException("Virus scan failed: " + output);
+    }
+
+    private List<String> buildScanCommand(Path file) {
+        List<String> cmd = new ArrayList<>();
+        cmd.add(command);
+
+        String normalizedCommand = command.toLowerCase(Locale.ROOT);
+        if (normalizedCommand.contains("clamdscan")) {
+            cmd.add("--fdpass");
+        }
+
+        cmd.add(file.toAbsolutePath().toString());
+        return cmd;
     }
 }
