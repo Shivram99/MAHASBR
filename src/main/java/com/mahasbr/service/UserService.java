@@ -2,24 +2,21 @@ package com.mahasbr.service;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
-import com.mahasbr.dto.DivisionDto;
 import com.mahasbr.dto.RoleDto;
 import com.mahasbr.dto.UserDto;
 import com.mahasbr.dto.UserProfileDto;
-import com.mahasbr.entity.DivisionMaster;
 import com.mahasbr.entity.Role;
 import com.mahasbr.entity.User;
 import com.mahasbr.entity.UserProfileEntity;
-import com.mahasbr.model.ERole;
-import com.mahasbr.repository.DistrictMasterRepository;
-import com.mahasbr.repository.RegistryMasterRepository;
+import com.mahasbr.exception.ResourceNotFoundException;
+import com.mahasbr.repository.DivisionRepository;
 import com.mahasbr.repository.RoleRepository;
 import com.mahasbr.repository.UserRepository;
 
@@ -33,12 +30,8 @@ public class UserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
-    
-    private final DistrictMasterRepository districtRepository;
-    
-    private final RegistryMasterRepository registryRepository;
-    
-    private final DivisionService divisionService;
+    private final DivisionRepository divisionRepository;
+    private final UserRoleLocationPolicyService userRoleLocationPolicyService;
 
     // Get all users
     public List<UserDto> getAllUsers() {
@@ -51,103 +44,57 @@ public class UserService {
     public UserDto getUserById(Long id) {
         return userRepository.findById(id)
                 .map(this::toDto)
-                .orElseThrow(() -> new RuntimeException("User not found with id " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id " + id));
     }
 
- // -------------------------
-    // Create User
-    // -------------------------
     public UserDto createUser(@Valid UserDto dto) {
+        validateUniqueUsername(dto.getUsername(), null);
+        validateUniqueEmail(dto.getEmail(), null);
+
+        UserRoleLocationPolicyService.ValidatedUserLocation location =
+                userRoleLocationPolicyService.validateAndResolve(dto);
+
         User user = new User();
-        user.setUsername(dto.getUsername());
-        user.setEmail(dto.getEmail());
+        user.setUsername(dto.getUsername().trim());
+        user.setEmail(dto.getEmail().trim());
         user.setIsFirstTimeLogin(true);
         user.setPassword(passwordEncoder.encode("Pass@123"));
-        user.setDivisionCode(dto.getDivisionCode());
-
-        // Set roles
         user.setRoles(resolveRoles(dto.getRoles()));
-
-        // Set registry if present
-        if (dto.getRegistryId() != null) {
-            user.setRegistry(registryRepository.findById(dto.getRegistryId())
-                    .orElseThrow(() -> new RuntimeException("Registry not found with id: " + dto.getRegistryId())));
-        }
-
-        // Set district if present
-        if (dto.getDistrictId() != null) {
-            user.setDistrict(districtRepository.findById(dto.getDistrictId())
-                    .orElseThrow(() -> new RuntimeException("District not found with id: " + dto.getDistrictId())));
-        }
-
-//     // Set district if present
-//        if (dto.getDivisionId() != null) {
-//        	DivisionDto division = divisionService.getDivisionById(dto.getDivisionId());
-//            user.setDivisionCode(division.getDivisionCode());
-//        }
-        // Set UserProfile
+        user.setRegistry(location.registry());
+        user.setDivisionCode(location.divisionCode());
+        user.setDistrict(location.district());
         user.setUserProfile(buildUserProfile(dto.getUserProfile(), user));
 
         User savedUser = userRepository.save(user);
         return toDto(savedUser);
     }
 
-    // Update user
     public UserDto updateUser(Long id, UserDto dto) {
         User existing = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id " + id));
 
-        existing.setUsername(dto.getUsername());
-        existing.setEmail(dto.getEmail());
+        validateUniqueUsername(dto.getUsername(), id);
+        validateUniqueEmail(dto.getEmail(), id);
+
+        UserRoleLocationPolicyService.ValidatedUserLocation location =
+                userRoleLocationPolicyService.validateAndResolve(dto);
+
+        existing.setUsername(dto.getUsername().trim());
+        existing.setEmail(dto.getEmail().trim());
         existing.setIsFirstTimeLogin(dto.getIsFirstTimeLogin());
-        existing.setDivisionCode(dto.getDivisionCode());
-        
-        // Set registry if present
-        if (dto.getRegistryId() != null) {
-        	existing.setRegistry(registryRepository.findById(dto.getRegistryId())
-                    .orElseThrow(() -> new RuntimeException("Registry not found with id: " + dto.getRegistryId())));
-        }
-
-        // Set district if present
-        if (dto.getDistrictId() != null) {
-        	existing.setDistrict(districtRepository.findById(dto.getDistrictId())
-                    .orElseThrow(() -> new RuntimeException("District not found with id: " + dto.getDistrictId())));
-        }
-
-        // Update roles
-        if (dto.getRoles() != null) {
-            Set<Role> roles = dto.getRoles().stream()
-                    .map(roleName -> roleRepository.findByName(roleName)
-                            .orElseThrow(() -> new RuntimeException("Role not found: " + roleName)))
-                    .collect(Collectors.toSet());
-            existing.setRoles(roles);
-        }
-
-        // Update profile
-        if (dto.getUserProfile() != null) {
-            UserProfileEntity profile = existing.getUserProfile();
-            if (profile == null) {
-                profile = new UserProfileEntity();
-                profile.setUser(existing);
-            }
-            profile.setFullName(dto.getUserProfile().getFullName());
-            profile.setOfficeName(dto.getUserProfile().getOfficeName());
-            profile.setOfficeAddress(dto.getUserProfile().getOfficeAddress());
-            profile.setMobileNumber(dto.getUserProfile().getMobileNumber());
-            existing.setUserProfile(profile);
-        }
+        existing.setRoles(resolveRoles(dto.getRoles()));
+        existing.setRegistry(location.registry());
+        existing.setDivisionCode(location.divisionCode());
+        existing.setDistrict(location.district());
+        existing.setUserProfile(buildUserProfile(dto.getUserProfile(), existing));
 
         return toDto(userRepository.save(existing));
     }
 
-    // Delete user
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
     }
 
-    // -------------------------
-    // Convert Entity to DTO
-    // -------------------------
     private UserDto toDto(User user) {
         UserDto dto = new UserDto();
         dto.setId(user.getId());
@@ -157,6 +104,10 @@ public class UserService {
         dto.setRegistryId(user.getRegistry() != null ? user.getRegistry().getId() : null);
         dto.setDistrictId(user.getDistrict() != null ? user.getDistrict().getDistrictId() : null);
         dto.setDivisionCode(user.getDivisionCode() != null ? user.getDivisionCode() : null);
+        if (StringUtils.hasText(user.getDivisionCode())) {
+            divisionRepository.findByDivisionCode(user.getDivisionCode())
+                    .ifPresent(division -> dto.setDivisionId(division.getDivisionId()));
+        }
 
 
         if (user.getRoles() != null) {
@@ -182,29 +133,28 @@ public class UserService {
                 .map(role -> new RoleDto(role.getId(), role.getName()))
                 .collect(Collectors.toList());
     }
-    
+
     private Set<Role> resolveRoles(Set<String> roleNames) {
         Set<Role> roles = new HashSet<>();
 
         if (roleNames == null || roleNames.isEmpty()) {
             Role defaultRole = roleRepository.findByName("ROLE_USER")
-                    .orElseThrow(() -> new RuntimeException("Default role not found"));
+                    .orElseThrow(() -> new IllegalArgumentException("At least one role must be selected."));
             roles.add(defaultRole);
         } else {
             for (String roleName : roleNames) {
                 Role role = roleRepository.findByName(roleName)
-                        .orElseThrow(() -> new RuntimeException("Role not found: " + roleName));
+                        .orElseThrow(() -> new IllegalArgumentException("Role not found: " + roleName));
                 roles.add(role);
             }
         }
         return roles;
     }
-    
- // -------------------------
-    // Helper: Build or Update UserProfile
-    // -------------------------
+
     private UserProfileEntity buildUserProfile(UserProfileDto dto, User user) {
-        if (dto == null) return null;
+        if (dto == null) {
+            return null;
+        }
 
         UserProfileEntity profile = user.getUserProfile();
         if (profile == null) {
@@ -212,11 +162,37 @@ public class UserService {
             profile.setUser(user);
         }
 
-        profile.setFullName(dto.getFullName());
-        profile.setOfficeName(dto.getOfficeName());
-        profile.setOfficeAddress(dto.getOfficeAddress());
-        profile.setMobileNumber(dto.getMobileNumber());
+        profile.setFullName(dto.getFullName().trim());
+        profile.setOfficeName(dto.getOfficeName().trim());
+        profile.setOfficeAddress(dto.getOfficeAddress() != null ? dto.getOfficeAddress().trim() : null);
+        profile.setMobileNumber(dto.getMobileNumber().trim());
 
         return profile;
+    }
+
+    private void validateUniqueUsername(String username, Long userId) {
+        String normalizedUsername = username != null ? username.trim() : null;
+        if (!StringUtils.hasText(normalizedUsername)) {
+            return;
+        }
+
+        userRepository.findByUsernameIgnoreCase(normalizedUsername)
+                .filter(user -> !user.getId().equals(userId))
+                .ifPresent(user -> {
+                    throw new IllegalArgumentException("Username already exists.");
+                });
+    }
+
+    private void validateUniqueEmail(String email, Long userId) {
+        String normalizedEmail = email != null ? email.trim() : null;
+        if (!StringUtils.hasText(normalizedEmail)) {
+            return;
+        }
+
+        userRepository.findByEmailIgnoreCase(normalizedEmail)
+                .filter(user -> !user.getId().equals(userId))
+                .ifPresent(user -> {
+                    throw new IllegalArgumentException("Email already exists.");
+                });
     }
 }

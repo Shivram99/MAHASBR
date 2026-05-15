@@ -18,6 +18,7 @@ import com.mahasbr.dto.RoleDto;
 import com.mahasbr.dto.UserDto;
 import com.mahasbr.service.UserService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -40,12 +41,12 @@ public class UserController {
 	}
 
 	@PostMapping
-	public ResponseEntity<UserDto> createUser(@RequestBody UserDto dto) {
+	public ResponseEntity<UserDto> createUser(@Valid @RequestBody UserDto dto) {
 		return ResponseEntity.ok(userService.createUser(dto));
 	}
 
 	@PutMapping("/{id}")
-	public ResponseEntity<UserDto> updateUser(@PathVariable Long id, @RequestBody UserDto dto) {
+	public ResponseEntity<UserDto> updateUser(@PathVariable Long id, @Valid @RequestBody UserDto dto) {
 		return ResponseEntity.ok(userService.updateUser(id, dto));
 	}
 
