@@ -23,7 +23,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mahasbr.filter.AuthEntryPointJwt;
 import com.mahasbr.filter.AuthTokenFilter;
 import com.mahasbr.filter.CorrelationIdFilter;
-import com.mahasbr.filter.XssFilter;
 import com.mahasbr.repository.PermissionRepository;
 import com.mahasbr.service.RefreshTokenService;
 import com.mahasbr.service.UserDetailsServiceImpl;
@@ -79,12 +78,6 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
 	}
 
 	@Bean
-	public XssFilter xssFilter() {
-		return new XssFilter();
-	}
-
-
-	@Bean
 	public LogoutSuccessHandler logoutSuccessHandler() {
 		return (request, response, authentication) -> {
 			response.setStatus(HttpServletResponse.SC_OK);
@@ -129,7 +122,6 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
 		http.authenticationProvider(authenticationProvider());	
 		http.addFilterBefore(correlationIdFilter(),UsernamePasswordAuthenticationFilter.class);
 		http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);		
-		http.addFilterBefore(xssFilter(), UsernamePasswordAuthenticationFilter.class);
 		
 		return http.build();
 	}
