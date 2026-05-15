@@ -19,6 +19,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mahasbr.UserMapper;
+import com.mahasbr.dto.LoggedInUserResponse;
 import com.mahasbr.dto.UserDto;
 import com.mahasbr.entity.AuditLog;
 import com.mahasbr.entity.User;
@@ -35,6 +37,7 @@ import com.mahasbr.repository.RoleRepository;
 import com.mahasbr.repository.UserRepository;
 import com.mahasbr.response.JwtResponse;
 import com.mahasbr.service.AuditLogService;
+import com.mahasbr.service.LoggedInUserService;
 import com.mahasbr.service.RefreshTokenService;
 import com.mahasbr.service.TokenBlacklistService;
 import com.mahasbr.service.UserDetailsImpl;
@@ -64,6 +67,8 @@ public class LoginController {
     private final AuditLogService auditService;
     
     private final TokenBlacklistService tokenBlacklistService;
+
+    private final LoggedInUserService loggedInUserService;
 
     private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
 	
@@ -110,6 +115,16 @@ public class LoginController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("message", "Invalid username or password"));
         }
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<LoggedInUserResponse> getCurrentUser(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()
+                || "anonymousUser".equalsIgnoreCase(String.valueOf(authentication.getPrincipal()))) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        return ResponseEntity.ok(loggedInUserService.getCurrentUser());
     }
 
 

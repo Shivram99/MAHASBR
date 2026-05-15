@@ -35,8 +35,7 @@ public class AuthEntryPointJwt implements AuthenticationEntryPoint {
     } else if (authException instanceof org.springframework.security.authentication.DisabledException) {
         response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Error: User account is disabled");
     } else {
-        // For any other type of exception, consider it as an internal server error
-        response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error: Internal server error");
+        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Error: Unauthorized");
     }
   }
 }
