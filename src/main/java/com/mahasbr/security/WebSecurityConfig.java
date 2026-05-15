@@ -28,6 +28,7 @@ import com.mahasbr.repository.PermissionRepository;
 import com.mahasbr.service.RefreshTokenService;
 import com.mahasbr.service.UserDetailsServiceImpl;
 
+import jakarta.servlet.DispatcherType;
 import jakarta.servlet.http.HttpServletResponse;
 
 @Configuration
@@ -114,7 +115,10 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
 				.exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				// .failureHandler(authenticationFailureHandler)
-				.authorizeHttpRequests(auth -> auth.requestMatchers("/api/auth/signin", "/citizenSearch/**").permitAll()
+				.authorizeHttpRequests(auth -> auth
+						.dispatcherTypeMatchers(DispatcherType.ASYNC, DispatcherType.FORWARD, DispatcherType.ERROR)
+						.permitAll()
+						.requestMatchers("/api/auth/signin", "/citizenSearch/**").permitAll()
 						.requestMatchers("/api/auth/signup").permitAll().requestMatchers("/api/test/**").permitAll()
 						.requestMatchers("/common/api**").permitAll().requestMatchers("/api/auth/progress/**")
 						.permitAll().requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()

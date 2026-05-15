@@ -66,6 +66,8 @@ public class PdfExportUtil {
 		table.setWidthPercentage(100);
 		table.setSpacingBefore(4f);
 		table.setSpacingAfter(8f);
+		table.setHeaderRows(1);
+		table.setSplitLate(false);
 
 		addHeaderCell(table, "Sr.No");
 		addHeaderCell(table, "BRN");
@@ -81,9 +83,9 @@ public class PdfExportUtil {
 			addBodyCell(table, toDisplayValue(row.srNo()));
 			addBodyCell(table, row.brn());
 			addBodyCell(table, row.establishmentName());
-			addBodyCell(table, row.city());
+			addBodyCell(table, toDisplayValue(row.taluka(), row.townVillage()));
 			addBodyCell(table, row.district());
-			addBodyCell(table, row.institutionType());
+			addBodyCell(table, row.sector());
 		}
 	}
 
@@ -124,5 +126,13 @@ public class PdfExportUtil {
 
 		String normalizedValue = value.toString().trim();
 		return normalizedValue.isEmpty() ? "-" : normalizedValue;
+	}
+
+	private String toDisplayValue(String primaryValue, String fallbackValue) {
+		String normalizedPrimaryValue = toDisplayValue(primaryValue);
+		if (!"-".equals(normalizedPrimaryValue)) {
+			return normalizedPrimaryValue;
+		}
+		return toDisplayValue(fallbackValue);
 	}
 }

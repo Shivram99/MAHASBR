@@ -11,6 +11,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
@@ -24,7 +25,11 @@ import lombok.ToString;
 
 @JsonIgnoreProperties(value = { "hourOfDay" }, ignoreUnknown = true)
 @Entity
-@Table(name = "mst_reg_details")
+@Table(name = "mst_reg_details", indexes = {
+		@Index(name = "idx_mst_reg_details_reg_user_si_no", columnList = "reg_user_id, si_no"),
+		@Index(name = "idx_mst_reg_details_district_taluka_si_no", columnList = "district, taluka, si_no"),
+		@Index(name = "idx_mst_reg_details_brn_number", columnList = "brn_number")
+})
 @Getter
 @Setter
 @NoArgsConstructor

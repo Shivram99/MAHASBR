@@ -18,18 +18,21 @@ public interface RegisteredEstablishmentExportRepository extends Repository<MstR
 			    m.siNo,
 			    m.brnNo,
 			    m.nameOfEstablishmentOrOwner,
-			    COALESCE(m.taluka, m.townVillage),
+			    CASE
+			        WHEN m.taluka IS NULL OR TRIM(m.taluka) = '' THEN m.townVillage
+			        ELSE m.taluka
+			    END,
 			    m.district,
 			    m.sector
 			)
 			FROM MstRegistryDetailsPageEntity m
 			WHERE (:applyRegistryFilter = false OR m.regUserId = :registryId)
-			  AND (:applyDistrictFilter = false OR LOWER(m.district) IN :districts)
-			  AND (:applyTalukaFilter = false OR LOWER(m.taluka) IN :talukas)
+			  AND (:applyDistrictFilter = false OR m.district IN :districts)
+			  AND (:applyTalukaFilter = false OR m.taluka IN :talukas)
 			  AND (:brn IS NULL OR m.brnNo = :brn)
 			ORDER BY m.siNo ASC
 			""")
-	Slice<RegisteredEstablishmentExportDto> findForPdfExport(
+	Slice<RegisteredEstablishmentExportDto> findForExport(
 			@Param("applyRegistryFilter") boolean applyRegistryFilter,
 			@Param("registryId") Integer registryId,
 			@Param("applyDistrictFilter") boolean applyDistrictFilter,
