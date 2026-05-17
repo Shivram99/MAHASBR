@@ -82,6 +82,25 @@ public interface MstRegistryDetailsPageRepository extends JpaRepository<MstRegis
 
 	Optional<MstRegistryDetailsPageEntity> findByBrnNo(String brnno);
 
+	boolean existsByBrnNo(String brnNo);
+
+	@Query("""
+			SELECT CASE WHEN COUNT(m) > 0 THEN true ELSE false END
+			FROM MstRegistryDetailsPageEntity m
+			WHERE LOWER(TRIM(m.actAuthorityRegistrationNumbers)) = LOWER(TRIM(:actAuthorityRegistrationNumbers))
+			  AND LOWER(TRIM(m.nameOfAct)) = LOWER(TRIM(:nameOfAct))
+			""")
+	boolean existsDuplicateByActAuthorityRegistrationNumbersAndNameOfAct(
+			@Param("actAuthorityRegistrationNumbers") String actAuthorityRegistrationNumbers,
+			@Param("nameOfAct") String nameOfAct);
+
+	@Query("""
+			SELECT CASE WHEN COUNT(m) > 0 THEN true ELSE false END
+			FROM MstRegistryDetailsPageEntity m
+			WHERE LOWER(TRIM(m.gstNumber)) = LOWER(TRIM(:gstNumber))
+			""")
+	boolean existsByGstNumberIgnoreCase(@Param("gstNumber") String gstNumber);
+
 	@Query("SELECT m FROM MstRegistryDetailsPageEntity m WHERE m.taluka IN :talukas AND m.district IN :district")
 	Page<MstRegistryDetailsPageEntity> findByTalukaInAndDistrictIn(@Param("talukas") List<String> talukas,
 			@Param("district") List<String> district, Pageable pageable);
