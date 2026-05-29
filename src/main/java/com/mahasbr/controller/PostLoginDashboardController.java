@@ -86,11 +86,13 @@ public class PostLoginDashboardController {
 			@RequestParam(defaultValue = "0") int page,
 			@RequestParam(defaultValue = "12") int size,
 			@RequestParam(defaultValue = "siNo") String sortBy,
+			@RequestParam(required = false) String registerDateFrom,
+			@RequestParam(required = false) String registerDateTo,
 			Authentication authentication) {
 
 		Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
 		Page<MstRegistryDetailsPageEntity> registryDetailsPage = mstRegistryDetailsPageService
-				.getAllRegistoryDetails(pageable);
+				.getAllRegistoryDetails(pageable, registerDateFrom, registerDateTo);
 		return ResponseEntity.ok(registryDetailsPage);
 	}
 
@@ -117,9 +119,12 @@ public class PostLoginDashboardController {
 	}
 
 	@GetMapping("/brn-details/{brn}")
-	public ResponseEntity<Page<MstRegistryDetailsPageEntity>> getBRNDetails(@PathVariable String brn) {
+	public ResponseEntity<Page<MstRegistryDetailsPageEntity>> getBRNDetails(@PathVariable String brn,
+			@RequestParam(required = false) String registerDateFrom,
+			@RequestParam(required = false) String registerDateTo) {
 		Pageable pageable = PageRequest.of(0, 10, Sort.by("siNo"));
-		Page<MstRegistryDetailsPageEntity> details = mstRegistryDetailsPageService.getBRNData(brn, pageable);
+		Page<MstRegistryDetailsPageEntity> details = mstRegistryDetailsPageService.getBRNData(brn, pageable,
+				registerDateFrom, registerDateTo);
 		details.getContent().forEach(entity -> {
 			System.out.println("SI.No: " + entity.getSiNo());
 			// print other fields...

@@ -17,11 +17,11 @@ public interface MstRegistryDetailsPageService {
 	Page<MstRegistryDetailsPageEntity> searchBrnRecords(Pageable pageable, String district, String taluka, String brn,
 			String establishmentName);
 
-	Page<MstRegistryDetailsPageEntity> getAllRegistoryDetails(Pageable pageable);
+	Page<MstRegistryDetailsPageEntity> getAllRegistoryDetails(Pageable pageable, String registerDateFrom, String registerDateTo);
 
 	Optional<MstRegistryDetailsPageEntity> getBRNDetails(String brn);
 	
-	Page<MstRegistryDetailsPageEntity> getBRNData(String brn ,Pageable pageable);
+	Page<MstRegistryDetailsPageEntity> getBRNData(String brn ,Pageable pageable, String registerDateFrom, String registerDateTo);
 
 	Page<MstRegistryDetailsPageEntity> getPostLoginDashboardData(Pageable pageable, List<Long> selectedDistrictIds,
 			List<Long> selectedTalukaIds, String registerDateFrom, String registerDateTo);

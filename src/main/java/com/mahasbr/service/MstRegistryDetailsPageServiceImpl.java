@@ -2,8 +2,13 @@ package com.mahasbr.service;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -24,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -39,6 +45,7 @@ import com.mahasbr.entity.User;
 import com.mahasbr.filter.AuthTokenFilter;
 import com.mahasbr.model.BRNGenartionRemark;
 import com.mahasbr.model.BRNGenerationRecordCount;
+import com.mahasbr.model.FilterCriteria;
 import com.mahasbr.model.MstRegistryDetailsPageModel;
 import com.mahasbr.repository.CensusEntityRepository;
 import com.mahasbr.repository.ConcernRegistryDetailsPageRepository;
@@ -92,6 +99,14 @@ public class MstRegistryDetailsPageServiceImpl implements MstRegistryDetailsPage
 	@Autowired
 	private JwtUtils jwtUtils;
 
+	private static final List<String> SUPPORTED_ROLE_PRIORITY = List.of(
+			"ROLE_ADMIN",
+			"ROLE_DES_STATE",
+			"ROLE_DES_REGION",
+			"ROLE_DES_DISTRICT",
+			"ROLE_REG_AUTH_API",
+			"ROLE_REG_AUTH_CSV");
+
 	public Long getLoginUsernameId() {
 		return getAuthenticatedUser()
 				.map(User::getRegistry)
@@ -122,10 +137,15 @@ public class MstRegistryDetailsPageServiceImpl implements MstRegistryDetailsPage
 	}
 
 	private String getPrimaryRole() {
-		return getUsersRole().stream()
+		Set<String> assignedRoles = getUsersRole().stream()
 				.map(GrantedAuthority::getAuthority)
+				.filter(Objects::nonNull)
+				.collect(Collectors.toSet());
+
+		return SUPPORTED_ROLE_PRIORITY.stream()
+				.filter(assignedRoles::contains)
 				.findFirst()
-				.orElse("UNKNOWN");
+				.orElseGet(() -> assignedRoles.stream().findFirst().orElse("UNKNOWN"));
 	}
 
 	public BRNGenerationRecordCount uploadRegiteryCSVFileForBRNGeneration(MultipartFile file) {
@@ -656,33 +676,17 @@ public class MstRegistryDetailsPageServiceImpl implements MstRegistryDetailsPage
 	}
 
 	@Override
-	public Page<MstRegistryDetailsPageEntity> getAllRegistoryDetails(Pageable pageable) {
+	public Page<MstRegistryDetailsPageEntity> getAllRegistoryDetails(Pageable pageable, String registerDateFrom,
+			String registerDateTo) {
 		String role = getPrimaryRole();
 		Long registryId = getLoginUsernameId();
+		LocalDate generatedDateFrom = parseFilterDate(registerDateFrom);
+		LocalDate generatedDateTo = parseFilterDate(registerDateTo);
 
-		switch (role) {
-		case "ROLE_REG_AUTH_API":
-			return registryId != null
-					? mstRegistryDetailsPageRepository.findAllByRegUserId(registryId, pageable)
-					: Page.empty(pageable);
-
-		case "ROLE_REG_AUTH_CSV":
-			return registryId != null
-					? mstRegistryDetailsPageRepository.findAllByRegUserId(registryId, pageable)
-					: Page.empty(pageable);
-
-		case "ROLE_DES_DISTRICT":
-			return getDistrictWiseRegistryDetails(pageable);
-
-		case "ROLE_DES_REGION":
-			return getRegionWiseRegistryDetails(pageable);
-
-		case "ROLE_DES_STATE":
-			return mstRegistryDetailsPageRepository.findAll(pageable);
-
-		default:
-			return Page.empty(pageable);
-		}
+		return mstRegistryDetailsPageRepository.findAll(
+				buildScopeSpecification(role, registryId)
+						.and(hasGeneratedDateBetween(generatedDateFrom, generatedDateTo)),
+				pageable);
 
 	}
 
@@ -718,54 +722,44 @@ public class MstRegistryDetailsPageServiceImpl implements MstRegistryDetailsPage
 		List<String> talukaName = talukaMasterRepository.findTalukaNameByCensusTalukaCode(formattedCodes);
 		List<String> districtName = districtMasterRepository
 				.findDistrictNamesByCensusDistrictCodes(safeSelectedDistrictIds);
-		List<String> districtsLower = districtName.stream().map(String::toLowerCase).collect(Collectors.toList());
-
-		List<String> talukaNameLower = talukaName.stream().map(String::toLowerCase).collect(Collectors.toList());
+		List<String> districtsLower = toLowercaseList(districtName);
+		List<String> talukaNameLower = toLowercaseList(talukaName);
+		LocalDate generatedDateFrom = parseFilterDate(registerDateFrom);
+		LocalDate generatedDateTo = parseFilterDate(registerDateTo);
 
 		String role = getPrimaryRole();
 		Long registryId = getLoginUsernameId();
 
 		switch (role) {
+		case "ROLE_ADMIN":
+			return findRegistryDetails(pageable, districtsLower, talukaNameLower, registryId, role, generatedDateFrom,
+					generatedDateTo);
+
 		case "ROLE_REG_AUTH_API":
 			if (registryId == null) {
 				return Page.empty(pageable);
 			}
-			if (!talukaName.isEmpty())
-				return mstRegistryDetailsPageRepository.findByTalukasAndDistrictsAndRegUserId(talukaNameLower,
-						districtsLower, registryId, pageable);
-			else if (!districtName.isEmpty())
-				return mstRegistryDetailsPageRepository.findByDistrictsAndRegUserId(districtsLower,
-						registryId, pageable);
-			else if (registryId != null)
-				return mstRegistryDetailsPageRepository.findAllByRegUserId(registryId, pageable);
-			else
-				return Page.empty(pageable);
+			return findRegistryDetails(pageable, districtsLower, talukaNameLower, registryId, role, generatedDateFrom,
+					generatedDateTo);
 
 		case "ROLE_REG_AUTH_CSV":
 			if (registryId == null) {
 				return Page.empty(pageable);
 			}
-			if (!talukaName.isEmpty())
-				return mstRegistryDetailsPageRepository.findByTalukasAndDistrictsAndRegUserId(talukaNameLower,
-						districtsLower, registryId, pageable);
-			else if (!districtName.isEmpty())
-				return mstRegistryDetailsPageRepository.findByDistrictsAndRegUserId(districtsLower,
-						registryId, pageable);
-			else if (registryId != null)
-				return mstRegistryDetailsPageRepository.findAllByRegUserId(registryId, pageable);
-			else
-				return Page.empty(pageable);
+			return findRegistryDetails(pageable, districtsLower, talukaNameLower, registryId, role, generatedDateFrom,
+					generatedDateTo);
 
 		case "ROLE_DES_DISTRICT":
-			return getDistrictWiseRegistryDetails(pageable);
+			return findRegistryDetails(pageable, districtsLower, talukaNameLower, registryId, role, generatedDateFrom,
+					generatedDateTo);
 
 		case "ROLE_DES_REGION":
-			return getRegionWiseRegistryDetailsBasedOnfilter(safeSelectedDistrictIds, safeSelectedTalukaIds, registerDateFrom,
-					registerDateTo, pageable);
+			return findRegistryDetails(pageable, districtsLower, talukaNameLower, registryId, role, generatedDateFrom,
+					generatedDateTo);
 
 		case "ROLE_DES_STATE":
-			return getStateDetailsBasedOnfilter(safeSelectedDistrictIds, safeSelectedTalukaIds, registerDateFrom,
-					registerDateTo, pageable);
+			return findRegistryDetails(pageable, districtsLower, talukaNameLower, registryId, role, generatedDateFrom,
+					generatedDateTo);
 
 		default:
 			return Page.empty(pageable);
@@ -774,9 +768,15 @@ public class MstRegistryDetailsPageServiceImpl implements MstRegistryDetailsPage
 	}
 
 	@Override
-	public Page<MstRegistryDetailsPageEntity> getBRNData(String brn, Pageable pageable) {
-
-		return mstRegistryDetailsPageRepository.findAllByBrnNoAndRegUserId(brn, pageable);
+	public Page<MstRegistryDetailsPageEntity> getBRNData(String brn, Pageable pageable, String registerDateFrom,
+			String registerDateTo) {
+		LocalDate generatedDateFrom = parseFilterDate(registerDateFrom);
+		LocalDate generatedDateTo = parseFilterDate(registerDateTo);
+		return mstRegistryDetailsPageRepository.findAll(
+				buildScopeSpecification(getPrimaryRole(), getLoginUsernameId())
+						.and(hasBrn(brn))
+						.and(hasGeneratedDateBetween(generatedDateFrom, generatedDateTo)),
+				pageable);
 	}
 
 	private Page<MstRegistryDetailsPageEntity> getRegionWiseRegistryDetails(Pageable pageable) {
@@ -836,6 +836,117 @@ public class MstRegistryDetailsPageServiceImpl implements MstRegistryDetailsPage
 		}
 		return mstRegistryDetailsPageRepository.findByDistricts(lowercaseDistricts, pageable);
 
+	}
+
+	private Page<MstRegistryDetailsPageEntity> findRegistryDetails(Pageable pageable, List<String> districtsLower,
+			List<String> talukaNameLower, Long registryId, String role, LocalDate generatedDateFrom,
+			LocalDate generatedDateTo) {
+		return mstRegistryDetailsPageRepository.findAll(
+				buildScopeSpecification(role, registryId)
+						.and(hasDistricts(districtsLower))
+						.and(hasTalukas(talukaNameLower))
+						.and(hasGeneratedDateBetween(generatedDateFrom, generatedDateTo)),
+				pageable);
+	}
+
+	private Specification<MstRegistryDetailsPageEntity> buildScopeSpecification(String role, Long registryId) {
+		switch (role) {
+		case "ROLE_ADMIN":
+		case "ROLE_DES_STATE":
+			return Specification.where(null);
+
+		case "ROLE_REG_AUTH_API":
+		case "ROLE_REG_AUTH_CSV":
+			if (registryId == null) {
+				return alwaysFalse();
+			}
+			return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("regUserId"), registryId.intValue());
+
+		case "ROLE_DES_DISTRICT":
+			Optional<String> districtName = getAuthenticatedUser()
+					.map(User::getDistrict)
+					.filter(Objects::nonNull)
+					.map(district -> district.getDistrictId())
+					.flatMap(districtMasterRepository::findDistrictNameById)
+					.map(String::toLowerCase);
+			return districtName
+					.<Specification<MstRegistryDetailsPageEntity>>map(
+							value -> (root, query, criteriaBuilder) -> criteriaBuilder.equal(
+									criteriaBuilder.lower(root.get("district")), value))
+					.orElseGet(this::alwaysFalse);
+
+		case "ROLE_DES_REGION":
+			List<String> regionDistricts = getAuthenticatedUser()
+					.map(User::getDivisionCode)
+					.filter(divisionCode -> divisionCode != null && !divisionCode.isBlank())
+					.map(districtMasterRepository::findDistrictNamesByDivisionCode)
+					.map(this::toLowercaseList)
+					.orElseGet(List::of);
+			return hasDistricts(regionDistricts);
+
+		default:
+			return alwaysFalse();
+		}
+	}
+
+	private Specification<MstRegistryDetailsPageEntity> hasDistricts(List<String> districtsLower) {
+		if (districtsLower == null || districtsLower.isEmpty()) {
+			return Specification.where(null);
+		}
+		return (root, query, criteriaBuilder) -> criteriaBuilder.lower(root.get("district")).in(districtsLower);
+	}
+
+	private Specification<MstRegistryDetailsPageEntity> hasTalukas(List<String> talukasLower) {
+		if (talukasLower == null || talukasLower.isEmpty()) {
+			return Specification.where(null);
+		}
+		return (root, query, criteriaBuilder) -> criteriaBuilder.lower(root.get("taluka")).in(talukasLower);
+	}
+
+	private Specification<MstRegistryDetailsPageEntity> hasBrn(String brn) {
+		if (brn == null || brn.isBlank()) {
+			return Specification.where(null);
+		}
+		return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("brnNo"), brn.trim());
+	}
+
+	private Specification<MstRegistryDetailsPageEntity> hasGeneratedDateBetween(LocalDate generatedDateFrom,
+			LocalDate generatedDateTo) {
+		if (generatedDateFrom == null && generatedDateTo == null) {
+			return Specification.where(null);
+		}
+
+		Date fromDate = generatedDateFrom == null ? null : toDate(generatedDateFrom.atStartOfDay());
+		Date toDate = generatedDateTo == null ? null : toDate(generatedDateTo.atTime(LocalTime.MAX));
+
+		return (root, query, criteriaBuilder) -> {
+			if (fromDate != null && toDate != null) {
+				return criteriaBuilder.between(root.get("createdDateTime"), fromDate, toDate);
+			}
+			if (fromDate != null) {
+				return criteriaBuilder.greaterThanOrEqualTo(root.get("createdDateTime"), fromDate);
+			}
+			return criteriaBuilder.lessThanOrEqualTo(root.get("createdDateTime"), toDate);
+		};
+	}
+
+	private Specification<MstRegistryDetailsPageEntity> alwaysFalse() {
+		return (root, query, criteriaBuilder) -> criteriaBuilder.disjunction();
+	}
+
+	private List<String> toLowercaseList(List<String> values) {
+		return values.stream().filter(Objects::nonNull).map(String::toLowerCase).toList();
+	}
+
+	private LocalDate parseFilterDate(String value) {
+		if (value == null || value.isBlank()) {
+			return null;
+		}
+		return LocalDate.parse(value.trim());
+	}
+
+	private Date toDate(java.time.LocalDateTime value) {
+		return Timestamp.from(value.atZone(ZoneId.systemDefault()).toInstant());
 	}
 
 	private Page<MstRegistryDetailsPageEntity> getStateDetailsBasedOnfilter(List<Long> selectedDistrictIds,
