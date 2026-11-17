@@ -28,7 +28,8 @@ import lombok.ToString;
 @Table(name = "mst_reg_details", indexes = {
 		@Index(name = "idx_mst_reg_details_reg_user_si_no", columnList = "reg_user_id, si_no"),
 		@Index(name = "idx_mst_reg_details_district_taluka_si_no", columnList = "district, taluka, si_no"),
-		@Index(name = "idx_mst_reg_details_brn_number", columnList = "brn_number")
+		@Index(name = "idx_mst_reg_details_brn_number", columnList = "brn_number"),
+		@Index(name = "idx_mst_reg_details_source_key", columnList = "reg_user_id, source_record_key")
 })
 @Getter
 @Setter
@@ -200,4 +201,13 @@ public class MstRegistryDetailsPageEntity extends Auditable {
 
 	@Column(name = "reg_user_id")
 	private Integer regUserId;
+
+	/**
+	 * Identifies the same establishment across API syncs (SHA-256 hex, see RegistryRecordKey).
+	 * Together with regUserId it lets a re-sync update the existing row instead of inserting
+	 * a duplicate with a new BRN.
+	 */
+	@Size(max = 64)
+	@Column(name = "source_record_key", length = 64)
+	private String sourceRecordKey;
 }

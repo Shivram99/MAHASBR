@@ -46,4 +46,12 @@ public class MstRegistryFailedEntity extends Auditable {
 
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    /** The single record as received (JSON, max 4000 chars), so it can be fixed and re-run. */
+    @Column(name = "raw_data", length = 4000)
+    private String rawData;
+
+    /** Registry the record came from (mst_registry_master.id). */
+    @Column(name = "reg_user_id")
+    private Integer regUserId;
 }

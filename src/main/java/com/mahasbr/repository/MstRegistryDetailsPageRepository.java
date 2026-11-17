@@ -18,6 +18,12 @@ import com.mahasbr.entity.MstRegistryDetailsPageEntity;
 public interface MstRegistryDetailsPageRepository
 		extends JpaRepository<MstRegistryDetailsPageEntity, Long>, JpaSpecificationExecutor<MstRegistryDetailsPageEntity> {
 
+	/** Registry API sync: find the row a previous sync created for this establishment. */
+	List<MstRegistryDetailsPageEntity> findByRegUserIdAndSourceRecordKey(Integer regUserId, String sourceRecordKey);
+
+	/** Registry API sync: rows of one registry that predate the dedupe key (filled in once). */
+	Slice<MstRegistryDetailsPageEntity> findByRegUserIdAndSourceRecordKeyIsNull(Integer regUserId, Pageable pageable);
+
 	@Query("SELECT m FROM MstRegistryDetailsPageEntity m "
 			+ "WHERE m.nameOfEstablishmentOrOwner = :nameOfEstablishmentOrOwner " + "AND m.houseNo = :houseNo "
 			+ "AND m.streetName = :streetName " + "AND m.locality = :locality " + "AND m.pinCode = :pinCode "

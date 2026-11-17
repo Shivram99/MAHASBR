@@ -19,4 +19,7 @@ public interface RegistryApiAuthConfigService {
     List<RegistryApiAuthConfigResponse> getAll();
 
     RegistryApiAuthConfigEntity getByServiceNameCode(String serviceNameCode);
+
+    /** Switches one API on or off. Switching on requires a registry to be linked. */
+    RegistryApiAuthConfigResponse setActive(Long id, boolean active);
 }

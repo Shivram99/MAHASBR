@@ -128,6 +128,8 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
 
 						// User management and menu-permission assignment: ADMIN only.
 						.requestMatchers("/api/users", "/api/users/**", "/api/permissions/**").hasRole("ADMIN")
+						// Registry API Settings (external API URLs, logins, on/off, run now): ADMIN only.
+						.requestMatchers("/api/registry-auth", "/api/registry-auth/**").hasRole("ADMIN")
 
 						.requestMatchers("/api/auth/signup").permitAll().requestMatchers("/api/test/**").permitAll()
 						.requestMatchers("/common/api**").permitAll().requestMatchers("/api/auth/progress/**")

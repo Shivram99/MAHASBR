@@ -18,7 +18,6 @@ import com.mahasbr.dto.CitizenDashboardData;
 import com.mahasbr.dto.CitizenDashboardDataRegDeRegNewReg;
 import com.mahasbr.dto.CitizenDashboardFilter;
 import com.mahasbr.dto.RegistrationStatsDTO;
-import com.mahasbr.service.ApiSchedulerService;
 import com.mahasbr.service.RegistrationService;
 
 @RestController
@@ -32,9 +31,6 @@ public class CitizenDashboardController {
     
     @Autowired
     private  ObjectMapper objectMapper;
-    
-    @Autowired
-    private ApiSchedulerService apiSchedulerService;
 
     @GetMapping("/registrationStats")
     public ResponseEntity<List<RegistrationStatsDTO>> getRegistrationStats() {
@@ -74,11 +70,7 @@ public class CitizenDashboardController {
     	List<CitizenDashboardDataRegDeRegNewReg> citizenDashboardDataRegDeRegNewReg = registrationService.citizenDashboardDataRegDeRegNewReg();
     	return ResponseEntity.ok(citizenDashboardDataRegDeRegNewReg);
 	}
-    
-    @GetMapping("/fetchGovApis")
-    public ResponseEntity<String> fetchGovApis() {
-    	apiSchedulerService.fetchGovApis();
-		return ResponseEntity.ok("Success");
-	}
 
+    // GET /citizenSearch/fetchGovApis was removed: it let anyone trigger a full registry API pull.
+    // Registry APIs are now run by RegistrySyncService (nightly, or "Run now" for admins).
 }
