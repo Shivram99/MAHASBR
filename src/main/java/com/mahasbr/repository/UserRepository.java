@@ -24,6 +24,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
   
   @Query("SELECT CASE WHEN COUNT(u) > 0 THEN true ELSE false END FROM User u WHERE u.email = :email")
   Boolean existsByEmail(@Param("email") String email);  //Boolean existsByEmail(String email);
-  
+
+  /** True if any user has the given role (used to block deleting a role that is still in use). */
+  boolean existsByRoles_Id(Long roleId);
+
 
 }

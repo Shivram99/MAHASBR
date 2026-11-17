@@ -1,6 +1,8 @@
 package com.mahasbr.dto;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
@@ -31,6 +33,13 @@ public class UserDto {
     private Set<String> roles;
 
     private Boolean isFirstTimeLogin;
+
+    /**
+     * Set only in the response to "create user", so the admin can hand it to the user once.
+     * READ_ONLY: a client can never send it in. It is never stored in plain text.
+     */
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private String temporaryPassword;
 
     private String divisionCode;
     

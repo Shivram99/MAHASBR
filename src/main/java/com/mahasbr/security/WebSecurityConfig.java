@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
@@ -111,11 +112,26 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
 				.authorizeHttpRequests(auth -> auth
 						.dispatcherTypeMatchers(DispatcherType.ASYNC, DispatcherType.FORWARD, DispatcherType.ERROR)
 						.permitAll()
-						.requestMatchers("/api/auth/signin", "/citizenSearch/**").permitAll()
+						.requestMatchers("/api/auth/signin").permitAll()
+
+						// Menu changes: admin only. These must come BEFORE the /citizenSearch/** permitAll,
+						// because the first matching rule wins. Reading menus (GET, incl. /menus/my) stays open.
+						.requestMatchers(HttpMethod.POST, "/citizenSearch/menus", "/citizenSearch/menus/**").hasRole("ADMIN")
+						.requestMatchers(HttpMethod.PUT, "/citizenSearch/menus/**").hasRole("ADMIN")
+						.requestMatchers(HttpMethod.DELETE, "/citizenSearch/menus/**").hasRole("ADMIN")
+						.requestMatchers("/citizenSearch/**").permitAll()
+
+						// Roles: any logged-in user may read the list; only ADMIN may create, rename or delete.
+						.requestMatchers(HttpMethod.GET, "/admin/roles", "/admin/roles/*").authenticated()
+						// Everything else under /admin (signup, role changes, audit logs): ADMIN only.
+						.requestMatchers("/admin/**").hasRole("ADMIN")
+
+						// User management and menu-permission assignment: ADMIN only.
+						.requestMatchers("/api/users", "/api/users/**", "/api/permissions/**").hasRole("ADMIN")
+
 						.requestMatchers("/api/auth/signup").permitAll().requestMatchers("/api/test/**").permitAll()
 						.requestMatchers("/common/api**").permitAll().requestMatchers("/api/auth/progress/**")
 						.permitAll().requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-						.requestMatchers(" /common/department**").permitAll().requestMatchers("/admin/**").permitAll()
 						.requestMatchers("/moderator/**").hasRole("MODERATOR").requestMatchers("/developer/**")
 						.hasRole("DEVELOPER").requestMatchers("/user/**").permitAll().anyRequest().authenticated());
 

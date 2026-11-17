@@ -62,6 +62,7 @@ public class LoggedInUserService {
                 .email(user.getEmail())
                 .roles(roles)
                 .activeRole(resolveActiveRole(roles))
+                .isFirstTimeLogin(Boolean.TRUE.equals(user.getIsFirstTimeLogin()))
                 .build();
     }
 

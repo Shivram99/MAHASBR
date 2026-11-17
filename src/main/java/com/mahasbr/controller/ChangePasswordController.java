@@ -11,6 +11,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,57 +23,74 @@ import com.mahasbr.repository.UserRepository;
 import com.mahasbr.response.MessageResponse;
 import com.mahasbr.service.ChangePasswordServceImpl;
 
-import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/auth")
 public class ChangePasswordController {
 	private static final Logger logger = LoggerFactory.getLogger(ChangePasswordController.class);
+
+	/** Old shared default password: existing accounts may still have it, so never accept it as a new one. */
+	private static final String LEGACY_DEFAULT_PASSWORD = "Pass@123";
+
 	@Autowired
 	PasswordEncoder encoder;
 
 	@Autowired
 	private ChangePasswordServceImpl changePasswordServiceImpl;
-	
+
 	@Autowired
-	private UserRepository UserRepository;
+	private UserRepository userRepository;
 
 	@PostMapping("/changePassword")
-	public ResponseEntity<MessageResponse> changePassword(@RequestBody ChangePasswordModel changePasswordModel,
-			BindingResult bindingResult, HttpSession session) {
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		String username = authentication.getName();
-		Optional<User> optional = UserRepository.findByUsername(username);
+	public ResponseEntity<MessageResponse> changePassword(@Valid @RequestBody ChangePasswordModel request,
+			BindingResult bindingResult) {
+
+		// BindingResult right after the @Valid argument means Spring hands us the errors instead of
+		// throwing, so every failure below comes back in the same { "message": ... } shape.
 		if (bindingResult.hasErrors()) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-					.body(new MessageResponse("Failed to update password!"));
+			FieldError firstError = bindingResult.getFieldError();
+			String message = firstError != null ? firstError.getDefaultMessage() : "Invalid request.";
+			return badRequest(message);
 		}
 
-		if (optional.isPresent()) {
-			User messages = optional.get();
-			if (changePasswordModel.getNewPasswordConfirm().equals(changePasswordModel.getNewPassword())) {
-				String oldPass = changePasswordModel.getPassword();
-				String newPass = encoder.encode(changePasswordModel.getNewPasswordConfirm());
-				if (encoder.matches(oldPass, messages.getPassword())) {
-					messages.setPassword((encoder.encode(changePasswordModel.getNewPasswordConfirm())));
-					messages.setIsFirstTimeLogin(false);
-					User message = (User) changePasswordServiceImpl.updateUser(messages);
-
-					return ResponseEntity.status(HttpStatus.OK)
-							.body(new MessageResponse("Password updated successfully!"));
-
-				} else {
-					return ResponseEntity.status(HttpStatus.CONFLICT)
-							.body(new MessageResponse("Old Password does not match!"));
-				}
-
-			}
-		} else {
-			return ResponseEntity.status(HttpStatus.OK).body(new MessageResponse("Failed to update password !"));
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		String username = authentication != null ? authentication.getName() : null;
+		Optional<User> optionalUser = username != null ? userRepository.findByUsername(username) : Optional.empty();
+		if (optionalUser.isEmpty()) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+					.body(new MessageResponse("Please log in again."));
 		}
-		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-				.body(new MessageResponse("Failed to update password!"));
 
+		User user = optionalUser.get();
+		String newPassword = request.getNewPassword();
+
+		if (!encoder.matches(request.getPassword(), user.getPassword())) {
+			return ResponseEntity.status(HttpStatus.CONFLICT)
+					.body(new MessageResponse("Current password is incorrect."));
+		}
+		if (!newPassword.equals(request.getNewPasswordConfirm())) {
+			return badRequest("New password and confirmation do not match.");
+		}
+		if (encoder.matches(newPassword, user.getPassword())) {
+			return badRequest("New password must be different from the current password.");
+		}
+		if (newPassword.equalsIgnoreCase(LEGACY_DEFAULT_PASSWORD)) {
+			return badRequest("This password is not allowed. Choose a different one.");
+		}
+		if (newPassword.toLowerCase().contains(user.getUsername().toLowerCase())) {
+			return badRequest("Password must not contain your username.");
+		}
+
+		user.setPassword(encoder.encode(newPassword));
+		user.setIsFirstTimeLogin(false);
+		changePasswordServiceImpl.updateUser(user);
+		logger.info("Password changed for user {}", user.getUsername());
+
+		return ResponseEntity.ok(new MessageResponse("Password updated successfully!"));
 	}
 
+	private static ResponseEntity<MessageResponse> badRequest(String message) {
+		return ResponseEntity.badRequest().body(new MessageResponse(message));
+	}
 }

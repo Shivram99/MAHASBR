@@ -19,6 +19,7 @@ import com.mahasbr.exception.ResourceNotFoundException;
 import com.mahasbr.repository.DivisionRepository;
 import com.mahasbr.repository.RoleRepository;
 import com.mahasbr.repository.UserRepository;
+import com.mahasbr.util.TemporaryPasswordGenerator;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -54,11 +55,13 @@ public class UserService {
         UserRoleLocationPolicyService.ValidatedUserLocation location =
                 userRoleLocationPolicyService.validateAndResolve(dto);
 
+        String temporaryPassword = TemporaryPasswordGenerator.generate();
+
         User user = new User();
         user.setUsername(dto.getUsername().trim());
         user.setEmail(dto.getEmail().trim());
-        user.setIsFirstTimeLogin(true);
-        user.setPassword(passwordEncoder.encode("Pass@123"));
+        user.setIsFirstTimeLogin(true);   // forces a password change at first login
+        user.setPassword(passwordEncoder.encode(temporaryPassword));
         user.setRoles(resolveRoles(dto.getRoles()));
         user.setRegistry(location.registry());
         user.setDivisionCode(location.divisionCode());
@@ -66,7 +69,9 @@ public class UserService {
         user.setUserProfile(buildUserProfile(dto.getUserProfile(), user));
 
         User savedUser = userRepository.save(user);
-        return toDto(savedUser);
+        UserDto created = toDto(savedUser);
+        created.setTemporaryPassword(temporaryPassword);   // returned once, never stored in plain text
+        return created;
     }
 
     public UserDto updateUser(Long id, UserDto dto) {
@@ -81,7 +86,9 @@ public class UserService {
 
         existing.setUsername(dto.getUsername().trim());
         existing.setEmail(dto.getEmail().trim());
-        existing.setIsFirstTimeLogin(dto.getIsFirstTimeLogin());
+        if (dto.getIsFirstTimeLogin() != null) {   // don't wipe the flag when the form omits it
+            existing.setIsFirstTimeLogin(dto.getIsFirstTimeLogin());
+        }
         existing.setRoles(resolveRoles(dto.getRoles()));
         existing.setRegistry(location.registry());
         existing.setDivisionCode(location.divisionCode());
