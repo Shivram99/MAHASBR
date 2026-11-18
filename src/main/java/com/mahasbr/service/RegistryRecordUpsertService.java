@@ -19,6 +19,7 @@ import com.mahasbr.repository.MstRegistryDetailsPageRepository;
 import com.mahasbr.repository.MstRegistryFailedRepository;
 import com.mahasbr.util.LocationGenerator;
 import com.mahasbr.util.RegistryRecordKey;
+import com.mahasbr.util.RegistryRecordSanitizer;
 
 import lombok.RequiredArgsConstructor;
 
@@ -61,12 +62,14 @@ public class RegistryRecordUpsertService {
 			}
 			MstRegistryDetailsPageEntity entity = existing.get(0);
 			mapper.updateEntityFromDto(dto, entity);
+			RegistryRecordSanitizer.sanitize(entity);
 			entity.setLocationCode(locationCode);
 			repository.save(entity);
 			return Outcome.UPDATED;
 		}
 
 		MstRegistryDetailsPageEntity entity = mapper.dtoToEntity(dto);
+		RegistryRecordSanitizer.sanitize(entity);
 		entity.setRegUserId(regUserId);
 		entity.setSourceRecordKey(key);
 		entity.setBrnNo(brnGeneratorService.generateBrn(MAHARASHTRA_STATE_CODE));

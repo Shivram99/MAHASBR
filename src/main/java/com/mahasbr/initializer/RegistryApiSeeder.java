@@ -42,7 +42,10 @@ public class RegistryApiSeeder implements ApplicationRunner {
 	private static final String LOGIN_ONLINE = "https://sbrlmsapi.mahaonline.gov.in/api/Login";
 	private static final String LOGIN_ITGOV = "https://sbrlmsapi.mahaitgov.in/api/Login";
 
-	record Source(long registryId, String code, String name, String loginUrl, String dataUrl) {
+	record Source(long registryId, String code, String name, String loginUrl, String dataUrl, boolean basic) {
+		Source(long registryId, String code, String name, String loginUrl, String dataUrl) {
+			this(registryId, code, name, loginUrl, dataUrl, false);
+		}
 	}
 
 	static final List<Source> SOURCES = List.of(
@@ -55,7 +58,10 @@ public class RegistryApiSeeder implements ApplicationRunner {
 			new Source(24, "CO-OP", "Co-Op Societies", LOGIN_ITGOV,
 					"https://sbrlmsapi.mahaitgov.in/api/SBR/GetCoOperativeData"),
 			new Source(25, "KVIB", "KVIB", LOGIN_ITGOV, "https://sbrlmsapi.mahaitgov.in/api/SBR/GetKVIBData"),
-			new Source(26, "MCGM", "MCGM", LOGIN_ITGOV, "https://sbrlmsapi.mahaitgov.in/api/SBR/GetMCGMData"),
+			// MCGM (Municipal Corporation of Greater Mumbai): Basic authentication, no login call,
+			// dates sent as from_date / to_date in yyyyMMdd. See Source.basic().
+			new Source(26, "MCGM", "Municipal Corporation of Greater Mumbai (MCGM)", null,
+					"https://65.0.229.38:50001/RESTAdapter/Api/SharingShop", true),
 			new Source(27, "MSME", "MSME", LOGIN_ITGOV, "https://sbrlmsapi.mahaitgov.in/api/SBR/GetMSMEData"),
 			new Source(28, "MCA", "MCA", LOGIN_ITGOV, "https://sbrlmsapi.mahaitgov.in/api/SBR/GetMCAData"),
 			new Source(29, "GSTN", "GSTN", LOGIN_ITGOV, "https://sbrlmsapi.mahaitgov.in/api/SBR/GetGSTNData"));
@@ -81,7 +87,15 @@ public class RegistryApiSeeder implements ApplicationRunner {
 			entity.setServiceName(source.name());
 			entity.setServiceNameCode(source.code());
 			entity.setAuthUrl(source.loginUrl());
-			entity.setAuthUrlMethod("POST");
+			if (source.basic()) {
+				entity.setAuthType("BASIC");
+				entity.setAuthUrlMethod(null);
+				entity.setDateFromField("from_date");
+				entity.setDateToField("to_date");
+				entity.setDateFormat("yyyyMMdd");
+			} else {
+				entity.setAuthUrlMethod("POST");
+			}
 			entity.setApiData(source.dataUrl());
 			entity.setApiDataMethod("POST");
 			entity.setUsername(blankToEmpty(env.apply(prefix + "_USERNAME")));

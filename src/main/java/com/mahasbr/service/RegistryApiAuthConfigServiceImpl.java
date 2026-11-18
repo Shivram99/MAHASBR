@@ -132,8 +132,29 @@ public class RegistryApiAuthConfigServiceImpl implements RegistryApiAuthConfigSe
 
         entity.setServiceName(serviceName);
         entity.setServiceNameCode(code);
-        entity.setAuthUrl(url(request.getAuthUrl(), "Login URL"));
-        entity.setAuthUrlMethod(method(request.getAuthUrlMethod()));
+        String authType = StringUtils.hasText(request.getAuthType())
+                ? request.getAuthType().trim().toUpperCase(Locale.ROOT) : "TOKEN";
+        if (!authType.equals("TOKEN") && !authType.equals("BASIC")) {
+            throw new IllegalArgumentException("Login type must be TOKEN or BASIC.");
+        }
+        entity.setAuthType(authType);
+        if (authType.equals("TOKEN")) {
+            entity.setAuthUrl(url(request.getAuthUrl(), "Login URL"));
+            entity.setAuthUrlMethod(method(request.getAuthUrlMethod()));
+        } else {   // BASIC: no separate login call
+            entity.setAuthUrl(StringUtils.hasText(request.getAuthUrl()) ? url(request.getAuthUrl(), "Login URL") : null);
+            entity.setAuthUrlMethod(null);
+        }
+        entity.setDateFromField(fieldName(request.getDateFromField(), "FromDate", "\"From\" date field name"));
+        entity.setDateToField(fieldName(request.getDateToField(), "ToDate", "\"To\" date field name"));
+        String dateFormat = StringUtils.hasText(request.getDateFormat()) ? request.getDateFormat().trim() : "yyyy-MM-dd";
+        try {
+            java.time.format.DateTimeFormatter.ofPattern(dateFormat).format(LocalDate.now());
+        } catch (IllegalArgumentException | java.time.DateTimeException e) {
+            throw new IllegalArgumentException("Date format is not valid (examples: yyyy-MM-dd, yyyyMMdd).");
+        }
+        entity.setDateFormat(dateFormat);
+        entity.setSkipSslVerify(Boolean.TRUE.equals(request.getSkipSslVerify()));
         entity.setUsername(required(request.getUsername(), "Username"));
         entity.setApiData(url(request.getApiData(), "Data URL"));
         entity.setApiDataMethod(method(request.getApiDataMethod()));
@@ -174,6 +195,23 @@ public class RegistryApiAuthConfigServiceImpl implements RegistryApiAuthConfigSe
             // fall through to the error below
         }
         throw new IllegalArgumentException(label + " must be a full http(s):// address.");
+    }
+
+    /**
+     * The name of a JSON field in the request body, e.g. from_date. It must start with a letter:
+     * a name like 20260101 (a date value typed into the wrong box) is rejected by gateways that
+     * convert the JSON to XML.
+     */
+    private static String fieldName(String value, String fallback, String label) {
+        if (!StringUtils.hasText(value)) {
+            return fallback;
+        }
+        String name = value.trim();
+        if (!name.matches("^[A-Za-z_][A-Za-z0-9_]*$")) {
+            throw new IllegalArgumentException(label + " must be a field name such as from_date "
+                    + "(letters, digits and _, starting with a letter), not a date value.");
+        }
+        return name;
     }
 
     private static String method(String value) {

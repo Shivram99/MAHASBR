@@ -61,6 +61,29 @@ public class RegistryApiAuthConfigEntity extends Auditable {
 	@Column(name = "active")
 	private Boolean active = true;
 
+	/** TOKEN (default): log in at auth_url, then send the token as Bearer. BASIC: send username/password with every request. */
+	@Column(name = "auth_type", length = 10)
+	private String authType = "TOKEN";
+
+	/** Name of the "from" date field in the request body (default FromDate). */
+	@Column(name = "date_from_field", length = 50)
+	private String dateFromField = "FromDate";
+
+	/** Name of the "to" date field in the request body (default ToDate). */
+	@Column(name = "date_to_field", length = 50)
+	private String dateToField = "ToDate";
+
+	/** Java date pattern for both date fields (default yyyy-MM-dd; MCGM uses yyyyMMdd). */
+	@Column(name = "date_format", length = 20)
+	private String dateFormat = "yyyy-MM-dd";
+
+	/**
+	 * Accept any HTTPS certificate from this API (self-signed, wrong name). Off by default.
+	 * Unsafe on untrusted networks: the server's identity is not checked.
+	 */
+	@Column(name = "skip_ssl_verify")
+	private Boolean skipSslVerify = false;
+
 	/** The registry this data belongs to; its id is stored as reg_user_id on every record. */
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "registry_id")

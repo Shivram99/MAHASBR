@@ -2,6 +2,7 @@ package com.mahasbr.dto;
 
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -41,6 +42,8 @@ public class MstRegistryDetailsPagesDTO {
 	private String yearOfStartOfOperation;
 	private String ownershipCode;
 	private Integer totalNumberOfPersonsWorking;
+	/** The authority's own registration number. MCGM sends it as "siNo". */
+	@JsonAlias("siNo")
 	private String actAuthorityRegistrationNumbers;
 	private String remarks;
 

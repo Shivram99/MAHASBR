@@ -18,8 +18,12 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.ResourceAccessException;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.mahasbr.dto.MstRegistryDetailsPagesDTO;
 import com.mahasbr.entity.RegistryApiAuthConfigEntity;
 import com.mahasbr.exception.ResourceNotFoundException;
@@ -61,6 +65,7 @@ public class RegistrySyncService {
 	private final RegistryRecordUpsertService upsertService;
 	private final ApiLogService apiLogService;
 	private final ObjectMapper objectMapper;
+	private final ObjectMapper recordMapper;
 	private final ZoneId zone;
 	private final int overlapDays;
 
@@ -82,6 +87,8 @@ public class RegistrySyncService {
 		this.upsertService = upsertService;
 		this.apiLogService = apiLogService;
 		this.objectMapper = objectMapper;
+		// Field names are matched ignoring case, so "PANNumber" fills panNumber for any API.
+		this.recordMapper = objectMapper.copy().enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES);
 		this.zone = ZoneId.of(zone);
 		this.overlapDays = Math.max(0, overlapDays);
 	}
@@ -127,6 +134,7 @@ public class RegistrySyncService {
 		}
 		String apiName = "registry-api-" + id;
 		String dataUrl = null;
+		java.util.concurrent.atomic.AtomicReference<String> lastRequest = new java.util.concurrent.atomic.AtomicReference<>();
 		try {
 			RegistryApiAuthConfigEntity config = configRepository.findById(id).orElse(null);
 			if (config == null || !Boolean.TRUE.equals(config.getActive())) {
@@ -156,6 +164,7 @@ public class RegistrySyncService {
 				LocalDate to = min(from.plusMonths(WINDOW_MONTHS).minusDays(1), end);
 				setStatus(id, STATUS_RUNNING, "Fetching " + from + " to " + to + " (" + total + " so far)");
 
+				lastRequest.set(apiClient.describeRequest(config, from, to));
 				FetchResult result = fetchWindowWithRetry(config, token, from, to);
 				token = result.token();
 				Counts window = saveRecords(result, config, regUserId);
@@ -172,6 +181,9 @@ public class RegistrySyncService {
 			log.info("Registry sync {} ({}) finished: {}", apiName, trigger, message);
 		} catch (Exception e) {
 			String message = "Failed: " + rootMessage(e);
+			if (lastRequest.get() != null) {
+				message += " || Request sent: " + lastRequest.get();
+			}
 			log.error("Registry sync {} ({}) failed", apiName, trigger, e);
 			setStatus(id, STATUS_FAILED, message);
 			apiLogService.log(apiName, dataUrl, STATUS_FAILED, message);
@@ -211,7 +223,7 @@ public class RegistrySyncService {
 			try {
 				return new FetchResult(apiClient.fetchWindow(config, currentToken, from, to), currentToken);
 			} catch (HttpClientErrorException.Unauthorized e) {
-				if (reloggedIn) {
+				if (reloggedIn || RegistryApiClient.isBasic(config)) {   // BASIC: wrong login, retrying won't help
 					throw e;
 				}
 				currentToken = apiClient.login(config);   // token expired during a long run
@@ -232,7 +244,7 @@ public class RegistrySyncService {
 		for (JsonNode node : result.records()) {
 			MstRegistryDetailsPagesDTO dto = null;
 			try {
-				dto = objectMapper.treeToValue(node, MstRegistryDetailsPagesDTO.class);
+				dto = parseLenient(node);
 				if (upsertService.upsert(dto, regUserId) == RegistryRecordUpsertService.Outcome.CREATED) {
 					counts.created++;
 				} else {
@@ -245,6 +257,51 @@ public class RegistrySyncService {
 			}
 		}
 		return counts;
+	}
+
+	/**
+	 * Reads one record the same way for every API: fields that are missing stay blank, and a field
+	 * whose value can't be read (e.g. text in a number or an unreadable date) is left blank
+	 * instead of rejecting the whole record. Only a record with no usable data at all fails.
+	 */
+	MstRegistryDetailsPagesDTO parseLenient(JsonNode node) throws JsonProcessingException {
+		if (node == null || !node.isObject()) {
+			throw new IllegalArgumentException("Record is not a JSON object.");
+		}
+		MstRegistryDetailsPagesDTO dto;
+		try {
+			dto = recordMapper.treeToValue(node, MstRegistryDetailsPagesDTO.class);
+		} catch (JsonProcessingException e) {
+			ObjectNode usable = JsonNodeFactory.instance.objectNode();
+			node.fields().forEachRemaining(entry -> {
+				ObjectNode single = JsonNodeFactory.instance.objectNode();
+				single.set(entry.getKey(), entry.getValue());
+				try {
+					recordMapper.treeToValue(single, MstRegistryDetailsPagesDTO.class);
+					usable.set(entry.getKey(), entry.getValue());
+				} catch (JsonProcessingException ignored) {
+					// leave this field blank
+				}
+			});
+			dto = recordMapper.treeToValue(usable, MstRegistryDetailsPagesDTO.class);
+		}
+		if (dto == null || isEmpty(dto)) {
+			throw new IllegalArgumentException("Record has no usable data.");
+		}
+		return dto;
+	}
+
+	private boolean isEmpty(MstRegistryDetailsPagesDTO dto) {
+		return allNull(objectMapper.valueToTree(dto));
+	}
+
+	private static boolean allNull(JsonNode tree) {
+		for (JsonNode value : tree) {
+			if (!value.isNull() && !(value.isTextual() && value.asText().isBlank())) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	private void setStatus(Long id, String status, String message) {
@@ -265,7 +322,9 @@ public class RegistrySyncService {
 			root = root.getCause();
 		}
 		String message = root.getMessage() != null ? root.getMessage() : root.getClass().getSimpleName();
-		return truncate(message.replaceAll("\\s+", " "), 900);
+		// Gateways such as SAP send HTML-escaped text (&#x20; for a space): make it readable.
+		message = org.springframework.web.util.HtmlUtils.htmlUnescape(message);
+		return truncate(message.replaceAll("\\s+", " ").replaceAll("(The content of elements must consist of well-formed character data or markup\\.:? ?){2,}", "$1"), 600);
 	}
 
 	private static String truncate(String value, int max) {

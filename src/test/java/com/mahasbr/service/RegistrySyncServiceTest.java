@@ -91,6 +91,31 @@ class RegistrySyncServiceTest {
 	}
 
 	@Test
+	void missingFieldsStayBlank() throws Exception {
+		var dto = service.parseLenient(new ObjectMapper().readTree("{\"district\":\"Pune\"}"));
+
+		assertEquals("Pune", dto.getDistrict());
+		org.junit.jupiter.api.Assertions.assertNull(dto.getNameOfEstablishmentOrOwner());
+		org.junit.jupiter.api.Assertions.assertNull(dto.getPinCode());
+	}
+
+	@Test
+	void anUnreadableFieldIsLeftBlankAndTheRestIsKept() throws Exception {
+		var dto = service.parseLenient(new ObjectMapper().readTree(
+				"{\"nameOfEstablishmentOrOwner\":\"Sai\",\"pinCode\":\"not-a-number\",\"dateOfRegistration\":\"31/02/xx\"}"));
+
+		assertEquals("Sai", dto.getNameOfEstablishmentOrOwner());
+		org.junit.jupiter.api.Assertions.assertNull(dto.getPinCode());
+		org.junit.jupiter.api.Assertions.assertNull(dto.getDateOfRegistration());
+	}
+
+	@Test
+	void aRecordWithNoUsableDataIsRejected() {
+		assertThrows(IllegalArgumentException.class,
+				() -> service.parseLenient(new ObjectMapper().readTree("{\"pinCode\":\"x\"}")));
+	}
+
+	@Test
 	void failedLoginIsReportedAsFailedNotThrown() {
 		RegistryApiAuthConfigEntity config = config(true, LocalDate.of(2015, 1, 1), null);
 		config.setServiceName("Labour");

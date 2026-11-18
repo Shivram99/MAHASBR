@@ -21,6 +21,14 @@ public class RegistryApiAuthConfigRequest {
     private String apiData;
     private String apiDataMethod;
     private Boolean active;
+    /** TOKEN or BASIC (default TOKEN). */
+    private String authType;
+    private String dateFromField;
+    private String dateToField;
+    /** Date pattern, e.g. yyyy-MM-dd or yyyyMMdd. */
+    private String dateFormat;
+    /** Accept any HTTPS certificate from this API (unsafe; off by default). */
+    private Boolean skipSslVerify;
     /** mst_registry_master.id the data belongs to. */
     private Long registryId;
     /** First date to fetch on the very first sync (default 2015-01-01). */

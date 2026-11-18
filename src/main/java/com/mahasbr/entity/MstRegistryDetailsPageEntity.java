@@ -142,8 +142,9 @@ public class MstRegistryDetailsPageEntity extends Auditable {
 	@Column(name = "location_code")
 	private String locationCode;
 
-	@Size(max = 1)
-	@Column(name = "registration_status")
+	/** Stored as the registry sends it (e.g. "ISSUED"). */
+	@Size(max = 50)
+	@Column(name = "registration_status", length = 50)
 	private String registrationStatus;
 
 	@Size(max = 100)

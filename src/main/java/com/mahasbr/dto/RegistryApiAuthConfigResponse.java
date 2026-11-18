@@ -24,6 +24,11 @@ public class RegistryApiAuthConfigResponse {
     private String apiData;
     private String apiDataMethod;
     private Boolean active;
+    private String authType;
+    private String dateFromField;
+    private String dateToField;
+    private String dateFormat;
+    private Boolean skipSslVerify;
 
     private Long registryId;
     private String registryName;

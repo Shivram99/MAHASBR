@@ -22,6 +22,11 @@ public class RegistryApiAuthConfigMapper {
         response.setApiData(entity.getApiData());
         response.setApiDataMethod(entity.getApiDataMethod());
         response.setActive(entity.getActive());
+        response.setAuthType(entity.getAuthType());
+        response.setDateFromField(entity.getDateFromField());
+        response.setDateToField(entity.getDateToField());
+        response.setDateFormat(entity.getDateFormat());
+        response.setSkipSslVerify(Boolean.TRUE.equals(entity.getSkipSslVerify()));
 
         RegistryMasterEntity registry = entity.getRegistry();
         if (registry != null) {
