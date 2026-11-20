@@ -31,4 +31,11 @@ public class Circular extends Auditable {
 	@Column(name = "file_path", nullable = false)
 	private String filePath; // store uploaded PDF path
 
+	/**
+	 * Only active circulars are shown to the public (home page bar and the Circulars page).
+	 * Rows saved before this column existed have no value and count as active.
+	 */
+	@Column(name = "is_active")
+	private Boolean active = true;
+
 }

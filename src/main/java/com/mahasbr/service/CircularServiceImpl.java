@@ -86,6 +86,31 @@ public class CircularServiceImpl implements CircularService {
     }
 
     @Override
+    public List<CircularResponseDTO> getActiveCirculars() {
+        return circularRepository.findAll().stream()
+                .filter(CircularServiceImpl::isActive)
+                .sorted(java.util.Comparator.comparing(Circular::getCircularDate,
+                        java.util.Comparator.nullsLast(java.util.Comparator.reverseOrder()))
+                        .thenComparing(Circular::getId, java.util.Comparator.reverseOrder()))
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public CircularResponseDTO setActive(Long id, boolean active) {
+        Circular circular = circularRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Circular not found with id: " + id));
+        circular.setActive(active);
+        return mapToResponse(circularRepository.save(circular));
+    }
+
+    /** A circular saved before the flag existed has no value and counts as active. */
+    private static boolean isActive(Circular circular) {
+        return !Boolean.FALSE.equals(circular.getActive());
+    }
+
+    @Override
     public CircularResponseDTO getCircularById(Long id) {
         Circular circular = circularRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Circular not found with id: " + id));
@@ -120,6 +145,7 @@ public class CircularServiceImpl implements CircularService {
                 .activity(extractActivity(circular.getFilePath()))
                 .date(circular.getCircularDate())
                 .fileUrl(circular.getFilePath())
+                .active(isActive(circular))
                 .build();
     }
 

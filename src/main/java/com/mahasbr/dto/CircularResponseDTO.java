@@ -21,4 +21,6 @@ public class CircularResponseDTO {
     private String fileUrl;
     private String message;
     private String status;
+    /** Whether the public can see this circular. */
+    private Boolean active;
 }

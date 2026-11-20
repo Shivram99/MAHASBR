@@ -7,7 +7,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -72,6 +74,17 @@ public class CircularController {
     @GetMapping("/{id}")
     public ResponseEntity<CircularResponseDTO> getCircular(@PathVariable Long id) {
         return ResponseEntity.ok(circularService.getCircularById(id));
+    }
+
+    /** Show or hide a circular on the public site. Body: {"active": true} or {"active": false}. */
+    @PatchMapping("/{id}/active")
+    public ResponseEntity<CircularResponseDTO> setActive(@PathVariable Long id,
+            @RequestBody java.util.Map<String, Boolean> body) {
+        Boolean active = body.get("active");
+        if (active == null) {
+            throw new IllegalArgumentException("Send {\"active\": true} or {\"active\": false}.");
+        }
+        return ResponseEntity.ok(circularService.setActive(id, active));
     }
 
     @DeleteMapping("/{id}")

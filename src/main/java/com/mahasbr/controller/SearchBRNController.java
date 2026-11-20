@@ -96,7 +96,8 @@ public class SearchBRNController {
 
     @GetMapping("/circulars")
     public ResponseEntity<List<CircularResponseDTO>> getAllCirculars() {
-        return ResponseEntity.ok(circularService.getAllCirculars());
+        // Public site: only circulars an admin has left active.
+        return ResponseEntity.ok(circularService.getActiveCirculars());
     }
 
     @GetMapping("/files/**")
